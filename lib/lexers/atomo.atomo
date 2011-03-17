@@ -28,8 +28,11 @@ lexer(HL::Lexers::Atomo):
     r"--.*?$" is(comment.single)
     r"{-" is(comment.multiline) => in-comment
 
-    -- constants
+    -- primitive constants
     r"true|false|nil" is(keyword.constant)
+
+    -- constants
+    r"[A-Z][a-zA-Z0-9_]*" is(name.constant)
 
     -- floats
     r"[\+\-]?\d+[eE][\+\-]?\d+" is(number.float)
@@ -46,6 +49,14 @@ lexer(HL::Lexers::Atomo):
     -- macro-quotes
     Regexp new("(" + @@identifier + raw")([\"`'{\[])")
       is(string.other) => macro-quote
+
+    -- special variables
+    Regexp new("@@" + @@identifier) is(name.variable.class)
+    Regexp new("$" + @@identifier) is(name.variable.global)
+    Regexp new("@" + @@identifier) is(name.variable.instance)
+
+    -- particles
+    Regexp new("#" + @@identifier) is(string.symbol)
 
     -- identifiers
     Regexp new(@@identifier) is(name)
