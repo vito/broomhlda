@@ -3,10 +3,9 @@ $path << File expand-path("../", _FILE)
 import("macros")
 import("lexers")
 import("state")
+import("formatters/html")
 import("lexers/atomo")
 
 atomo = HL::Lexers::Atomo new("nil {- hello {- goodbye -} -} true")
---p(atomo)
---p(HL::Lexers::Atomo class-variable-get("@@matchers"))
-p(atomo run)
---p(atomo)
+res = atomo run
+puts(HL::Formatters::Html new(res, false) format)

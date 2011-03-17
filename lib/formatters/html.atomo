@@ -11,7 +11,8 @@ module(HL::Formatters):
       Builder::XmlMarkup
         new(#(: #target -> out))
         div(#(: #class -> "highlight")) (d):
-          @tokens each (t):
-            d span(t contents, #(: #class -> t type))
+          d pre (p):
+            @tokens each (t):
+              p span(t contents, #(: #class -> t type))
         
       out
