@@ -18,20 +18,27 @@ module(HL):
         @state = [
           @@matchers fetch(@@info fetch(#start))
         ] -- [Matcher]
+
         @lexed = [] -- [Token]
 
+      -- run the lexer until the input is empty, yielding
+      -- the lexed tokens
       define(run):
         while(!(@input empty?)):
           try-all(@state last)
 
         @lexed
 
+      -- go through matchers until one matches the immediate
+      -- next input. if none match, try again, but allowing
+      -- matches past the start. see #try-all-first.
       try-all([]) :=
         raise(NoMatchFor new(@input))
       try-all(x: List . xs) :=
         try-all(x + xs)
       try-all(m . ms) :=
         m regexp match(@input) match:
+          -- only allow a match that's at the start of the input
           (d: MatchData ? pre-match empty?) -> do:
             @input slice!(0, d to-s size)
 
@@ -39,6 +46,8 @@ module(HL):
 
             tokens(d, m type)
 
+          -- no match; try the rest, and if none work,
+          -- start matching again but with #try-all-first.
           _ ->
             begin: try-all(ms);
               rescue (e):
