@@ -1,4 +1,5 @@
-$path << File expand-path("../", _FILE)
+here = File expand-path("../", _FILE)
+$path << here
 
 import("macros")
 import("token")
@@ -8,21 +9,7 @@ import("formatters/html")
 import("lexers/atomo")
 
 atomo = HL::Lexers::Atomo new(
-  "nil {- hello {- goodbye -} -}
-true 1.0e10 a-b-c
-
-macro operator
-
-for-macro for-macros for-macro!
-
-abcd + efg
-
-\"hello!\\DEL\"
-
-#foo
-#abc
-foo[b\\a\\]r]
-"
+  File open(here + "/lexers/atomo.atomo") read
 )
 res = atomo run
 puts(HL::Formatters::Html new(res, false) format)
