@@ -18,8 +18,16 @@ for-macro class(<< self):
   short-name(xs: List) :=
     xs inject("") (acc, x): acc + short-name([x])
 
-  name-from(x: Atomo::AST::Variable) :=
-    Atomo::AST::String new(0, short-name(x name split(".")))
+  type-from(x: Atomo::AST::Variable) := do:
+    tag = Atomo::AST::String new(0, short-name(x name split(".")))
+    `(HL::Tokens::Tagged new(~tag))
+
+  type-from(gs: Atomo::AST::Send ? @method-name == "by_groups") := do:
+    msg = '(HL::Tokens::ByGroups new)
+    msg arguments = [Atomo::AST::List new(0, gs arguments collect (a): type-from(a))]
+    msg
+
+  type-from(x) := raise("unknown match type: " + x inspect)
 
 macro (lex(name, &tokens)) do:
   branches = '[]
@@ -31,7 +39,7 @@ macro (lex(name, &tokens)) do:
         branches elements <<
           `(HL::Matcher new(
               ~x
-              ~(name-from(y))
+              ~(type-from(y))
               HL::States::Continue new
             ))
 
@@ -49,7 +57,7 @@ macro (lex(name, &tokens)) do:
         branches elements <<
           `(HL::Matcher new(
               ~x
-              ~(name-from(y))
+              ~(type-from(y))
               ~z
             ))
 
@@ -58,7 +66,7 @@ macro (lex(name, &tokens)) do:
         branches elements <<
           `(HL::Matcher new(
               ~x
-              ~(name-from(y))
+              ~(type-from(y))
               HL::States::GoTo new(#~z)
             ))
 

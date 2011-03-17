@@ -1,12 +1,12 @@
 class(NoMatchFor < RuntimeError):
   initialize(@input) := #ok
 
-  message := "no matchers succeeded on: " + @input slice(0, 50) + " [...]"
+  message :=
+    "no matchers succeeded on: " + @input slice(0, 50) + " [...]"
 
 
 module(HL):
   data(Object):
-    Token(@type, @contents)
     Matcher(@regexp, @type, @next)
 
   module(Lexers):
@@ -57,10 +57,16 @@ module(HL):
 
                   _ -> raise(e)
 
-      -- TODO: Using and ByGroups types; take a list of
-      -- matches
-      tokens(data, type) :=
-        @lexed << Token new(type, data to-s)
+      -- TODO: Using
+      tokens(data, gs: HL::Tokens::ByGroups) :=
+        gs types zip(data to-a drop(1)) ([t, d]):
+          when(t nil? || d nil?):
+            return(nil)
+
+          @lexed << HL::Tokens::Token new(t, d)
+
+      tokens(data, t: HL::Tokens::Tagged) :=
+        @lexed << HL::Tokens::Token new(t, data to-s)
 
       -- like try-all, but it goes with the first matching
       -- segment, with the contents before it as an Error
@@ -77,12 +83,15 @@ module(HL):
 
             apply(m next) -- TODO?: highlighter doesn't do this
 
-            @lexed << Token new("err", skipped)
+            @lexed << HL::Tokens::Token new(
+              HL::Tokens::Tagged("err")
+              skipped
+            )
 
             tokens(d, m type)
 
           _ -> try-all-first(ms)
-      
+
       class(<< self):
         name(&x) :=
           @@info at(#name) put(x call)

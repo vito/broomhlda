@@ -13,6 +13,6 @@ module(HL::Formatters):
         div(#(: #class -> "highlight")) (d):
           d pre (p):
             @tokens each (t):
-              p span(t contents, #(: #class -> t type))
+              p span(t contents, #(: #class -> t type tag))
         
       out

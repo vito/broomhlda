@@ -1,0 +1,9 @@
+module(HL):
+  module(Tokens):
+    data(Type):
+      Tagged(@tag)
+      Using(@lexer)
+      ByGroups(@types)
+
+    data(Object):
+      Token(@type, @contents)
