@@ -24,8 +24,8 @@ module(HL):
       apply((p: PopNum), _ = []) :=
         @state pop(p num)
 
-      apply((d: DoAll), _ = []) :=
-        d each (s): apply(s)
+      apply((d: DoAll), d = []) :=
+        d each (s): apply(s, d)
 
       apply((c: Combined), _ = []) :=
         @state = c flatten + @state

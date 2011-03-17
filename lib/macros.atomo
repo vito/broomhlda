@@ -58,8 +58,18 @@ macro (lex(name, &tokens)) do:
         z = state match:
           'pop -> '(HL::States::Pop new)
           'push -> '(HL::States::Push new)
+          'continue -> '(HL::States::Continue new)
 
-          `(goto(~n)) ->
+          `(do-all()) -> do:
+            all = '[]
+            all elements = state arguments
+            `(HL::States::DoAll new(~all))
+
+          `(pop(~n)) ->
+            `(HL::States::PopNum new(~n))
+
+          -- TODO: combined, do-all
+          `(go-to(~n)) ->
             `(HL::States::GoTo new(#(~n)))
 
           _ -> raise("unknown state: " + state inspect)
