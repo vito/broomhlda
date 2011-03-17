@@ -1,0 +1,17 @@
+require("rubygems")
+require("builder")
+
+module(HL::Formatters):
+  class(Html):
+    initialize(@tokens, @line-numbers) := #ok
+
+    define(format):
+      out = ""
+
+      Builder::XmlMarkup
+        new(#(: #target -> out))
+        div(#(: #class -> "highlight")) (d):
+          @tokens each (t):
+            d span(t contents, #(: #class -> t type))
+        
+      out
