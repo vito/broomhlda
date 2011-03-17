@@ -3,7 +3,6 @@ module(HL):
     data(State):
       Continue
       GoTo(@next)
-      CapturesTo(@callback)
       Pop
       PopNum(@num)
       Push
@@ -13,8 +12,8 @@ module(HL):
     class(HL::Lexers::Lexer):
       apply(Continue, _ = []) := nil
 
-      apply(g: GoTo, _ = []) :=
-        @state << @@matchers fetch(g next)
+      apply((g: GoTo), cs = []) :=
+        @state << @@matchers fetch(g next) call(cs)
 
       apply(Push, _ = []) :=
         @state << @state last
@@ -22,14 +21,11 @@ module(HL):
       apply(Pop, _ = []) :=
         @state pop
 
-      apply(p: PopNum, _ = []) :=
+      apply((p: PopNum), _ = []) :=
         @state pop(p num)
 
-      apply(c: CapturesTo, cs = []) :=
-        @state << c callback call(cs)
-
-      apply(d: DoAll, _ = []) :=
+      apply((d: DoAll), _ = []) :=
         d each (s): apply(s)
 
-      apply(c: Combined, _ = []) :=
+      apply((c: Combined), _ = []) :=
         @state = c flatten + @state

@@ -16,7 +16,7 @@ module(HL):
 
       define(initialize(@input)):
         @state = [
-          @@matchers fetch(@@info fetch(#start))
+          @@matchers fetch(@@info fetch(#start)) call
         ] -- [Matcher]
 
         @lexed = [] -- [Token]
@@ -42,7 +42,7 @@ module(HL):
           (d: MatchData ? pre-match empty?) -> do:
             @input slice!(0, d to-s size)
 
-            apply(m next)
+            apply(m next, d)
 
             tokens(d, m type)
 
@@ -81,10 +81,10 @@ module(HL):
             skipped = d pre-match
             @input = d post-match
 
-            apply(m next) -- TODO?: highlighter doesn't do this
+            apply(m next, d) -- TODO?: highlighter doesn't do this
 
             @lexed << HL::Tokens::Token new(
-              HL::Tokens::Tagged("err")
+              HL::Tokens::Tagged new("err")
               skipped
             )
 
