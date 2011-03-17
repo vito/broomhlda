@@ -43,6 +43,10 @@ lexer(HL::Lexers::Atomo):
     -- reserved words
     Regexp new(@@reserved) is(keyword.reserved)
 
+    -- macro-quotes
+    Regexp new("(" + @@identifier + raw")([\"`'{\[])")
+      is(string.other) => macro-quote
+
     -- identifiers
     Regexp new(@@identifier) is(name)
 
@@ -58,6 +62,8 @@ lexer(HL::Lexers::Atomo):
     -- quoting expressions
     Regexp new("['`]" + @@identifier) is(string.symbol)
     r"['`]'" is(string.symbol)
+
+    -- unquote
     Regexp new("~" + @@identifier) is(string.interpolate)
     r"~" is(string.interpolate)
 
@@ -79,6 +85,7 @@ lexer(HL::Lexers::Atomo):
     r"\\" is(string.escape) => escape
     r"\"" is(string) -> pop
 
+
   -- all of our character escapes
   lex(escape):
     r"[nsrtvfbae\\\"]" is(string.escape) -> pop
@@ -88,3 +95,22 @@ lexer(HL::Lexers::Atomo):
     r"x[\da-fA-F]+" is(string.escape) -> pop
     r"\d+" is(string.escape) -> pop
     r"\s+\\" is(string.escape) -> pop
+
+
+  class(<< self):
+    -- determine the closing delimiter for a macro-quote
+    pair("{") := "}"
+    pair("[") := "]"
+    pair(x) := x
+
+  -- match delimiters in a macro-quote, skipping escapes
+  lex(macro-quote) (d):
+    close = Regexp quote(pair(d captures at(1)))
+
+    Regexp new(raw"[^\\" + close + "]+")
+      is(string.other)
+
+    r"\\." is(string.other)
+
+    Regexp new(close + "([[:alpha:]]*)")
+      is(string.other) -> pop

@@ -17,7 +17,12 @@ for-macro for-macros for-macro!
 
 abcd + efg
 
-\"hello!\\DEL\""
+\"hello!\\DEL\"
+
+#foo
+#abc
+foo[b\\a\\]r]
+"
 )
 res = atomo run
 puts(HL::Formatters::Html new(res, false) format)
