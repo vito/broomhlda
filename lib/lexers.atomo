@@ -1,0 +1,94 @@
+class(NoMatchFor < RuntimeError):
+  initialize(@input) := #ok
+
+  message := "no matchers succeeded on: " + @input slice(0, 50) + "..."
+
+
+module(HL):
+  data(Object):
+    Token(@type, @contents)
+    Matcher(@regexp, @type, @next)
+
+  module(Lexers):
+    class(Lexer):
+      @@matchers = Hash new
+      @@info = Hash new
+
+      define(initialize(@input)):
+        @state = [
+          @@matchers fetch(@@info fetch(#start))
+        ] -- [Matcher]
+        @lexed = [] -- [Token]
+
+      define(run):
+        while(!(@input empty?)):
+          try-all(@state last)
+
+        @lexed
+
+      try-all([]) :=
+        raise(NoMatchFor new(@input))
+      try-all(x: List . xs) :=
+        try-all(x + xs)
+      try-all(m . ms) :=
+        m regexp match(@input) match:
+          (d: MatchData ? pre-match empty?) -> do:
+            @input slice!(0, d to-s size)
+
+            apply(m next)
+
+            tokens(d, m type)
+
+          _ ->
+            begin: try-all(ms);
+              rescue (e):
+                e match:
+                  NoMatchFor ->
+                    try-all-first([m] + ms)
+
+                  _ -> raise(e)
+
+      -- TODO: Using and ByGroups types; take a list of
+      -- matches
+      tokens(data, type) :=
+        @lexed << Token new(type, data to-s)
+
+      -- like try-all, but it goes with the first matching
+      -- segment, with the contents before it as an Error
+      -- token (ie, it's not anchored to the beginning)
+      try-all-first([]) :=
+        raise(NoMatchFor new(@input))
+      try-all-first(x: List . xs) :=
+        try-all-first(x + xs)
+      try-all-first(m . ms) :=
+        m regexp match(@input) match:
+          (d: MatchData) -> do:
+            skipped = d pre-match
+            @input = d post-match
+
+            apply(m next) -- TODO?: highlighter doesn't do this
+
+            @lexed << Token new("err", skipped)
+
+            tokens(d, m type)
+
+          _ -> try-all-first(ms)
+      
+      class(<< self):
+        name(&x) :=
+          @@info at(#name) put(x call)
+
+        aliases(&x) :=
+          @@info at(#aliases) put(Array(x call))
+
+        extensions(&x) :=
+          @@info at(#extensions) put(Array(x call))
+
+        mimetypes(&x) :=
+          @@info at(#mimetypes) put(Array(x call))
+
+        start(&x) :=
+          @@info at(#start) put(x call)
+
+        flags(&x) :=
+          @@info at(#flags) put(Array(x call))

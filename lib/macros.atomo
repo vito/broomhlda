@@ -1,0 +1,69 @@
+macro (lexer(name, &body))
+  `(class(~name < HL::Lexers::Lexer):
+      ~body call)
+
+for-macro class(<< self):
+  short-name(["name", "constant"]) := "no"
+  short-name(["name", "entity"]) := "ni"
+  short-name(["name", "property"]) := "py"
+  short-name(["literal", b]) := short-name([b])
+  short-name([a, "other"]) := short-name([a]) + "x"
+  short-name([a, "error"]) := short-name([a]) + "r"
+  short-name([a, "single"]) := short-name([a]) + "1"
+  short-name([a, "double"]) := short-name([a]) + "2"
+  short-name([a, b]) := short-name([a]) + short-name([b])
+  short-name(["error"]) := "err"
+  short-name(["number"]) := "m"
+  short-name([x]) := x slice(0, 1)
+  short-name(xs: List) :=
+    xs inject("") (acc, x): acc + short-name([x])
+
+  name-from(x: Atomo::AST::Variable) :=
+    Atomo::AST::String new(0, short-name(x name split(".")))
+
+macro (lex(name, &tokens)) do:
+  branches = '[]
+
+  tokens contents each (c):
+    c match:
+      -- implicit continue state
+      `(~x is(~y)) ->
+        branches elements <<
+          `(HL::Matcher new(
+              ~x
+              ~(name-from(y))
+              HL::States::Continue new
+            ))
+
+      -- specifying a state
+      `(~x is(~y) -> ~state) -> do:
+        z = state match:
+          'pop -> '(HL::States::Pop new)
+          'push -> '(HL::States::Push new)
+
+          `(goto(~n)) ->
+            `(HL::States::GoTo new(#(~n)))
+
+          _ -> raise("unknown state: " + state inspect)
+
+        branches elements <<
+          `(HL::Matcher new(
+              ~x
+              ~(name-from(y))
+              ~z
+            ))
+
+      -- goto shortcut
+      `(~x is(~y) => ~z) ->
+        branches elements <<
+          `(HL::Matcher new(
+              ~x
+              ~(name-from(y))
+              HL::States::GoTo new(#~z)
+            ))
+
+      _ -> raise("unknown lexer segment: " + c pretty render)
+
+  `(@@matchers at(#(~name)) put(~branches))
+
+

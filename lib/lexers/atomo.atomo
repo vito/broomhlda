@@ -1,0 +1,33 @@
+lexer(HL::Lexers::Atomo):
+  name: "Atomo"
+  aliases: "atomo"
+  extensions: [".atomo", ".quanto"]
+  mimetypes: "text/x-atomo"
+  start: #root
+  flags: Regexp::MULTILINE
+
+  lex(root):
+    -- comments
+    r"--.*?$" is(comment.single)
+    r"{-" is(comment.multiline) => in-comment
+
+    -- constants
+    r"true|false|nil" is(keyword.constant)
+
+    -- floats
+    r"[\+\-]?\d+[eE][\+\-]?\d+" is(number.float)
+    r"[\+\-]?\d+\.\d+([eE][\+\-]?\d+)?" is(number.float)
+
+    -- integers
+    r"[\+\-]?0[oO][0-7]+" is(number.octal)
+    r"[\+\-]?0[xX][\da-fA-F]+" is(number.hexadecimal)
+    r"[\+\-]?\d+" is(number.integer)
+
+    -- whitespace
+    r"\s+" is(text)
+
+  lex(in-comment):
+    r"[^\-\{\}]+" is(comment.multiline)
+    r"{-" is(comment.multiline) -> push
+    r"-}" is(comment.multiline) -> pop
+    r"[-{}]" is(comment.mutline)
