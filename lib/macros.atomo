@@ -29,6 +29,12 @@ for-macro class(<< self):
 
   type-from(x) := raise("unknown match type: " + x inspect)
 
+  regexp-from(x) :=
+    `((x): Regexp new(
+        x source
+        x options | @@info fetch(#flags)
+      ); call(~x))
+
 macro (lex(name, &tokens)) do:
   branches = '[]
 
@@ -38,7 +44,7 @@ macro (lex(name, &tokens)) do:
       `(~x is(~y)) ->
         branches elements <<
           `(HL::Matcher new(
-              ~x
+              ~(regexp-from(x))
               ~(type-from(y))
               HL::States::Continue new
             ))
@@ -56,7 +62,7 @@ macro (lex(name, &tokens)) do:
 
         branches elements <<
           `(HL::Matcher new(
-              ~x
+              ~(regexp-from(x))
               ~(type-from(y))
               ~z
             ))
@@ -65,7 +71,7 @@ macro (lex(name, &tokens)) do:
       `(~x is(~y) => ~z) ->
         branches elements <<
           `(HL::Matcher new(
-              ~x
+              ~(regexp-from(x))
               ~(type-from(y))
               HL::States::GoTo new(#~z)
             ))

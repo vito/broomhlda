@@ -109,4 +109,4 @@ module(HL):
           @@info at(#start) put(x call)
 
         flags(&x) :=
-          @@info at(#flags) put(Array(x call))
+          @@info at(#flags) put(x call)
