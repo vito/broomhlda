@@ -15,8 +15,7 @@ for-macro class(<< self):
   short-name(["error"]) := "err"
   short-name(["number"]) := "m"
   short-name([x]) := x slice(0, 1)
-  short-name(xs: List) :=
-    xs inject("") (acc, x): acc + short-name([x])
+  short-name(_ . xs) := short-name(xs)
 
   type-from(x: Atomo::AST::Variable) := do:
     tag = Atomo::AST::String new(0, short-name(x name split(".")))
