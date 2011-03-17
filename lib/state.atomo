@@ -13,7 +13,7 @@ module(HL):
       apply(Continue, _ = []) := nil
 
       apply((g: GoTo), cs = []) :=
-        @state << @@matchers fetch(g next) call(cs)
+        @state << class matchers fetch(g next) call(cs)
 
       apply(Push, _ = []) :=
         @state << @state last

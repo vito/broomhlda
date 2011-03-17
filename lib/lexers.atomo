@@ -11,12 +11,9 @@ module(HL):
 
   module(Lexers):
     class(Lexer):
-      @@matchers = Hash new
-      @@info = Hash new
-
       define(initialize(@input)):
         @state = [
-          @@matchers fetch(@@info fetch(#start)) call
+          class matchers fetch(class info fetch(#start)) call
         ] -- [Matcher]
 
         @lexed = [] -- [Token]
@@ -93,20 +90,22 @@ module(HL):
           _ -> try-all-first(ms)
 
       class(<< self):
+        attr-accessor(#matchers, #info)
+
         name(&x) :=
-          @@info at(#name) put(x call)
+          @info at(#name) put(x call)
 
         aliases(&x) :=
-          @@info at(#aliases) put(Array(x call))
+          @info at(#aliases) put(Array(x call))
 
         extensions(&x) :=
-          @@info at(#extensions) put(Array(x call))
+          @info at(#extensions) put(Array(x call))
 
         mimetypes(&x) :=
-          @@info at(#mimetypes) put(Array(x call))
+          @info at(#mimetypes) put(Array(x call))
 
         start(&x) :=
-          @@info at(#start) put(x call)
+          @info at(#start) put(x call)
 
         flags(&x) :=
-          @@info at(#flags) put(x call)
+          @info at(#flags) put(x call)

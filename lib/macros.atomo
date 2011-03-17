@@ -1,5 +1,8 @@
 macro (lexer(name, &body))
   `(class(~name < HL::Lexers::Lexer):
+      @matchers = Hash new
+      @info = Hash new
+
       ~body call)
 
 for-macro class(<< self):
@@ -31,7 +34,7 @@ for-macro class(<< self):
   regexp-from(x) :=
     `((x): Regexp new(
         x source
-        x options | @@info fetch(#flags)
+        x options | @info fetch(#flags)
       ); call(~x))
 
 macro (lex(name, &tokens)) do:
@@ -83,6 +86,6 @@ macro (lex(name, &tokens)) do:
 
   tokens contents = body
 
-  `(@@matchers at(#~name) put(~tokens))
+  `(@matchers at(#~name) put(~tokens))
 
 
