@@ -26,6 +26,9 @@ lexer(HL::Lexers::Atomo):
     -- whitespace
     r"\s+" is(text)
 
+    -- punctuation
+    r"[][(),;{}|]" is(punctuation)
+
   lex(in-comment):
     r"[^\-\{\}]+" is(comment.multiline)
     r"{-" is(comment.multiline) -> push

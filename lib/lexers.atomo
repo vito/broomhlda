@@ -1,7 +1,7 @@
 class(NoMatchFor < RuntimeError):
   initialize(@input) := #ok
 
-  message := "no matchers succeeded on: " + @input slice(0, 50) + "..."
+  message := "no matchers succeeded on: " + @input slice(0, 50) + " [...]"
 
 
 module(HL):

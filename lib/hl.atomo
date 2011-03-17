@@ -6,6 +6,6 @@ import("state")
 import("formatters/html")
 import("lexers/atomo")
 
-atomo = HL::Lexers::Atomo new("nil {- hello {- goodbye -} -} true")
+atomo = HL::Lexers::Atomo new("nil {- hello {- goodbye -} -} true 1.0e10")
 res = atomo run
 puts(HL::Formatters::Html new(res, false) format)
