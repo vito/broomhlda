@@ -1,0 +1,37 @@
+lexer(HL::Lexers::Mako):
+
+name: "Mako"
+aliases: ["mako"]
+extensions: [".mao"]
+mimetypes: ["application/x-mako"]
+start: #root
+flags: 0
+
+lex(ondeftags):
+  Regexp new("<%") is(comment.preproc)
+  Regexp new("(?<=<%)(include|inherit|namespace|page)") is(name.builtin)
+  any-of(tag)
+
+lex(tag):
+  Regexp new("((?:\\w+)\\s*=)\\s*(\".*?\")") is(by-groups(name.attribute, literal.string))
+  Regexp new("/?\\s*>") is(comment.preproc) -> pop
+  Regexp new("\\s+") is(text)
+
+lex(root):
+  Regexp new("(\\s*)(%)(\\s*end(?:\\w+))(\\n|\\Z)") is(by-groups(text, comment.preproc, keyword, other))
+  Regexp new("(\\s*)(%)([^\\n]*)(\\n|\\Z)") is(by-groups(text, comment.preproc, using(Python), other))
+  Regexp new("(\\s*)(##[^\\n]*)(\\n|\\Z)") is(by-groups(text, comment.preproc, other))
+  Regexp new("(?s)<%doc>.*?</%doc>") is(comment.preproc)
+  Regexp new("(<%)([\\w\\.\\:]+)") is(by-groups(comment.preproc, name.builtin)) -> go-to(tag)
+  Regexp new("(</%)([\\w\\.\\:]+)(>)") is(by-groups(comment.preproc, name.builtin, comment.preproc))
+  Regexp new("<%(?=([\\w\\.\\:]+))") is(comment.preproc) -> go-to(ondeftags)
+  Regexp new("(<%(?:!?))(.*?)(%>)(?s)") is(by-groups(comment.preproc, using(Python), comment.preproc))
+  Regexp new("(\\$\\{)(.*?)(\\})") is(by-groups(comment.preproc, using(Python), comment.preproc))
+  Regexp new("(?sx)\10                (.+?)                # anything, followed by:\10                (?:\10                 (?<=\\n)(?=%|\\#\\#) | # an eval or comment line\10                 (?=\\#\\*) |          # multiline comment\10                 (?=</?%) |          # a python block\10                                     # call start or end\10                 (?=\\$\\{) |          # a substitution\10                 (?<=\\n)(?=\\s*%) |\10                                     # - don't consume\10                 (\\\\\\n) |            # an escaped newline\10                 \\Z                  # end of string\10                )\10            ") is(by-groups(other, operator))
+  Regexp new("\\s+") is(text)
+
+lex(attr):
+  Regexp new("\".*?\"") is(literal.string) -> pop
+  Regexp new("'.*?'") is(literal.string) -> pop
+  Regexp new("[^\\s>]+") is(literal.string) -> pop
+

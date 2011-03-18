@@ -1,0 +1,25 @@
+lexer(HL::Lexers::Vim):
+
+name: "VimL"
+aliases: ["vim"]
+extensions: [".vim", ".vimrc"]
+mimetypes: ["text/x-vim"]
+start: #root
+flags: 0
+
+lex(root):
+  Regexp new("^\\s*\".*") is(comment)
+  Regexp new("(?<=\\s)\"[^\\-:.%#=*].*") is(comment)
+  Regexp new("[ \\t]+") is(text)
+  Regexp new("/(\\\\\\\\|\\\\/|[^\\n/])*/") is(literal.string.regex)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\\n\"])*\"") is(literal.string.double)
+  Regexp new("'(\\\\\\\\|\\\\'|[^\\n'])*'") is(literal.string.single)
+  Regexp new("-?\\d+") is(literal.number)
+  Regexp new("#[0-9a-f]{6}") is(literal.number.hex)
+  Regexp new("^:") is(punctuation)
+  Regexp new("[()<>+=!|,\126-]") is(punctuation)
+  Regexp new("\\b(let|if|else|endif|elseif|fun|function|endfunction)\\b") is(keyword)
+  Regexp new("\\b(NONE|bold|italic|underline|dark|light)\\b") is(name.builtin)
+  Regexp new("\\b\\w+\\b") is(name.other)
+  Regexp new(".") is(text)
+

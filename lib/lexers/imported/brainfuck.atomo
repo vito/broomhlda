@@ -1,0 +1,25 @@
+lexer(HL::Lexers::Brainfuck):
+
+name: "Brainfuck"
+aliases: ["brainfuck", "bf"]
+extensions: [".bf", ".b"]
+mimetypes: ["application/x-brainfuck"]
+start: #root
+flags: 0
+
+lex(root):
+  Regexp new("\\[") is(keyword) -> go-to(loop)
+  Regexp new("\\]") is(error)
+  any-of(common)
+
+lex(common):
+  Regexp new("[.,]+") is(name.tag)
+  Regexp new("[+-]+") is(name.builtin)
+  Regexp new("[<>]+") is(name.variable)
+  Regexp new("[^.,+\\-<>\\[\\]]+") is(comment)
+
+lex(loop):
+  Regexp new("\\[") is(keyword) -> push
+  Regexp new("\\]") is(keyword) -> pop
+  any-of(common)
+

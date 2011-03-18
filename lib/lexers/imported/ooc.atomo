@@ -1,0 +1,42 @@
+lexer(HL::Lexers::Ooc):
+
+name: "Ooc"
+aliases: ["ooc"]
+extensions: [".ooc"]
+mimetypes: ["text/x-ooc"]
+start: #root
+flags: 0
+
+lex(include):
+  Regexp new("[\\w/]+") is(name)
+  Regexp new(",") is(punctuation)
+  Regexp new("[ \\t]") is(text)
+  Regexp new("[;\\n]") is(text) -> pop
+
+lex(root):
+  Regexp new("\\b(class|interface|implement|abstract|extends|from|this|super|new|const|final|static|import|use|extern|inline|proto|break|continue|fallthrough|operator|if|else|for|while|do|switch|case|as|in|version|return|true|false|null)\\b") is(keyword)
+  Regexp new("include\\b") is(keyword) -> go-to(include)
+  Regexp new("(cover)([ \\t]+)(from)([ \\t]+)([a-zA-Z0-9_]+[*@]?)") is(by-groups(keyword, text, keyword, text, name.class))
+  Regexp new("(func)((?:[ \\t]|\\\\\\n)+)(\126[a-z_][a-zA-Z0-9_]*)") is(by-groups(keyword, text, name.function))
+  Regexp new("\\bfunc\\b") is(keyword)
+  Regexp new("//.*") is(comment)
+  Regexp new("(?s)/\\*.*?\\*/") is(comment.multiline)
+  Regexp new("(==?|\\+=?|-[=>]?|\\*=?|/=?|:=|!=?|%=?|\\?|>{1,3}=?|<{1,3}=?|\\.\\.|&&?|\\|\\|?|\\^=?)") is(operator)
+  Regexp new("(\\.)([ \\t]*)([a-z]\\w*)") is(by-groups(operator, text, name.function))
+  Regexp new("[A-Z][A-Z0-9_]+") is(name.constant)
+  Regexp new("[A-Z][a-zA-Z0-9_]*([@*]|\\[[ \\t]*\\])?") is(name.class)
+  Regexp new("([a-z][a-zA-Z0-9_]*(?:\126[a-z][a-zA-Z0-9_]*)?)((?:[ \\t]|\\\\\\n)*)(?=\\()") is(by-groups(name.function, text))
+  Regexp new("[a-z][a-zA-Z0-9_]*") is(name.variable)
+  Regexp new("[:(){}\\[\\];,]") is(punctuation)
+  Regexp new("0x[0-9a-fA-F]+") is(literal.number.hex)
+  Regexp new("0c[0-9]+") is(literal.number.oct)
+  Regexp new("0b[01]+") is(literal.number.binary)
+  Regexp new("[0-9_]\\.[0-9_]*(?!\\.)") is(literal.number.float)
+  Regexp new("[0-9_]+") is(literal.number.decimal)
+  Regexp new("\"(?:\\\\.|\\\\[0-7]{1,3}|\\\\x[a-fA-F0-9]{1,2}|[^\\\\\\\"])*\"") is(literal.string.double)
+  Regexp new("'(?:\\\\.|\\\\[0-9]{1,3}|\\\\x[a-fA-F0-9]{1,2}|[^\\\\\\'\\n])'") is(literal.string.char)
+  Regexp new("@") is(punctuation)
+  Regexp new("\\.") is(punctuation)
+  Regexp new("\\\\[ \\t\\n]") is(text)
+  Regexp new("[ \\t]+") is(text)
+

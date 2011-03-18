@@ -1,0 +1,59 @@
+lexer(HL::Lexers::VbNet):
+
+name: "VB.net"
+aliases: ["vb.net", "vbnet"]
+extensions: [".vb", ".bas"]
+mimetypes: ["text/x-vbnet", "text/x-vba"]
+start: #root
+flags: Regexp::IGNORECASE
+
+lex(dim):
+  Regexp new("[a-z_][a-z0-9_]*") is(name.variable) -> pop
+  Regexp new("") is(text) -> pop
+
+lex(end):
+  Regexp new("\\s+") is(text)
+  Regexp new("(Function|Sub|Property|Class|Structure|Enum|Module|Namespace)\\b") is(keyword) -> pop
+  Regexp new("") is(text) -> pop
+
+lex(string):
+  Regexp new("\"\"") is(literal.string)
+  Regexp new("\"C?") is(literal.string) -> pop
+  Regexp new("[^\"]+") is(literal.string)
+
+lex(namespace):
+  Regexp new("[a-z_][a-z0-9_.]*") is(name.namespace) -> pop
+
+lex(funcname):
+  Regexp new("[a-z_][a-z0-9_]*") is(name.function) -> pop
+
+lex(classname):
+  Regexp new("[a-z_][a-z0-9_]*") is(name.class) -> pop
+
+lex(root):
+  Regexp new("^\\s*<.*?>") is(name.attribute)
+  Regexp new("\\s+") is(text)
+  Regexp new("\\n") is(text)
+  Regexp new("rem\\b.*?\\n") is(comment)
+  Regexp new("'.*?\\n") is(comment)
+  Regexp new("#If\\s.*?\\sThen|#ElseIf\\s.*?\\sThen|#End\\s+If|#Const|#ExternalSource.*?\\n|#End\\s+ExternalSource|#Region.*?\\n|#End\\s+Region|#ExternalChecksum") is(comment.preproc)
+  Regexp new("[\\(\\){}!#,.:]") is(punctuation)
+  Regexp new("Option\\s+(Strict|Explicit|Compare)\\s+(On|Off|Binary|Text)") is(keyword.declaration)
+  Regexp new("(?<!\\.)(AddHandler|Alias|ByRef|ByVal|Call|Case|Catch|CBool|CByte|CChar|CDate|CDec|CDbl|CInt|CLng|CObj|Continue|CSByte|CShort|CSng|CStr|CType|CUInt|CULng|CUShort|Declare|Default|Delegate|DirectCast|Do|Each|Else|ElseIf|EndIf|Erase|Error|Event|Exit|False|Finally|For|Friend|Get|Global|GoSub|GoTo|Handles|If|Implements|Inherits|Interface|Let|Lib|Loop|Me|MustInherit|MustOverride|MyBase|MyClass|Narrowing|New|Next|Not|Nothing|NotInheritable|NotOverridable|Of|On|Operator|Option|Optional|Overloads|Overridable|Overrides|ParamArray|Partial|Private|Protected|Public|RaiseEvent|ReadOnly|ReDim|RemoveHandler|Resume|Return|Select|Set|Shadows|Shared|Single|Static|Step|Stop|SyncLock|Then|Throw|To|True|Try|TryCast|Wend|Using|When|While|Widening|With|WithEvents|WriteOnly)\\b") is(keyword)
+  Regexp new("(?<!\\.)End\\b") is(keyword) -> go-to(end)
+  Regexp new("(?<!\\.)(Dim|Const)\\b") is(keyword) -> go-to(dim)
+  Regexp new("(?<!\\.)(Function|Sub|Property)(\\s+)") is(by-groups(keyword, text)) -> go-to(funcname)
+  Regexp new("(?<!\\.)(Class|Structure|Enum)(\\s+)") is(by-groups(keyword, text)) -> go-to(classname)
+  Regexp new("(?<!\\.)(Module|Namespace|Imports)(\\s+)") is(by-groups(keyword, text)) -> go-to(namespace)
+  Regexp new("(?<!\\.)(Boolean|Byte|Char|Date|Decimal|Double|Integer|Long|Object|SByte|Short|Single|String|Variant|UInteger|ULong|UShort)\\b") is(keyword.type)
+  Regexp new("(?<!\\.)(AddressOf|And|AndAlso|As|GetType|In|Is|IsNot|Like|Mod|Or|OrElse|TypeOf|Xor)\\b") is(operator.word)
+  Regexp new("&=|[*]=|/=|\\\\=|\\^=|\\+=|-=|<<=|>>=|<<|>>|:=|<=|>=|<>|[-&*/\\\\^+=<>]") is(operator)
+  Regexp new("\"") is(literal.string) -> go-to(string)
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*[%&@!#$]?") is(name)
+  Regexp new("#.*?#") is(literal.date)
+  Regexp new("(\\d+\\.\\d*|\\d*\\.\\d+)([fF][+-]?[0-9]+)?") is(literal.number.float)
+  Regexp new("\\d+([SILDFR]|US|UI|UL)?") is(literal.number.integer)
+  Regexp new("&H[0-9a-f]+([SILDFR]|US|UI|UL)?") is(literal.number.integer)
+  Regexp new("&O[0-7]+([SILDFR]|US|UI|UL)?") is(literal.number.integer)
+  Regexp new("_\\n") is(text)
+

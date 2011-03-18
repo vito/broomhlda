@@ -1,0 +1,22 @@
+lexer(HL::Lexers::Objdump):
+
+name: "objdump"
+aliases: ["objdump"]
+extensions: [".objdump"]
+mimetypes: ["text/x-objdump"]
+start: #root
+flags: 0
+
+lex(root):
+  Regexp new("(.*?)(:)( +file format )(.*?)$") is(by-groups(name.label, punctuation, text, literal.string))
+  Regexp new("(Disassembly of section )(.*?)(:)$") is(by-groups(text, name.label, punctuation))
+  Regexp new("([0-9A-Za-z]+)( )(<)(.*?)([-+])(0[xX][A-Za-z0-9]+)(>:)$") is(by-groups(literal.number.hex, text, punctuation, name.function, punctuation, literal.number.hex, punctuation))
+  Regexp new("([0-9A-Za-z]+)( )(<)(.*?)(>:)$") is(by-groups(literal.number.hex, text, punctuation, name.function, punctuation))
+  Regexp new("( *)([0-9A-Za-z]+:)(\\t)((?:[0-9A-Za-z][0-9A-Za-z] )+)( *\9)([a-zA-Z].*?)$") is(by-groups(text, name.label, text, literal.number.hex, text, using(Gas)))
+  Regexp new("( *)([0-9A-Za-z]+:)(\\t)((?:[0-9A-Za-z][0-9A-Za-z] )+)( *)(.*?)$") is(by-groups(text, name.label, text, literal.number.hex, text, literal.string))
+  Regexp new("( *)([0-9A-Za-z]+:)(\\t)((?:[0-9A-Za-z][0-9A-Za-z] )+)$") is(by-groups(text, name.label, text, literal.number.hex))
+  Regexp new("\9\\.\\.\\.$") is(text)
+  Regexp new("(\9\9\9)([0-9A-Za-z]+:)( )([^\9]+)(\9)(.*?)([-+])(0x[0-9A-Za-z]+)$") is(by-groups(text, name.label, text, name.property, text, name.constant, punctuation, literal.number.hex))
+  Regexp new("(\9\9\9)([0-9A-Za-z]+:)( )([^\9]+)(\9)(.*?)$") is(by-groups(text, name.label, text, name.property, text, name.constant))
+  Regexp new("[^\10]+\10") is(other)
+

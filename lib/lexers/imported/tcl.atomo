@@ -1,0 +1,107 @@
+lexer(HL::Lexers::Tcl):
+
+name: "Tcl"
+aliases: ["tcl"]
+extensions: [".tcl"]
+mimetypes: ["text/x-tcl", "text/x-script.tcl", "application/x-tcl"]
+start: #root
+flags: 0
+
+lex(comment):
+  Regexp new(".*[^\\\\]\\n") is(comment) -> pop
+  Regexp new(".*\\\\\\n") is(comment)
+
+lex(string-square):
+  Regexp new("\\[") is(literal.string.double) -> go-to(string-square)
+  Regexp new("(?s)(\\\\\\\\|\\\\[0-7]+|\\\\.|\\\\\\n|[^\\]\\\\])") is(literal.string.double)
+  Regexp new("\\]") is(literal.string.double) -> pop
+
+lex(string):
+  Regexp new("\\[") is(literal.string.double) -> go-to(string-square)
+  Regexp new("(?s)(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\])") is(literal.string.double)
+  Regexp new("\"") is(literal.string.double) -> pop
+
+lex(command-in-paren):
+  Regexp new("\\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\\b") is(keyword) -> go-to(params-in-paren)
+  Regexp new("\\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\\b") is(name.builtin) -> go-to(params-in-paren)
+  Regexp new("([\\w\\.\\-]+)") is(name.variable) -> go-to(params-in-paren)
+  Regexp new("#") is(comment) -> go-to(comment)
+
+lex(data):
+  Regexp new("\\s+") is(text)
+  Regexp new("0x[a-fA-F0-9]+") is(literal.number.hex)
+  Regexp new("0[0-7]+") is(literal.number.oct)
+  Regexp new("\\d+\\.\\d+") is(literal.number.float)
+  Regexp new("\\d+") is(literal.number.integer)
+  Regexp new("\\$([\\w\\.\\-\\:]+)") is(name.variable)
+  Regexp new("([\\w\\.\\-\\:]+)") is(text)
+
+lex(brace):
+  Regexp new("}") is(keyword) -> pop
+  any-of(command-in-brace)
+  any-of(basic)
+  any-of(data)
+
+lex(paren):
+  Regexp new("\\)") is(keyword) -> pop
+  any-of(command-in-paren)
+  any-of(basic)
+  any-of(data)
+
+lex(params-in-paren):
+  Regexp new("\\)") is(keyword) -> do-all(pop, pop)
+  any-of(params)
+
+lex(bracket):
+  Regexp new("\\]") is(keyword) -> pop
+  any-of(command-in-bracket)
+  any-of(basic)
+  any-of(data)
+
+lex(command):
+  Regexp new("\\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\\b") is(keyword) -> go-to(params)
+  Regexp new("\\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\\b") is(name.builtin) -> go-to(params)
+  Regexp new("([\\w\\.\\-]+)") is(name.variable) -> go-to(params)
+  Regexp new("#") is(comment) -> go-to(comment)
+
+lex(params):
+  Regexp new(";") is(keyword) -> pop
+  Regexp new("\\n") is(text) -> pop
+  Regexp new("(else|elseif|then)") is(keyword)
+  any-of(basic)
+  any-of(data)
+
+lex(basic):
+  Regexp new("\\(") is(keyword) -> go-to(paren)
+  Regexp new("\\[") is(keyword) -> go-to(bracket)
+  Regexp new("\\{") is(keyword) -> go-to(brace)
+  Regexp new("\"") is(literal.string.double) -> go-to(string)
+  Regexp new("(eq|ne|in|ni)\\b") is(operator.word)
+  Regexp new("!=|==|<<|>>|<=|>=|&&|\\|\\||\\*\\*|[-+\126!*/%<>&^|?:]") is(operator)
+
+lex(params-in-bracket):
+  Regexp new("\\]") is(keyword) -> do-all(pop, pop)
+  any-of(params)
+
+lex(command-in-bracket):
+  Regexp new("\\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\\b") is(keyword) -> go-to(params-in-bracket)
+  Regexp new("\\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\\b") is(name.builtin) -> go-to(params-in-bracket)
+  Regexp new("([\\w\\.\\-]+)") is(name.variable) -> go-to(params-in-bracket)
+  Regexp new("#") is(comment) -> go-to(comment)
+
+lex(params-in-brace):
+  Regexp new("}") is(keyword) -> do-all(pop, pop)
+  any-of(params)
+
+lex(root):
+  any-of(command)
+  any-of(basic)
+  any-of(data)
+  Regexp new("}") is(keyword)
+
+lex(command-in-brace):
+  Regexp new("\\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\\b") is(keyword) -> go-to(params-in-brace)
+  Regexp new("\\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\\b") is(name.builtin) -> go-to(params-in-brace)
+  Regexp new("([\\w\\.\\-]+)") is(name.variable) -> go-to(params-in-brace)
+  Regexp new("#") is(comment) -> go-to(comment)
+

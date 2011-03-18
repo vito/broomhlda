@@ -1,0 +1,35 @@
+lexer(HL::Lexers::CMake):
+
+name: "CMake"
+aliases: ["cmake"]
+extensions: [".cmake", "CMakeLists.txt"]
+mimetypes: ["text/x-cmake"]
+start: #root
+flags: 0
+
+lex(keywords):
+  Regexp new("\\b(WIN32|UNIX|APPLE|CYGWIN|BORLAND|MINGW|MSVC|MSVC_IDE|MSVC60|MSVC70|MSVC71|MSVC80|MSVC90)\\b") is(keyword)
+
+lex(ws):
+  Regexp new("[ \\t]+") is(text)
+  Regexp new("#.+\\n") is(comment)
+
+lex(args):
+  Regexp new("\\(") is(punctuation) -> push
+  Regexp new("\\)") is(punctuation) -> pop
+  Regexp new("(\\${)(.+?)(})") is(by-groups(operator, name.variable, operator))
+  Regexp new("(?s)\".*?\"") is(literal.string.double)
+  Regexp new("\\\\\\S+") is(literal.string)
+  Regexp new("[^\\)$\"# \\t\\n]+") is(literal.string)
+  Regexp new("\\n") is(text)
+  any-of(keywords)
+  any-of(ws)
+
+lex(root):
+  Regexp new("\\b([A-Za-z_]+)([ \\t]*)(\\()") is(by-groups(name.builtin, text, punctuation)) -> go-to(args)
+  any-of(keywords)
+  any-of(ws)
+
+lex(string):
+  
+

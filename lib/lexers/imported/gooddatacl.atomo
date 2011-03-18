@@ -1,0 +1,30 @@
+lexer(HL::Lexers::GoodDataCL):
+
+name: "GoodData-CL"
+aliases: ["gooddata-cl"]
+extensions: [".gdc"]
+mimetypes: ["text/x-gooddata-cl"]
+start: #root
+flags: Regexp::IGNORECASE
+
+lex(args-list):
+  Regexp new("\\)") is(punctuation) -> pop
+  Regexp new(",") is(punctuation)
+  Regexp new("[a-zA-Z]\\w*") is(name.variable)
+  Regexp new("=") is(operator)
+  Regexp new("\"") is(literal.string) -> go-to(string-literal)
+  Regexp new("[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]{1,3})?") is(literal.number)
+  Regexp new("\\s") is(text)
+
+lex(root):
+  Regexp new("#.*") is(comment.single)
+  Regexp new("[a-zA-Z]\\w*") is(name.function)
+  Regexp new("\\(") is(punctuation) -> go-to(args-list)
+  Regexp new(";") is(punctuation)
+  Regexp new("\\s+") is(text)
+
+lex(string-literal):
+  Regexp new("\\\\[tnrfbae\"\\\\]") is(literal.string.escape)
+  Regexp new("\"") is(literal.string) -> pop
+  Regexp new("[^\\\\\"]+") is(literal.string)
+

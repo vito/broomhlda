@@ -1,0 +1,60 @@
+lexer(HL::Lexers::Modula2):
+
+name: "Modula-2"
+aliases: ["modula2", "m2"]
+extensions: [".def", ".mod"]
+mimetypes: ["text/x-modula2"]
+start: #root
+flags: Regexp::MULTILINE
+
+lex(punctuation):
+  Regexp new("[\\(\\)\\[\\]{},.:;|]") is(punctuation)
+
+lex(pragmas):
+  Regexp new("\\(\\*\\$(.*?)\\*\\)") is(comment.preproc)
+  Regexp new("<\\*(.*?)\\*>") is(comment.preproc)
+
+lex(whitespace):
+  Regexp new("\\n+") is(text)
+  Regexp new("\\s+") is(text)
+
+lex(numliterals):
+  Regexp new("[01]+B") is(literal.number.binary)
+  Regexp new("[0-7]+B") is(literal.number.oct)
+  Regexp new("[0-7]+C") is(literal.number.oct)
+  Regexp new("[0-9A-F]+C") is(literal.number.hex)
+  Regexp new("[0-9A-F]+H") is(literal.number.hex)
+  Regexp new("[0-9]+\\.[0-9]+E[+-][0-9]+") is(literal.number.float)
+  Regexp new("[0-9]+\\.[0-9]+") is(literal.number.float)
+  Regexp new("[0-9]+") is(literal.number.integer)
+
+lex(operators):
+  Regexp new("[*/+=#\126&<>\\^-]") is(operator)
+  Regexp new(":=") is(operator)
+  Regexp new("@") is(operator)
+  Regexp new("\\.\\.") is(operator)
+  Regexp new("`") is(operator)
+  Regexp new("::") is(operator)
+
+lex(identifiers):
+  Regexp new("([a-zA-Z_\\$][a-zA-Z0-9_\\$]*)") is(name)
+
+lex(root):
+  any-of(whitespace)
+  any-of(comments)
+  any-of(pragmas)
+  any-of(identifiers)
+  any-of(numliterals)
+  any-of(strings)
+  any-of(operators)
+  any-of(punctuation)
+
+lex(strings):
+  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string)
+
+lex(comments):
+  Regexp new("//.*?\\n") is(comment.single)
+  Regexp new("/\\*(.*?)\\*/") is(comment.multiline)
+  Regexp new("\\(\\*([^\\$].*?)\\*\\)") is(comment.multiline)
+

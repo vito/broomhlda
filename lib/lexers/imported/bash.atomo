@@ -1,0 +1,59 @@
+lexer(HL::Lexers::Bash):
+
+name: "Bash"
+aliases: ["bash", "sh", "ksh"]
+extensions: [".sh", ".ksh", ".bash", ".ebuild", ".eclass"]
+mimetypes: ["application/x-sh", "application/x-shellscript"]
+start: #root
+flags: 0
+
+lex(curly):
+  Regexp new("}") is(keyword) -> pop
+  Regexp new(":-") is(keyword)
+  Regexp new("[a-zA-Z0-9_]+") is(name.variable)
+  Regexp new("[^}:\"\\'`$]+") is(punctuation)
+  Regexp new(":") is(punctuation)
+  any-of(root)
+
+lex(backticks):
+  Regexp new("`") is(literal.string.backtick) -> pop
+  any-of(root)
+
+lex(root):
+  any-of(basic)
+  Regexp new("\\$\\(\\(") is(keyword) -> go-to(math)
+  Regexp new("\\$\\(") is(keyword) -> go-to(paren)
+  Regexp new("\\${#?") is(keyword) -> go-to(curly)
+  Regexp new("`") is(literal.string.backtick) -> go-to(backticks)
+  any-of(data)
+
+lex(basic):
+  Regexp new("\\b(if|fi|else|while|do|done|for|then|return|function|case|select|continue|until|esac|elif)\\s*\\b") is(keyword)
+  Regexp new("\\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|time|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)\\s*\\b(?!\\.)") is(name.builtin)
+  Regexp new("#.*\\n") is(comment)
+  Regexp new("\\\\[\\w\\W]") is(literal.string.escape)
+  Regexp new("(\\b\\w+)(\\s*)(=)") is(by-groups(name.variable, text, operator))
+  Regexp new("[\\[\\]{}()=]") is(operator)
+  Regexp new("<<-?\\s*(\\'?)\\\\?(\\w+)[\\w\\W]+?\\2") is(literal.string)
+  Regexp new("&&|\\|\\|") is(operator)
+
+lex(paren):
+  Regexp new("\\)") is(keyword) -> pop
+  any-of(root)
+
+lex(data):
+  Regexp new("(?s)\\$?\"(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\])*\"") is(literal.string.double)
+  Regexp new("(?s)\\$?'(\\\\\\\\|\\\\[0-7]+|\\\\.|[^'\\\\])*'") is(literal.string.single)
+  Regexp new(";") is(text)
+  Regexp new("\\s+") is(text)
+  Regexp new("[^=\\s\\n\\[\\]{}()$\"\\'`\\\\<]+") is(text)
+  Regexp new("\\d+(?= |\\Z)") is(literal.number)
+  Regexp new("\\$#?(\\w+|.)") is(name.variable)
+  Regexp new("<") is(text)
+
+lex(math):
+  Regexp new("\\)\\)") is(keyword) -> pop
+  Regexp new("[-+*/%^|&]|\\*\\*|\\|\\|") is(operator)
+  Regexp new("\\d+") is(literal.number)
+  any-of(root)
+

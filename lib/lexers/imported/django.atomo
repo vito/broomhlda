@@ -1,0 +1,43 @@
+lexer(HL::Lexers::Django):
+
+name: "Django/Jinja"
+aliases: ["django", "jinja"]
+extensions: []
+mimetypes: ["application/x-django-templating", "application/x-jinja"]
+start: #root
+flags: Regexp::MULTILINE
+
+lex(var):
+  Regexp new("\\s+") is(text)
+  Regexp new("(-?)(\\}\\})") is(by-groups(text, comment.preproc)) -> pop
+  any-of(varnames)
+
+lex(varnames):
+  Regexp new("(\\|)(\\s*)([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(operator, text, name.function))
+  Regexp new("(is)(\\s+)(not)?(\\s+)?([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(keyword, text, keyword, text, name.function))
+  Regexp new("(_|true|false|none|True|False|None)\\b") is(keyword.pseudo)
+  Regexp new("(in|as|reversed|recursive|not|and|or|is|if|else|import|with(?:(?:out)?\\s*context)?|scoped|ignore\\s+missing)\\b") is(keyword)
+  Regexp new("(loop|block|super|forloop)\\b") is(name.builtin)
+  Regexp new("[a-zA-Z][a-zA-Z0-9_-]*") is(name.variable)
+  Regexp new("\\.[a-zA-Z0-9_]+") is(name.variable)
+  Regexp new(":?\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.double)
+  Regexp new(":?'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string.single)
+  Regexp new("([{}()\\[\\]+\\-*/,:\126]|[><=]=?)") is(operator)
+  Regexp new("[0-9](\\.[0-9]*)?(eE[+-][0-9])?[flFLdD]?|0[xX][0-9a-fA-F]+[Ll]?") is(literal.number)
+
+lex(root):
+  Regexp new("[^{]+") is(other)
+  Regexp new("\\{\\{") is(comment.preproc) -> go-to(var)
+  Regexp new("\\{[*#].*?[*#]\\}") is(comment)
+  Regexp new("(\\{%)(-?\\s*)(comment)(\\s*-?)(%\\})(.*?)(\\{%)(-?\\s*)(endcomment)(\\s*-?)(%\\})") is(by-groups(comment.preproc, text, keyword, text, comment.preproc, comment, comment.preproc, text, keyword, text, comment.preproc))
+  Regexp new("(\\{%)(-?\\s*)(raw)(\\s*-?)(%\\})(.*?)(\\{%)(-?\\s*)(endraw)(\\s*-?)(%\\})") is(by-groups(comment.preproc, text, keyword, text, comment.preproc, text, comment.preproc, text, keyword, text, comment.preproc))
+  Regexp new("(\\{%)(-?\\s*)(filter)(\\s+)([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(comment.preproc, text, keyword, text, name.function)) -> go-to(block)
+  Regexp new("(\\{%)(-?\\s*)([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(comment.preproc, text, keyword)) -> go-to(block)
+  Regexp new("\\{") is(other)
+
+lex(block):
+  Regexp new("\\s+") is(text)
+  Regexp new("(-?)(%\\})") is(by-groups(text, comment.preproc)) -> pop
+  any-of(varnames)
+  Regexp new(".") is(punctuation)
+

@@ -1,0 +1,46 @@
+lexer(HL::Lexers::Tex):
+
+name: "TeX"
+aliases: ["tex", "latex"]
+extensions: [".tex", ".aux", ".toc"]
+mimetypes: ["text/x-tex", "text/x-latex"]
+start: #root
+flags: 0
+
+lex(displaymath):
+  Regexp new("\\\\\\]") is(literal.string) -> pop
+  Regexp new("\\$\\$") is(literal.string) -> pop
+  Regexp new("\\$") is(name.builtin)
+  any-of(math)
+
+lex(general):
+  Regexp new("%.*?\\n") is(comment)
+  Regexp new("[{}]") is(name.builtin)
+  Regexp new("[&_^]") is(name.builtin)
+
+lex(command):
+  Regexp new("\\[.*?\\]") is(name.attribute)
+  Regexp new("\\*") is(keyword)
+  Regexp new("") is(text) -> pop
+
+lex(inlinemath):
+  Regexp new("\\\\\\)") is(literal.string) -> pop
+  Regexp new("\\$") is(literal.string) -> pop
+  any-of(math)
+
+lex(root):
+  Regexp new("\\\\\\[") is(literal.string.backtick) -> go-to(displaymath)
+  Regexp new("\\\\\\(") is(literal.string) -> go-to(inlinemath)
+  Regexp new("\\$\\$") is(literal.string.backtick) -> go-to(displaymath)
+  Regexp new("\\$") is(literal.string) -> go-to(inlinemath)
+  Regexp new("\\\\([a-zA-Z]+|.)") is(keyword) -> go-to(command)
+  any-of(general)
+  Regexp new("[^\\\\$%&_^{}]+") is(text)
+
+lex(math):
+  Regexp new("\\\\([a-zA-Z]+|.)") is(name.variable)
+  any-of(general)
+  Regexp new("[0-9]+") is(literal.number)
+  Regexp new("[-=!+*/()\\[\\]]") is(operator)
+  Regexp new("[^=!+*/()\\[\\]\\\\$%&_^{}0-9-]+") is(name.builtin)
+

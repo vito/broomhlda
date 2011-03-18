@@ -1,0 +1,49 @@
+lexer(HL::Lexers::Nasm):
+
+name: "NASM"
+aliases: ["nasm"]
+extensions: [".asm", ".ASM"]
+mimetypes: ["text/x-nasm"]
+start: #root
+flags: Regexp::IGNORECASE
+
+lex(preproc):
+  Regexp new("[^;\\n]+") is(comment.preproc)
+  Regexp new(";.*?\\n") is(comment.single) -> pop
+  Regexp new("\\n") is(comment.preproc) -> pop
+
+lex(punctuation):
+  Regexp new("[,():\\[\\]]+") is(punctuation)
+  Regexp new("[&|^<>+*/%\126-]+") is(operator)
+  Regexp new("[$]+") is(keyword.constant)
+  Regexp new("seg|wrt|strict") is(operator.word)
+  Regexp new("byte|[dq]?word") is(keyword.type)
+
+lex(root):
+  any-of(whitespace)
+  Regexp new("^\\s*%") is(comment.preproc) -> go-to(preproc)
+  Regexp new("[a-zA-Z$._?][a-zA-Z0-9$._?#@\126]*:") is(name.label)
+  Regexp new("([a-zA-Z$._?][a-zA-Z0-9$._?#@\126]*)(\\s+)(equ)") is(by-groups(name.constant, keyword.declaration, keyword.declaration)) -> go-to(instruction-args)
+  Regexp new("BITS|USE16|USE32|SECTION|SEGMENT|ABSOLUTE|EXTERN|GLOBAL|ORG|ALIGN|STRUC|ENDSTRUC|COMMON|CPU|GROUP|UPPERCASE|IMPORT|EXPORT|LIBRARY|MODULE") is(keyword) -> go-to(instruction-args)
+  Regexp new("(?:res|d)[bwdqt]|times") is(keyword.declaration) -> go-to(instruction-args)
+  Regexp new("[a-zA-Z$._?][a-zA-Z0-9$._?#@\126]*") is(name.function) -> go-to(instruction-args)
+  Regexp new("[\\r\\n]+") is(text)
+
+lex(whitespace):
+  Regexp new("\\n") is(text)
+  Regexp new("[ \\t]+") is(text)
+  Regexp new(";.*") is(comment.single)
+
+lex(instruction-args):
+  Regexp new("\"(\\\\\"|[^\"])*\"|'(\\\\'|[^'])*'") is(literal.string)
+  Regexp new("(?:0[xX][0-9a-fA-F]+|$0[0-9a-fA-F]*|[0-9]+[0-9a-fA-F]*h)") is(literal.number.hex)
+  Regexp new("[0-7]+q") is(literal.number.oct)
+  Regexp new("[01]+b") is(literal.number)
+  Regexp new("[0-9]+\\.e?[0-9]+") is(literal.number.float)
+  Regexp new("[0-9]+") is(literal.number.integer)
+  any-of(punctuation)
+  Regexp new("[a-d][lh]|e?[a-d]x|e?[sb]p|e?[sd]i|[c-gs]s|st[0-7]|mm[0-7]|cr[0-4]|dr[0-367]|tr[3-7]") is(name.builtin)
+  Regexp new("[a-zA-Z$._?][a-zA-Z0-9$._?#@\126]*") is(name.variable)
+  Regexp new("[\\r\\n]+") is(text) -> pop
+  any-of(whitespace)
+

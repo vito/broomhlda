@@ -1,0 +1,18 @@
+lexer(HL::Lexers::RagelEmbedded):
+
+name: "Embedded Ragel"
+aliases: ["ragel-em"]
+extensions: [".rl"]
+mimetypes: []
+start: #root
+flags: 0
+
+lex(root):
+  Regexp new("([^%\\'\"/#]+|%(?=[^%]|$)|\"(\\\\\\\\|\\\\\"|[^\"])*\"|'(\\\\\\\\|\\\\'|[^'])*'|/\\*(.|\\n)*?\\*/|//.*$\\n?|\\#.*$\\n?|/(?!\\*)(\\\\\\\\|\\\\/|[^/])*/|/)+") is(other)
+  Regexp new("(%%)(?![{%])(.*)($|;)(\\n?)") is(by-groups(punctuation, using(Ragel), punctuation, text))
+  Regexp new("(%%%%|%%){") is(punctuation) -> go-to(multi-line-fsm)
+
+lex(multi-line-fsm):
+  Regexp new("(([^}\\'\"\\[/#]|}(?=[^%]|$)|}%(?=[^%]|$)|[^\\\\][\\\\][{}]|(>|\\$|%|<|@|<>)/|/(?!\\*)(\\\\\\\\|\\\\/|[^/])*/\\*|/(?=[^/\\*]|$))+|\"(\\\\\\\\|\\\\\"|[^\"])*\"|'(\\\\\\\\|\\\\'|[^'])*'|\\[(\\\\\\\\|\\\\\\]|[^\\]])*\\]|/\\*(.|\\n)*?\\*/|//.*$\\n?|\\#.*$\\n?)+") is(using(Ragel))
+  Regexp new("}%%") is(punctuation) -> pop
+

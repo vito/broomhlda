@@ -1,0 +1,46 @@
+lexer(HL::Lexers::Newspeak):
+
+name: "Newspeak"
+aliases: ["newspeak"]
+extensions: [".ns2"]
+mimetypes: ["text/x-newspeak"]
+start: #root
+flags: 0
+
+lex(literals):
+  Regexp new("\\$.") is(literal.string)
+  Regexp new("'[^']*'") is(literal.string)
+  Regexp new("#'[^']*'") is(literal.string.symbol)
+  Regexp new("#\\w+:?") is(literal.string.symbol)
+  Regexp new("#(\\+|\\/|\126|\\*|<|>|=|@|%|\\||&|\\?|!|,|-)+") is(literal.string.symbol)
+
+lex(root):
+  Regexp new("\\b(Newsqueak2)\\b") is(keyword.declaration)
+  Regexp new("'[^']*'") is(literal.string)
+  Regexp new("\\b(class)(\\s+)([a-zA-Z0-9_]+)(\\s*)") is(by-groups(keyword.declaration, text, name.class, text))
+  Regexp new("\\b(mixin|self|super|private|public|protected|nil|true|false)\\b") is(keyword)
+  Regexp new("([a-zA-Z0-9_]+\\:)(\\s*)([a-zA-Z_]\\w+)") is(by-groups(name.function, text, name.variable))
+  Regexp new("([a-zA-Z0-9_]+)(\\s*)(=)") is(by-groups(name.attribute, text, operator))
+  Regexp new("<[a-zA-Z0-9_]+>") is(comment.special)
+  any-of(expressionstat)
+  any-of(whitespace)
+
+lex(whitespace):
+  Regexp new("\\s+") is(text)
+  Regexp new("\"[^\"]*\"") is(comment)
+
+lex(expressionstat):
+  Regexp new("(\\d+\\.\\d*|\\.\\d+|\\d+[fF])[fF]?") is(literal.number.float)
+  Regexp new("\\d+") is(literal.number.integer)
+  Regexp new(":\\w+") is(name.variable)
+  Regexp new("(\\w+)(::)") is(by-groups(name.variable, operator))
+  Regexp new("\\w+:") is(name.function)
+  Regexp new("\\w+") is(name.variable)
+  Regexp new("\\(|\\)") is(punctuation)
+  Regexp new("\\[|\\]") is(punctuation)
+  Regexp new("\\{|\\}") is(punctuation)
+  Regexp new("(\\^|\\+|\\/|\126|\\*|<|>|=|@|%|\\||&|\\?|!|,|-|:)") is(operator)
+  Regexp new("\\.|;") is(punctuation)
+  any-of(whitespace)
+  any-of(literals)
+
