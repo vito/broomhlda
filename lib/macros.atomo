@@ -24,10 +24,13 @@ for-macro class(<< self):
     tag = Atomo::AST::String new(0, short-name(x name split(".")))
     `(HL::Tokens::Tagged new(~tag))
 
-  type-from(gs: Atomo::AST::Send ? @method-name == "by_groups") := do:
+  type-from(gs: `(by-groups())) := do:
     msg = '(HL::Tokens::ByGroups new)
     msg arguments = [Atomo::AST::List new(0, gs arguments collect (a): type-from(a))]
     msg
+
+  type-from(`(using(~who))) := do:
+    `(HL::Tokens::Using new(~who))
 
   type-from(x) := raise("unknown match type: " + x inspect)
 
@@ -89,6 +92,10 @@ macro (lex(name, &tokens)) do:
               ~(type-from(y))
               HL::States::GoTo new(#~z)
             ))
+
+      `(any-of(~any)) ->
+        branches elements <<
+          `(@matchers fetch(#~any) call) -- TODO: parameterization?
 
       _ -> body << c
 
