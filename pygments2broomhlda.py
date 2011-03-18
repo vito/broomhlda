@@ -58,8 +58,6 @@ def esc(c):
         return "\\%s" % ord(c)
 
 def convertible(states):
-    modules = []
-
     if "root" not in states:
         print("no root state")
         return False
@@ -76,13 +74,13 @@ def convertible(states):
             if isinstance(tok, str):
                 continue
 
-            if not token_convertible(modules, tok[1]):
+            if not token_convertible(tok[1]):
                 print("token not convertible: %s" % tok[1])
                 return False
 
-    return modules
+    return True
 
-def token_convertible(modules, tok):
+def token_convertible(tok):
     if isinstance(tok, tuple):
         return True
 
@@ -95,7 +93,7 @@ def token_convertible(modules, tok):
 
     # bygroups()
     if isinstance(closures[0], tuple) \
-        and all([token_convertible(modules, x) for x in tok.__closure__[0].cell_contents]):
+        and all([token_convertible(x) for x in tok.__closure__[0].cell_contents]):
         return True
 
     # using(this)
@@ -109,7 +107,6 @@ def token_convertible(modules, tok):
         and isinstance(closures[0], dict) \
         and hasattr(closures[2], "__name__") \
         and closures[2].__name__ in pygments.lexers.LEXERS:
-        modules.append(convert_modname(closures[2].__name__))
         return True
 
     return False
@@ -176,7 +173,7 @@ def convert_next(n):
     else:
         return "go-to(" + convert_name(n) + ")"
 
-def convert_lexer(modules, mod, name, aliases, filenames, mimetypes, flags):
+def convert_lexer(mod, name, aliases, filenames, mimetypes, flags):
   return """lexer(HL::Lexers::%s):
 
 name: %s
@@ -232,8 +229,7 @@ def try_converting(k, l, to = "lib/lexers/imported"):
             or not hasattr(cls, 'tokens'):
         return False
 
-    check = convertible(cls.tokens)
-    if check == False:
+    if not convertible(cls.tokens):
         return False
 
     print("converting %s" % k)
@@ -242,7 +238,7 @@ def try_converting(k, l, to = "lib/lexers/imported"):
 
     name, aliases, filenames, mimetypes = l[1:]
 
-    mod.write(convert_lexer(check, k, name, aliases, filenames, mimetypes, cls.flags))
+    mod.write(convert_lexer(k, name, aliases, filenames, mimetypes, cls.flags))
 
     for name, state in cls.tokens.items():
         mod.write(convert_state(cls.tokens, name, state) + "\n")
