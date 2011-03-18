@@ -40,6 +40,25 @@ for-macro class(<< self):
         x options | @info fetch(#flags)
       ); call(~x))
 
+  state-from('pop) := '(HL::States::Pop new)
+  state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
+  state-from('push) := '(HL::States::Push new)
+  state-from(z: `(do-all())) := do:
+    all = '[]
+    all elements = z arguments collect (a): state-from(a)
+    `(HL::States::DoAll new(~all))
+  state-from(z: `(combined())) := do:
+    all = '[]
+    all elements = z arguments reverse collect (a):
+      `(@matchers fetch(#~a))
+
+    `(HL::States::Combined new(~all))
+  state-from(`(go-to(~n))) :=
+    `(HL::States::GoTo new(#~n))
+  state-from(x) :=
+    raise("unknown state: " + x inspect)
+
+
 macro (lex(name, &tokens)) do:
   branches = '[]
 
@@ -57,31 +76,12 @@ macro (lex(name, &tokens)) do:
             ))
 
       -- specifying a state
-      `(~x is(~y) -> ~state) -> do:
-        z = state match:
-          'pop -> '(HL::States::Pop new)
-          'push -> '(HL::States::Push new)
-          'continue -> '(HL::States::Continue new)
-
-          `(do-all()) -> do:
-            all = '[]
-            all elements = state arguments
-            `(HL::States::DoAll new(~all))
-
-          `(pop(~n)) ->
-            `(HL::States::PopNum new(~n))
-
-          -- TODO: combined, do-all
-          `(go-to(~n)) ->
-            `(HL::States::GoTo new(#(~n)))
-
-          _ -> raise("unknown state: " + state inspect)
-
+      `(~x is(~y) -> ~z) -> do:
         branches elements <<
           `(HL::Matcher new(
               ~(regexp-from(x))
               ~(type-from(y))
-              ~z
+              ~(state-from(z))
             ))
 
       -- goto shortcut

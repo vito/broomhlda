@@ -27,5 +27,5 @@ module(HL):
       apply((d: DoAll), d = []) :=
         d each (s): apply(s, d)
 
-      apply((c: Combined), _ = []) :=
-        @state = c flatten + @state
+      apply((c: Combined), d = []) :=
+        @state << c matchers collect (l): l call(d)
