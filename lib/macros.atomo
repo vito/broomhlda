@@ -97,5 +97,3 @@ macro (lex(name, &tokens)) do:
   tokens contents = body
 
   `(@matchers at(#~name) put(~tokens))
-
-

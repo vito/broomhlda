@@ -2,7 +2,8 @@ class(NoMatchFor < RuntimeError):
   initialize(@input) := #ok
 
   message :=
-    "no matchers succeeded on: " + @input slice(0, 50) + " [...]"
+    "no matchers succeeded for: " +
+      @input slice(0, 50) + " [...]"
 
 
 module(HL):
@@ -31,7 +32,7 @@ module(HL):
       -- matches past the start. see #try-all-first.
       try-all([]) :=
         raise(NoMatchFor new(@input))
-      try-all(x: List . xs) :=
+      try-all((x: Array) . xs) :=
         try-all(x + xs)
       try-all(m . ms) :=
         m regexp match(@input) match:
@@ -70,7 +71,7 @@ module(HL):
       -- token (ie, it's not anchored to the beginning)
       try-all-first([]) :=
         raise(NoMatchFor new(@input))
-      try-all-first(x: List . xs) :=
+      try-all-first((x: Array) . xs) :=
         try-all-first(x + xs)
       try-all-first(m . ms) :=
         m regexp match(@input) match:
