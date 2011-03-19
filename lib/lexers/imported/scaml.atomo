@@ -1,0 +1,67 @@
+lexer(HL::Lexers::Scaml):
+
+name: "Scaml"
+aliases: ["scaml", "SCAML"]
+extensions: [".scaml"]
+mimetypes: ["text/x-scaml"]
+start: #root
+flags: Regexp::IGNORECASE
+
+lex(html-attribute-value):
+  Regexp new("[ \\t]+") is(text)
+  Regexp new("[a-z0-9_]+") is(name.variable) -> pop
+  Regexp new("@[a-z0-9_]+") is(name.variable.instance) -> pop
+  Regexp new("\\$[a-z0-9_]+") is(name.variable.global) -> pop
+  Regexp new("'(\\\\\\\\|\\\\'|[^'\\n])*'") is(literal.string) -> pop
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"\\n])*\"") is(literal.string) -> pop
+
+lex(filter-block):
+  Regexp new("([^#\\n]|#[^{\\n]|(\\\\\\\\)*\\\\#\\{)+") is(name.decorator)
+  Regexp new("(#\\{)(.*?)(\\})") is(by-groups(literal.string.interpol, using(Scala), literal.string.interpol))
+  Regexp new("\\n") is(text) -> go-to(root)
+
+lex(tag):
+  any-of(css)
+  Regexp new("\\{(,\\n|.)*?\\}") is(using(Scala))
+  Regexp new("\\[.*?\\]") is(using(Scala))
+  Regexp new("\\(") is(text) -> go-to(html-attributes)
+  Regexp new("/[ \\t]*\\n") is(punctuation) -> pop(2)
+  Regexp new("[<>]{1,2}(?=[ \\t=])") is(punctuation)
+  any-of(eval-or-plain)
+
+lex(scaml-comment-block):
+  Regexp new(".+") is(comment.preproc)
+  Regexp new("\\n") is(text) -> go-to(root)
+
+lex(html-attributes):
+  Regexp new("\\s+") is(text)
+  Regexp new("[a-z0-9_:-]+[ \\t]*=") is(name.attribute) -> go-to(html-attribute-value)
+  Regexp new("[a-z0-9_:-]+") is(name.attribute)
+  Regexp new("\\)") is(text) -> pop
+
+lex(plain):
+  Regexp new("([^#\\n]|#[^{\\n]|(\\\\\\\\)*\\\\#\\{)+") is(text)
+  Regexp new("(#\\{)(.*?)(\\})") is(by-groups(literal.string.interpol, using(Scala), literal.string.interpol))
+  Regexp new("\\n") is(text) -> go-to(root)
+
+lex(eval-or-plain):
+  Regexp new("[&!]?==") is(punctuation) -> go-to(plain)
+  Regexp new("([&!]?[=\126])(.*\10)") is(by-groups(punctuation, using(Scala))) -> go-to(root)
+  Regexp new("") is(text) -> go-to(plain)
+
+lex(content):
+  any-of(css)
+  Regexp new("%[a-z0-9_:-]+") is(name.tag) -> go-to(tag)
+  Regexp new("!!!.*\10") is(name.namespace) -> pop
+  Regexp new("(/)(\\[.*?\\])(.*\10)") is(by-groups(comment, comment.special, comment)) -> pop
+  Regexp new("/.*\10") is(using(self send(#class))) -> pop
+  Regexp new("-#.*\10") is(using(self send(#class))) -> pop
+  Regexp new("(-@\\s*)(import)?(.*\10)") is(by-groups(punctuation, keyword, using(Scala))) -> pop
+  Regexp new("(-)(.*\10)") is(by-groups(punctuation, using(Scala))) -> pop
+  Regexp new(":.*\10") is(using(self send(#class))) -> pop
+  any-of(eval-or-plain)
+
+lex(html-comment-block):
+  Regexp new(".+") is(comment)
+  Regexp new("\\n") is(text) -> go-to(root)
+
