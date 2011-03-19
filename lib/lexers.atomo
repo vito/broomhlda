@@ -22,7 +22,7 @@ module(HL):
       -- run the lexer until the input is empty, yielding
       -- the lexed tokens
       define(run):
-        while(!(@input empty?)):
+        until(@input empty?):
           try-all(@state last)
 
         @lexed
