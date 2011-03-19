@@ -6,10 +6,16 @@ import("token")
 import("lexers")
 import("state")
 import("formatters/html")
-import("lexers/atomo")
 
-atomo = HL::Lexers::Atomo new(
-  File open(here + "/lexers/atomo.atomo") read
+Dir glob(here + "/lexers/imported/*.atomo") each (t):
+  puts(File basename(t))
+  import(t)
+
+import("lexers/atomo")
+import("lexers/haskell")
+
+python = HL::Lexers::Python new(
+  File open(here + "/../pygments2broomhlda.py") read
 )
-res = atomo run
-puts(HL::Formatters::Html new(res, false) format)
+
+puts(HL::Formatters::Html new(python run, false) format)
