@@ -54,7 +54,7 @@ for-macro class(<< self):
 
     `(HL::States::Combined new(~all))
   state-from(`(go-to(~n))) :=
-    `(HL::States::GoTo new(#~n))
+    `(HL::States::GoTo new(@matchers, #~n))
   state-from(x) :=
     raise("unknown state: " + x inspect)
 
@@ -90,7 +90,7 @@ macro (lex(name, &tokens)) do:
           `(HL::Matcher new(
               ~(regexp-from(x))
               ~(type-from(y))
-              HL::States::GoTo new(#~z)
+              HL::States::GoTo new(@matchers, #~z)
             ))
 
       `(any-of(~any)) ->
@@ -99,7 +99,7 @@ macro (lex(name, &tokens)) do:
 
       _ -> body << c
 
-  body << branches
+  body << `(~branches flatten)
 
   tokens contents = body
 

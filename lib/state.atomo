@@ -2,30 +2,25 @@ module(HL):
   module(States):
     data(State):
       Continue
-      GoTo(@next)
+      GoTo(@matchers, @next)
       Pop
       PopNum(@num)
       Push
       DoAll(@states)
       Combined(@matchers)
 
-    class(HL::Lexers::Lexer):
-      apply(Continue, _ = []) := nil
+    Continue apply(_, _) := nil
 
-      apply((g: GoTo), cs = []) :=
-        @state << class matchers fetch(g next) call(cs)
+    GoTo apply(s, d) :=
+      s << @matchers fetch(@next) call(d)
 
-      apply(Push, _ = []) :=
-        @state << @state last
+    Push apply(s, _) := s << s last
 
-      apply(Pop, _ = []) :=
-        @state pop
+    Pop apply(s, _) := s pop
 
-      apply((p: PopNum), _ = []) :=
-        @state pop(p num)
+    PopNum apply(s, _) := s pop(@num)
 
-      apply((d: DoAll), d = []) :=
-        d each (s): apply(s, d)
+    DoAll apply(s, d) := d each (s): s apply(s, d)
 
-      apply((c: Combined), d = []) :=
-        @state << c matchers collect (l): l call(d)
+    Combined apply(s, d) :=
+      s << @matchers inject([]) (a, m): a + m call(d)

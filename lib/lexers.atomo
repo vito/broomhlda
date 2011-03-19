@@ -30,30 +30,46 @@ module(HL):
       -- go through matchers until one matches the immediate
       -- next input. if none match, try again, but allowing
       -- matches past the start. see #try-all-first.
-      try-all([]) :=
-        raise(NoMatchFor new(@input))
-      try-all((x: Array) . xs) :=
-        try-all(x + xs)
-      try-all(m . ms) :=
-        m regexp match(@input) match:
-          -- only allow a match that's at the start of the input
-          (d: MatchData ? pre-match empty?) -> do:
-            @input slice!(0, d to-s size)
+      try-all(ms) := do:
+        closest = nil
+        worked = nil
 
-            apply(m next, d)
+        ms each (m):
+          m regexp match(@input) match:
+            -- only allow a match that's at the start of the input
+            (d: MatchData ? pre-match empty?) -> do:
+              @input slice!(0, d to-s size)
 
-            tokens(d, m type)
+              m next apply(@state, d)
 
-          -- no match; try the rest, and if none work,
-          -- start matching again but with #try-all-first.
-          _ ->
-            begin: try-all(ms);
-              rescue (e):
-                e match:
-                  NoMatchFor ->
-                    try-all-first([m] + ms)
+              tokens(d, m type)
 
-                  _ -> raise(e)
+              return(true)
+
+            -- matched, but not at the start; set the closest match
+            -- information in case of failure
+            (d: MatchData ?
+              closest nil? ||
+                pre-match size < closest pre-match size) -> do:
+              closest =! d
+              worked =! m
+
+        if(closest nil?)
+          then: raise(NoMatchFor new(@input))
+          else:
+            skipped = closest pre-match
+            @input = closest post-match
+
+            worked next apply(@state, closest)
+
+            @lexed << HL::Tokens::Token new(
+              HL::Tokens::Tagged new("err")
+              skipped
+            )
+
+            tokens(closest, worked type)
+
+            return(false)
 
       -- TODO: Using
       tokens(data, gs: HL::Tokens::ByGroups) :=
@@ -65,30 +81,6 @@ module(HL):
 
       tokens(data, t: HL::Tokens::Tagged) :=
         @lexed << HL::Tokens::Token new(t, data to-s)
-
-      -- like try-all, but it goes with the first matching
-      -- segment, with the contents before it as an Error
-      -- token (ie, it's not anchored to the beginning)
-      try-all-first([]) :=
-        raise(NoMatchFor new(@input))
-      try-all-first((x: Array) . xs) :=
-        try-all-first(x + xs)
-      try-all-first(m . ms) :=
-        m regexp match(@input) match:
-          (d: MatchData) -> do:
-            skipped = d pre-match
-            @input = d post-match
-
-            apply(m next, d) -- TODO?: highlighter doesn't do this
-
-            @lexed << HL::Tokens::Token new(
-              HL::Tokens::Tagged new("err")
-              skipped
-            )
-
-            tokens(d, m type)
-
-          _ -> try-all-first(ms)
 
       class(<< self):
         attr-accessor(#matchers, #info)
