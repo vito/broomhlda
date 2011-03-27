@@ -20,13 +20,13 @@ for-macro class(<< self):
   short-name([x]) := x slice(0, 1)
   short-name(_ . xs) := short-name(xs)
 
-  type-from(x: Atomo::AST::Variable) := do:
-    tag = Atomo::AST::String new(0, short-name(x name split(".")))
+  type-from(x: Atomy::AST::Variable) := do:
+    tag = Atomy::AST::String new(0, short-name(x name split(".")))
     `(HL::Tokens::Tagged new(~tag))
 
   type-from(gs: `(by-groups())) := do:
     msg = '(HL::Tokens::ByGroups new)
-    msg arguments = [Atomo::AST::List new(0, gs arguments collect (a): type-from(a))]
+    msg arguments = [Atomy::AST::List new(0, gs arguments collect (a): type-from(a))]
     msg
 
   type-from(`(using(~who))) := do:

@@ -1,3 +1,3 @@
 task :clean do
-  sh "find . -name '*.rbc' -delete; find . -name '*.atomoc' -delete"
+  sh "find . -name '*.rbc' -delete; find . -name '*.ayc' -delete"
 end

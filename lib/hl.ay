@@ -1,5 +1,5 @@
 here = File expand-path("../", _FILE)
-$path << here
+$path unshift(here)
 
 import("macros")
 import("token")
@@ -7,11 +7,11 @@ import("lexers")
 import("state")
 import("formatters/html")
 
-Dir glob(here + "/lexers/imported/*.atomo") each (t):
+Dir glob(here + "/lexers/imported/*.ay") each (t):
   puts(File basename(t))
   import(t)
 
-import("lexers/atomo")
+import("lexers/atomy")
 import("lexers/haskell")
 
 python = HL::Lexers::Python new(

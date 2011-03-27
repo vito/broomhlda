@@ -1,8 +1,8 @@
-lexer(HL::Lexers::Atomo):
-  name: "Atomo"
-  aliases: "atomo"
-  extensions: [".atomo", ".quanto"]
-  mimetypes: "text/x-atomo"
+lexer(HL::Lexers::Atomy):
+  name: "Atomy"
+  aliases: "atomy"
+  extensions: [".ay"]
+  mimetypes: "text/x-atomy"
   start: #root
   flags: Regexp::MULTILINE
 
