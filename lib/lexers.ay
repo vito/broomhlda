@@ -12,7 +12,9 @@ module(HL):
 
   module(Lexers):
     class(Lexer):
-      define(initialize(@input)):
+      define(initialize(input)):
+        @input = input dup
+
         @state = [
           class matchers fetch(class info fetch(#start)) call
         ] -- [Matcher]
