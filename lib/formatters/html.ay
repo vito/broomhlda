@@ -1,18 +1,23 @@
 require("rubygems")
-require("builder")
+require("nokogiri")
 
 module(HL::Formatters):
   class(Html):
-    initialize(@tokens, @line-numbers) := #ok
+    initialize(@tokens, @line-numbers = false) := #ok
 
-    define(format):
-      out = ""
+    define(format(builder = nil)):
+      builder ||= Nokogiri::XML::Builder new
 
-      Builder::XmlMarkup
-        new(#[target: out])
+      builder
         div(#[class: "highlight"]) (d):
           d pre (p):
-            @tokens each (t):
-              p span(t contents, #[class: t type tag])
+            format-tokens(p)
         
-      out
+      builder doc children first to-xml
+
+    define(format-tokens(to)):
+      @tokens each (t):
+        to span(#[class: t type tag]) (s):
+          s text(t contents)
+
+      to
