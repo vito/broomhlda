@@ -1,10 +1,12 @@
-class(NoMatchFor < RuntimeError):
+class(NoMatchFor < Error):
   initialize(@input) := #ok
 
-  message :=
+  export: message :=
     "no matchers succeeded for: " +
-      @input slice(0, 50) + " [...]"
+      @input slice(0, 50) inspect + " [...]"
 
+
+symbols(try-all, tokens)
 
 module(HL):
   data(Object):
@@ -40,13 +42,16 @@ module(HL):
           m regexp match(@input) match:
             -- only allow a match that's at the start of the input
             (d: MatchData ? pre-match empty?) -> do:
+              closest =! nil
+              worked =! nil
+
               @input slice!(0, d to-s size)
 
               m next apply(@state, d)
 
               tokens(d, m type)
 
-              return(true)
+              return(true) -- o.
 
             -- matched, but not at the start; set the closest match
             -- information in case of failure
@@ -57,7 +62,7 @@ module(HL):
               worked =! m
 
         if(closest nil?)
-          then: raise(NoMatchFor new(@input))
+          then: error(NoMatchFor new(@input))
           else:
             skipped = closest pre-match
             @input = closest post-match
@@ -88,19 +93,19 @@ module(HL):
         attr-accessor(#matchers, #info)
 
         name(&x) :=
-          @info at(#name) put(x call)
+          @info [#name] = x call
 
         aliases(&x) :=
-          @info at(#aliases) put(Array(x call))
+          @info [#aliases] = Array(x call)
 
         extensions(&x) :=
-          @info at(#extensions) put(Array(x call))
+          @info [#extensions] = Array(x call)
 
         mimetypes(&x) :=
-          @info at(#mimetypes) put(Array(x call))
+          @info [#mimetypes] = Array(x call)
 
         start(&x) :=
-          @info at(#start) put(x call)
+          @info [#start] = x call
 
         flags(&x) :=
-          @info at(#flags) put(x call)
+          @info [#flags] = x call

@@ -116,7 +116,7 @@ lexer(HL::Lexers::Atomy):
 
   -- match delimiters in a macro-quote, skipping escapes
   lex(macro-quote) (d):
-    close = Regexp quote(pair(d captures at(1)))
+    close = Regexp quote(pair(d captures [1]))
 
     Regexp new(raw"[^\\" + close + "]+")
       is(string.other)

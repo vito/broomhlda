@@ -1,6 +1,8 @@
 require("rubygems")
 require("nokogiri")
 
+symbols(format-tokens)
+
 module(HL::Formatters):
   class(Html):
     initialize(@tokens, @line-numbers = false) := #ok
@@ -13,7 +15,7 @@ module(HL::Formatters):
           d pre (p):
             format-tokens(p)
         
-      builder doc children first to-xml
+      builder doc children first serialize(#[save-with: 0])
 
     define(format-tokens(to)):
       @tokens each (t):

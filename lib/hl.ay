@@ -1,10 +1,12 @@
 here = File expand-path("../", _FILE)
 $path unshift(here)
 
+namespace(broomhlda)
+
 import("macros")
 import("token")
-import("lexers")
 import("state")
+import("lexers")
 import("formatters/html")
 
 Dir glob(here + "/lexers/imported/*.ay") each (t):

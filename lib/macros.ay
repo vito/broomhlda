@@ -1,11 +1,11 @@
-macro (lexer(name, &body))
+macro(lexer(name, &body)):
   `(class(~name < HL::Lexers::Lexer):
       @matchers = Hash new
       @info = Hash new
 
       ~body call)
 
-for-macro class(<< self):
+for-macro:
   short-name(["name", "constant"]) := "no"
   short-name(["name", "entity"]) := "ni"
   short-name(["name", "property"]) := "py"
@@ -59,7 +59,7 @@ for-macro class(<< self):
     raise("unknown state: " + x inspect)
 
 
-macro (lex(name, &tokens)) do:
+macro(lex(name, &tokens)):
   branches = '[]
 
   body = []
@@ -103,4 +103,4 @@ macro (lex(name, &tokens)) do:
 
   tokens contents = body
 
-  `(@matchers at(#~name) put(~tokens))
+  `(@matchers [#~name] = ~tokens)
