@@ -26,7 +26,7 @@ for-macro:
 
   type-from(gs: `(by-groups())) := do:
     msg = '(HL::Tokens::ByGroups new)
-    msg arguments = [Atomy::AST::List new(0, gs arguments collect (a): type-from(a))]
+    msg arguments = [Atomy::AST::List new(0, gs arguments collect [a]: type-from(a))]
     msg
 
   type-from(`(using(~who))) := do:
@@ -45,11 +45,11 @@ for-macro:
   state-from('push) := '(HL::States::Push new)
   state-from(z: `(do-all())) := do:
     all = '[]
-    all elements = z arguments collect (a): state-from(a)
+    all elements = z arguments collect [a]: state-from(a)
     `(HL::States::DoAll new(~all))
   state-from(z: `(combined())) := do:
     all = '[]
-    all elements = z arguments reverse collect (a):
+    all elements = z arguments reverse collect [a]:
       `(@matchers fetch(#~a))
 
     `(HL::States::Combined new(~all))
@@ -64,7 +64,7 @@ macro(lex(name, &tokens)):
 
   body = []
 
-  tokens contents each (c):
+  tokens contents each [c]:
     c match:
       -- implicit continue state
       `(~x is(~y)) ->

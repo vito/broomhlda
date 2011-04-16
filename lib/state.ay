@@ -20,7 +20,7 @@ module(HL):
 
     PopNum apply(s, _) := s pop(@num)
 
-    DoAll apply(s, d) := d each (s): s apply(s, d)
+    DoAll apply(s, d) := d each [s]: s apply(s, d)
 
     Combined apply(s, d) :=
-      s << @matchers inject([]) (a, m): a + m call(d)
+      s << @matchers inject([]) [a, m]: a + m call(d)

@@ -11,15 +11,15 @@ module(HL::Formatters):
       builder ||= Nokogiri::XML::Builder new
 
       builder
-        div(#[class: "highlight"]) (d):
-          d pre (p):
+        div(#[class: "highlight"]) [d]:
+          d pre [p]:
             format-tokens(p)
         
       builder doc children first serialize(#[save-with: 0])
 
     define(format-tokens(to)):
-      @tokens each (t):
-        to span(#[class: t type tag]) (s):
+      @tokens each [t]:
+        to span(#[class: t type tag]) [s]:
           s text(t contents)
 
       to

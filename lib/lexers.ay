@@ -38,7 +38,7 @@ module(HL):
         closest = nil
         worked = nil
 
-        ms each (m):
+        ms each [m]:
           m regexp match(@input) match:
             -- only allow a match that's at the start of the input
             (d: MatchData ? pre-match empty?) -> do:
@@ -80,7 +80,7 @@ module(HL):
 
       -- TODO: Using
       tokens(data, gs: HL::Tokens::ByGroups) :=
-        gs types zip(data to-a drop(1)) ([t, d]):
+        gs types zip(data to-a drop(1)) [[t, d]]:
           when(t nil? || d nil?):
             return(nil)
 
