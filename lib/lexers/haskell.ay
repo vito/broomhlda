@@ -1,12 +1,12 @@
 namespace(broomhlda)
+
+lexer(HL::Lexers::Haskell):
   name: "Haskell"
   aliases: ["haskell", "hs"]
   extensions: [".hs"]
   mimetypes: ["text/x-haskell"]
   start: #root
   flags: Regexp::MULTILINE
-
-lexer(HL::Lexers::Haskell):
 
   lex(comment):
     Regexp new("[^-{}]+") is(comment.multiline)
