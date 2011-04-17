@@ -35,7 +35,7 @@ for-macro:
   type-from(x) := raise("unknown match type: " + x inspect)
 
   regexp-from(x) :=
-    `((x): Regexp new(
+    `([x]: Regexp new(
         x source
         x options | @info fetch(#flags)
       ); call(~x))
