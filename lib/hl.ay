@@ -9,15 +9,5 @@ import("state")
 import("lexers")
 import("formatters/html")
 
-Dir glob(here + "/lexers/imported/*.ay") each [t]:
-  puts(File basename(t))
-  import(t)
-
-import("lexers/atomy")
-import("lexers/haskell")
-
---python = HL::Lexers::Python new(
-  --File open(here + "/../pygments2broomhlda.py") read
---)
-
---puts(HL::Formatters::Html new(python run, false) format)
+load(lexer) :=
+  import("lexers/" + lexer downcase)
