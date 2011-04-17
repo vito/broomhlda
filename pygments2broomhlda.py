@@ -234,7 +234,7 @@ def try_converting(k, l, to = "lib/lexers/imported"):
 
     print("converting %s" % k)
 
-    mod = codecs.open("%s/%s.atomo" % (to, convert_modname(k).lower()), encoding="utf-8", mode="w")
+    mod = codecs.open("%s/%s.ay" % (to, convert_modname(k).lower()), encoding="utf-8", mode="w")
 
     name, aliases, filenames, mimetypes = l[1:]
 
