@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::LighttpdConf):
 
 name: "Lighttpd configuration file"

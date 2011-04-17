@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 macro(lexer(name, &body)):
   `(class(~name < HL::Lexers::Lexer):
       @matchers = Hash new

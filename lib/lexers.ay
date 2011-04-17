@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 class(NoMatchFor < Error):
   initialize(@input) := #ok
 
@@ -5,8 +7,6 @@ class(NoMatchFor < Error):
     "no matchers succeeded for: " +
       @input slice(0, 50) inspect + " [...]"
 
-
-symbols(try-all, tokens)
 
 module(HL):
   data(Object):

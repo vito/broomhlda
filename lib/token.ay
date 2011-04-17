@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 module(HL):
   module(Tokens):
     data(Type):

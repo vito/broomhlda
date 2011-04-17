@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::Diff):
 
 name: "Diff"

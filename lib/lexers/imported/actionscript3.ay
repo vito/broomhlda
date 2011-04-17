@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::ActionScript3):
 
 name: "ActionScript 3"

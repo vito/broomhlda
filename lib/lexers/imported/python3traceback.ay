@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::Python3Traceback):
 
 name: "Python 3.0 Traceback"

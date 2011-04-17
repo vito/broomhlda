@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::Python3):
 
 name: "Python 3"

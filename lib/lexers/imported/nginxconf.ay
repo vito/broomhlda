@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::NginxConf):
 
 name: "Nginx configuration file"

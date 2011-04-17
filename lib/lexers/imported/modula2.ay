@@ -1,3 +1,5 @@
+namespace(broomhlda)
+
 lexer(HL::Lexers::Modula2):
 
 name: "Modula-2"
