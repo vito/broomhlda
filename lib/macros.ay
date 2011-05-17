@@ -27,9 +27,9 @@ for-macro:
     `(HL::Tokens::Tagged new(~tag))
 
   type-from(gs: `(by-groups())) := do:
-    msg = '(HL::Tokens::ByGroups new)
-    msg arguments = [Atomy::AST::List new(0, gs arguments collect [a]: type-from(a))]
-    msg
+    `(HL::Tokens::ByGroups new(
+        [~*(gs arguments collect [a]: type-from(a))]
+      ))
 
   type-from(`(using(~who))) := do:
     `(HL::Tokens::Using new(~who))
