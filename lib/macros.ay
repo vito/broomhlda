@@ -26,9 +26,9 @@ for-macro:
     tag = Atomy::AST::String new(0, short-name(x name split(".")))
     `(HL::Tokens::Tagged new(~tag))
 
-  type-from(gs: `(by-groups())) := do:
+  type-from(`(by-groups(~*as))) := do:
     `(HL::Tokens::ByGroups new(
-        [~*(gs arguments collect [a]: type-from(a))]
+        [~*(as collect [a]: type-from(a))]
       ))
 
   type-from(`(using(~who))) := do:
@@ -45,16 +45,15 @@ for-macro:
   state-from('pop) := '(HL::States::Pop new)
   state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
   state-from('push) := '(HL::States::Push new)
-  state-from(z: `(do-all())) := do:
-    all = '[]
-    all elements = z arguments collect [a]: state-from(a)
-    `(HL::States::DoAll new(~all))
-  state-from(z: `(combined())) := do:
-    all = '[]
-    all elements = z arguments reverse collect [a]:
-      `(@matchers fetch(#~a))
-
-    `(HL::States::Combined new(~all))
+  state-from(`(do-all(~*as))) :=
+    `(HL::States::DoAll new(
+        [~*(as collect [a]: state-from(a))]
+      ))
+  state-from(`(combined(~*as))) :=
+    `(HL::States::Combined new(
+        [~*(as reverse collect [a]:
+              `(@matchers fetch(#~a)))]
+      ))
   state-from(`(go-to(~n))) :=
     `(HL::States::GoTo new(@matchers, #~n))
   state-from(x) :=
