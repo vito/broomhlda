@@ -9,12 +9,12 @@ lexer(HL::Lexers::Atomy):
   flags: Regexp::MULTILINE
 
   @@identifier =
-    raw"[a-z_][[:alnum:]\$\+\<=\>\^~!@#%&*\-.\/\?]*"
+    raw"[\p{Ll}_][\p{L}\d\p{S}!@#%&*\-\\.\/\?]*"
 
-  @@operator = raw"[\$\+\<=\>\^~!@&#%\|&*\-.\/\?:]"
+  @@operator = raw"[\p{S}!@#%&*\-\\:.\/\?]+"
 
   @@reserved =
-    raw"(operator|macro|for-macro|self)\b(?!" + @@operator + ")"
+    raw"(operator|macro|self)\b(?!" + @@operator + ")"
 
   @@ascii = [
     "NUL","SOH","[SE]TX","EOT","ENQ","ACK",
@@ -46,25 +46,24 @@ lexer(HL::Lexers::Atomy):
     r"[\+\-]?\d+" is(number.integer)
 
     -- reserved words
-    Regexp new(@@reserved) is(keyword.reserved)
-
-    -- macro-quotes
-    Regexp new("(" + @@identifier + raw")([\"`'{\[])")
-      is(string.other) => macro-quote
+    Regexp new(@@reserved, Regexp::KCODE_UTF8) is(keyword.reserved)
 
     -- special variables
-    Regexp new("@@" + @@identifier) is(name.variable.class)
-    Regexp new("$" + @@identifier) is(name.variable.global)
-    Regexp new("@" + @@identifier) is(name.variable.instance)
+    Regexp new("@@" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.class)
+    Regexp new("\\$" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.global)
+    Regexp new("@" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.instance)
 
     -- particles
-    Regexp new("#" + @@identifier) is(string.symbol)
+    Regexp new("#" + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+
+    -- macro-quotes
+    Regexp new("(" + @@identifier + ")(\")", Regexp::KCODE_UTF8) is(by-groups(name, string)) => macro-quote
 
     -- identifiers
-    Regexp new(@@identifier) is(name)
+    Regexp new(@@identifier, Regexp::KCODE_UTF8) is(name)
 
     -- operators
-    Regexp new(@@operator) is(operator)
+    Regexp new(@@operator, Regexp::KCODE_UTF8) is(operator)
 
     -- strings
     r"\"" is(string) => in-string
@@ -73,11 +72,11 @@ lexer(HL::Lexers::Atomy):
     r"\s+" is(text)
 
     -- quoting expressions
-    Regexp new("['`]" + @@identifier) is(string.symbol)
-    r"['`]'" is(string.symbol)
+    Regexp new("['`]" + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+    r"['`]" is(string.symbol)
 
     -- unquote
-    Regexp new("~" + @@identifier) is(string.interpolate)
+    Regexp new("~" + @@identifier, Regexp::KCODE_UTF8) is(string.interpolate)
     r"~" is(string.interpolate)
 
     -- punctuation
@@ -99,6 +98,13 @@ lexer(HL::Lexers::Atomy):
     r"\"" is(string) -> pop
 
 
+  -- match delimiters in a macro-quote, skipping escapes
+  lex(macro-quote) [d]:
+    r"[^\\\"]" is(string)
+    r"\\." is(string)
+    r"\"" is(string) -> pop
+
+
   -- all of our character escapes
   lex(escape):
     r"[nsrtvfbae\\\"]" is(string.escape) -> pop
@@ -108,22 +114,3 @@ lexer(HL::Lexers::Atomy):
     r"x[\da-fA-F]+" is(string.escape) -> pop
     r"\d+" is(string.escape) -> pop
     r"\s+\\" is(string.escape) -> pop
-
-
-  class(<< self):
-    -- determine the closing delimiter for a macro-quote
-    pair("{") := "}"
-    pair("[") := "]"
-    pair(x) := x
-
-  -- match delimiters in a macro-quote, skipping escapes
-  lex(macro-quote) [d]:
-    close = Regexp quote(pair(d captures [1]))
-
-    Regexp new(raw"[^\\" + close + "]+")
-      is(string.other)
-
-    r"\\." is(string.other)
-
-    Regexp new(close + "([[:alpha:]]*)")
-      is(string.other) -> pop
