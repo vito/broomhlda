@@ -1,11 +1,9 @@
-namespace(broomhlda)
-
-macro(lexer(name, &body)):
+macro(lexer(~name) { ~*body }):
   `(class(~name < HL::Lexers::Lexer):
       @matchers = Hash new
       @info = Hash new
 
-      ~body call)
+      ~*body)
 
 for-macro:
   short-name(["name", "constant"]) := "no"
@@ -26,10 +24,10 @@ for-macro:
     tag = Atomy::AST::String new(0, short-name(x name split(".")))
     `(HL::Tokens::Tagged new(~tag))
 
-  type-from(`(by-groups(~*as))) := do:
-    `(HL::Tokens::ByGroups new(
-        [~*(as collect [a]: type-from(a))]
-      ))
+  type-from(gs: `(by-groups())) := do:
+    msg = '(HL::Tokens::ByGroups new)
+    msg arguments = [Atomy::AST::List new(0, gs arguments collect [a]: type-from(a))]
+    msg
 
   type-from(`(using(~who))) := do:
     `(HL::Tokens::Using new(~who))
@@ -45,31 +43,32 @@ for-macro:
   state-from('pop) := '(HL::States::Pop new)
   state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
   state-from('push) := '(HL::States::Push new)
-  state-from(`(do-all(~*as))) :=
-    `(HL::States::DoAll new(
-        [~*(as collect [a]: state-from(a))]
-      ))
-  state-from(`(combined(~*as))) :=
-    `(HL::States::Combined new(
-        [~*(as reverse collect [a]:
-              `(@matchers fetch(#~a)))]
-      ))
+  state-from(z: `(do-all())) := do:
+    all = '[]
+    all elements = z arguments collect [a]: state-from(a)
+    `(HL::States::DoAll new(~all))
+  state-from(z: `(combined())) := do:
+    all = '[]
+    all elements = z arguments reverse collect [a]:
+      `(@matchers fetch(#~a))
+
+    `(HL::States::Combined new(~all))
   state-from(`(go-to(~n))) :=
     `(HL::States::GoTo new(@matchers, #~n))
   state-from(x) :=
     raise("unknown state: " + x inspect)
 
 
-macro(lex(name, &tokens)):
-  branches = '[]
+macro(lex(~name) { ~*tokens }):
+  branches = Array[]
 
-  body = []
+  body = Array[]
 
-  tokens contents each [c]:
+  tokens each [c]:
     c match:
       -- implicit continue state
       `(~x is(~y)) ->
-        branches elements <<
+        branches <<
           `(HL::Matcher new(
               ~(regexp-from(x))
               ~(type-from(y))
@@ -78,7 +77,7 @@ macro(lex(name, &tokens)):
 
       -- specifying a state
       `(~x is(~y) -> ~z) -> do:
-        branches elements <<
+        branches <<
           `(HL::Matcher new(
               ~(regexp-from(x))
               ~(type-from(y))
@@ -87,7 +86,7 @@ macro(lex(name, &tokens)):
 
       -- goto shortcut
       `(~x is(~y) => ~z) ->
-        branches elements <<
+        branches <<
           `(HL::Matcher new(
               ~(regexp-from(x))
               ~(type-from(y))
@@ -95,13 +94,11 @@ macro(lex(name, &tokens)):
             ))
 
       `(any-of(~any)) ->
-        branches elements <<
+        branches <<
           `(@matchers fetch(#~any) call) -- TODO: parameterization?
 
       _ -> body << c
 
-  body << `(~branches flatten)
+  body << `([~*branches] flatten)
 
-  tokens contents = body
-
-  `(@matchers [#~name] = ~tokens)
+  `(@matchers [#~name] = { ~*body })
