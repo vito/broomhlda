@@ -1,70 +1,71 @@
-macro (lexer(name, &body))
+macro(lexer(name) { *body }):
   `(class(~name < HL::Lexers::Lexer):
       @matchers = Hash new
       @info = Hash new
 
-      ~body call)
+      ~*body)
 
-for-macro class(<< self):
-  short-name(["name", "constant"]) := "no"
-  short-name(["name", "entity"]) := "ni"
-  short-name(["name", "property"]) := "py"
-  short-name(["literal", b]) := short-name([b])
-  short-name([a, "other"]) := short-name([a]) + "x"
-  short-name([a, "error"]) := short-name([a]) + "r"
-  short-name([a, "single"]) := short-name([a]) + "1"
-  short-name([a, "double"]) := short-name([a]) + "2"
-  short-name([a, b]) := short-name([a]) + short-name([b])
-  short-name(["error"]) := "err"
-  short-name(["number"]) := "m"
-  short-name([x]) := x slice(0, 1)
-  short-name(_ . xs) := short-name(xs)
+for-macro:
+  class(<< self):
+    short-name(["name", "constant"]) := "no"
+    short-name(["name", "entity"]) := "ni"
+    short-name(["name", "property"]) := "py"
+    short-name(["literal", b]) := short-name([b])
+    short-name([a, "other"]) := short-name([a]) + "x"
+    short-name([a, "error"]) := short-name([a]) + "r"
+    short-name([a, "single"]) := short-name([a]) + "1"
+    short-name([a, "double"]) := short-name([a]) + "2"
+    short-name([a, b]) := short-name([a]) + short-name([b])
+    short-name(["error"]) := "err"
+    short-name(["number"]) := "m"
+    short-name([x]) := x slice(0, 1)
+    short-name(_ . xs) := short-name(xs)
 
-  type-from(x: Atomy::AST::Variable) := do:
-    tag = Atomy::AST::String new(0, short-name(x name split(".")))
-    `(HL::Tokens::Tagged new(~tag))
+    type-from(x: Atomy::AST::Variable) := do:
+      tag = Atomy::AST::String new(0, short-name(x name split(".")))
+      `(HL::Tokens::Tagged new(~tag))
 
-  type-from(gs: `(by-groups())) := do:
-    msg = '(HL::Tokens::ByGroups new)
-    msg arguments = [Atomy::AST::List new(0, gs arguments collect (a): type-from(a))]
-    msg
+    type-from(gs: `(by-groups())) := do:
+      msg = '(HL::Tokens::ByGroups new)
+      msg arguments = [Atomy::AST::List new(0, gs arguments collect [a]: type-from(a))]
+      msg
 
-  type-from(`(using(~who))) := do:
-    `(HL::Tokens::Using new(~who))
+    type-from(`(using(~who))) := do:
+      `(HL::Tokens::Using new(~who))
 
-  type-from(x) := raise("unknown match type: " + x inspect)
+    type-from(x) := raise("unknown match type: " + x inspect)
 
-  regexp-from(x) :=
-    `((x): Regexp new(
-        x source
-        x options | @info fetch(#flags)
-      ); call(~x))
+    regexp-from(x) :=
+      `([x]: Regexp new(
+          x source
+          x options | @info fetch(#flags)
+        ); call(~x))
 
-  state-from('pop) := '(HL::States::Pop new)
-  state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
-  state-from('push) := '(HL::States::Push new)
-  state-from(z: `(do-all())) := do:
-    all = '[]
-    all elements = z arguments collect (a): state-from(a)
-    `(HL::States::DoAll new(~all))
-  state-from(z: `(combined())) := do:
-    all = '[]
-    all elements = z arguments reverse collect (a):
-      `(@matchers fetch(#~a))
+    state-from('pop) := '(HL::States::Pop new)
+    state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
+    state-from('push) := '(HL::States::Push new)
+    state-from(z: `(do-all())) := do:
+      all = '[]
+      all elements = z arguments collect [a]: state-from(a)
+      `(HL::States::DoAll new(~all))
+    state-from(z: `(combined())) := do:
+      all = '[]
+      all elements = z arguments reverse collect [a]:
+        `(@matchers fetch(#~a))
 
-    `(HL::States::Combined new(~all))
-  state-from(`(go-to(~n))) :=
-    `(HL::States::GoTo new(@matchers, #~n))
-  state-from(x) :=
-    raise("unknown state: " + x inspect)
+      `(HL::States::Combined new(~all))
+    state-from(`(go-to(~n))) :=
+      `(HL::States::GoTo new(@matchers, #~n))
+    state-from(x) :=
+      raise("unknown state: " + x inspect)
 
 
-macro (lex(name, &tokens)) do:
+macro(lex(name, &tokens)):
   branches = '[]
 
   body = []
 
-  tokens contents each (c):
+  tokens contents each [c]:
     c match:
       -- implicit continue state
       `(~x is(~y)) ->

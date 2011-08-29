@@ -7,7 +7,7 @@ import("lexers")
 import("state")
 import("formatters/html")
 
-Dir glob(here + "/lexers/imported/*.ay") each (t):
+Dir glob(here + "/lexers/imported/*.ay") each [t]:
   puts(File basename(t))
   import(t)
 
