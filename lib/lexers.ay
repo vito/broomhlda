@@ -1,9 +1,7 @@
-namespace(broomhlda)
-
 class(NoMatchFor < Error):
   initialize(@input) := #ok
 
-  export: message :=
+  message :=
     "no matchers succeeded for: " +
       @input slice(0, 50) inspect + " [...]"
 
@@ -17,11 +15,11 @@ module(HL):
       define(initialize(input)):
         @input = input dup
 
-        @state = [
-          class matchers fetch(class info fetch(#start)) call
+        @state = Array[
+          class matchers[class info[#start]][]
         ] -- [Matcher]
 
-        @lexed = [] -- [Token]
+        @lexed = Array[] -- [Token]
 
       -- run the lexer until the input is empty, yielding
       -- the lexed tokens

@@ -1,13 +1,15 @@
 here = File expand-path("../", _FILE)
-$path unshift(here)
 
-namespace(broomhlda)
-
-import("macros")
-import("token")
-import("state")
-import("lexers")
-import("formatters/html")
+require(here + "/macros")
+require(here + "/token")
+require(here + "/state")
+require(here + "/lexers")
+require(here + "/formatters/html")
 
 load(lexer) :=
-  import("lexers/" + lexer downcase)
+  require(
+    File expand-path(
+      "../lexers/" + lexer downcase
+      _FILE
+    )
+  )

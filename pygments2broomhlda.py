@@ -174,9 +174,7 @@ def convert_next(n):
         return "go-to(" + convert_name(n) + ")"
 
 def convert_lexer(mod, name, aliases, filenames, mimetypes, flags):
-  return """namespace(broomhlda)
-
-lexer(HL::Lexers::%s):
+  return """lexer(HL::Lexers::%s):
 
 name: %s
 aliases: %s

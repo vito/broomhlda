@@ -20,16 +20,14 @@ for-macro:
   short-name([x]) := x slice(0, 1)
   short-name(_ . xs) := short-name(xs)
 
-  type-from(x: Atomy::AST::Variable) := do:
-    tag = Atomy::AST::String new(0, short-name(x name split(".")))
+  type-from(x: Atomy::AST::Word) := do:
+    tag = short-name(x text split("."))
     `(HL::Tokens::Tagged new(~tag))
 
-  type-from(gs: `(by-groups())) := do:
-    msg = '(HL::Tokens::ByGroups new)
-    msg arguments = [Atomy::AST::List new(0, gs arguments collect [a]: type-from(a))]
-    msg
+  type-from(`(by-groups(~*args))) :=
+    `(HL::Tokens::ByGroups new([~*(args collect [a]: type-from(a))]))
 
-  type-from(`(using(~who))) := do:
+  type-from(`(using(~who))) :=
     `(HL::Tokens::Using new(~who))
 
   type-from(x) := raise("unknown match type: " + x inspect)
@@ -43,13 +41,10 @@ for-macro:
   state-from('pop) := '(HL::States::Pop new)
   state-from(`(pop(~n))) := `(HL::States::PopNum new(~n))
   state-from('push) := '(HL::States::Push new)
-  state-from(z: `(do-all())) := do:
-    all = '[]
-    all elements = z arguments collect [a]: state-from(a)
-    `(HL::States::DoAll new(~all))
-  state-from(z: `(combined())) := do:
-    all = '[]
-    all elements = z arguments reverse collect [a]:
+  state-from(`(do-all(~*args))) :=
+    `(HL::States::DoAll new(~(args collect [a]: state-from(a))))
+  state-from(`(combined(~*args))) := do:
+    all = args reverse collect [a]:
       `(@matchers fetch(#~a))
 
     `(HL::States::Combined new(~all))
@@ -60,6 +55,9 @@ for-macro:
 
 
 macro(lex(~name) { ~*tokens }):
+  `(lex(~name) [] { ~*tokens })
+
+macro(lex(~name) [~*args] { ~*tokens }):
   branches = Array[]
 
   body = Array[]
@@ -101,4 +99,4 @@ macro(lex(~name) { ~*tokens }):
 
   body << `([~*branches] flatten)
 
-  `(@matchers [#~name] = { ~*body })
+  `(@matchers [#~name] = [~*args] { ~*body })
