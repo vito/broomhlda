@@ -55,7 +55,7 @@ Lexer = lexer:
     Regexp new("@" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.instance)
 
     -- particles
-    Regexp new("." + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+    Regexp new("\\." + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
 
     -- macro-quotes
     Regexp new("(" + @@identifier + ")(\")", Regexp::KCODE_UTF8) is(by-groups(name, string)) => macro-quote
