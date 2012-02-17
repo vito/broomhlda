@@ -10,12 +10,12 @@ Lexer = lexer:
   flags: Regexp::MULTILINE
 
   @@identifier =
-    raw"[\p{Ll}_][\p{L}\d\p{S}!@#%&*\-\\.\/\?]*"
+    raw"[\p{Ll}_][\p{L}\d\-_]*"
 
   @@operator = raw"[\p{S}!@#%&*\-\\:.\/\?]+"
 
   @@reserved =
-    raw"(operator|macro|self)\b(?!" + @@operator + ")"
+    raw"(#language|macro|self)\b(?!" + @@operator + ")"
 
   @@ascii = [
     "NUL","SOH","[SE]TX","EOT","ENQ","ACK",
