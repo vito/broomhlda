@@ -1,0 +1,25 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "MOOCode"
+aliases: ["moocode"]
+extensions: [".moo"]
+mimetypes: ["text/x-moocode"]
+start: .root
+flags: 0
+
+lex(root):
+  Regexp new("(0|[1-9][0-9_]*)") is(literal.number.integer)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string)
+  Regexp new("(E_PERM|E_DIV)") is(name.exception)
+  Regexp new("((#[-0-9]+)|(\\$[a-z_A-Z0-9]+))") is(name.entity)
+  Regexp new("\\b(if|else|elseif|endif|for|endfor|fork|endfork|while|endwhile|break|continue|return|try|except|endtry|finally|in)\\b") is(keyword)
+  Regexp new("(random|length)") is(name.builtin)
+  Regexp new("(player|caller|this|args)") is(name.variable.instance)
+  Regexp new("\\s+") is(text)
+  Regexp new("\\n") is(text)
+  Regexp new("([!;=,{}&\\|:\\.\\[\\]@\\(\\)\\<\\>\\?]+)") is(operator)
+  Regexp new("([a-z_A-Z0-9]+)(\\()") is(by-groups(name.function, operator))
+  Regexp new("([a-zA-Z_0-9]+)") is(text)
+

@@ -1,0 +1,37 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Groff"
+aliases: ["groff", "nroff", "man"]
+extensions: [".[1234567]", ".man"]
+mimetypes: ["application/x-troff", "text/troff"]
+start: .root
+flags: 0
+
+lex(request):
+  Regexp new("\\n") is(text) -> pop
+  any-of(escapes)
+  Regexp new("\"[^\\n\"]+\"") is(literal.string.double)
+  Regexp new("\\d+") is(literal.number)
+  Regexp new("\\S+") is(literal.string)
+  Regexp new("\\s+") is(text)
+
+lex(escapes):
+  Regexp new("\\\\\"[^\\n]*") is(comment)
+  Regexp new("\\\\[fn]\\w") is(literal.string.escape)
+  Regexp new("\\\\\\(..") is(literal.string.escape)
+  Regexp new("\\\\.\\[.*\\]") is(literal.string.escape)
+  Regexp new("\\\\.") is(literal.string.escape)
+  Regexp new("\\\\\\n") is(text) -> go-to(request)
+
+lex(root):
+  Regexp new("(?i)(\\.)(\\w+)") is(by-groups(text, keyword)) -> go-to(request)
+  Regexp new("\\.") is(punctuation) -> go-to(request)
+  Regexp new("[^\\\\\\n]*") is(text) -> go-to(textline)
+
+lex(textline):
+  any-of(escapes)
+  Regexp new("[^\\\\\\n]+") is(text)
+  Regexp new("\\n") is(text) -> pop
+

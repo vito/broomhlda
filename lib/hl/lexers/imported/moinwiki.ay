@@ -1,0 +1,32 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "MoinMoin/Trac Wiki markup"
+aliases: ["trac-wiki", "moin"]
+extensions: []
+mimetypes: ["text/x-trac-wiki"]
+start: .root
+flags: Regexp::IGNORECASE
+
+lex(root):
+  Regexp new("^#.*$") is(comment)
+  Regexp new("(!)(\\S+)") is(by-groups(keyword, text))
+  Regexp new("^(=+)([^=]+)(=+)(\\s*#.+)?$") is(by-groups(generic.heading, using(self class), generic.heading, literal.string))
+  Regexp new("({{{)(\\n#!.+)?") is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
+  Regexp new("(\\'\\'\\'?|\\|\\||`|__|\126\126|\\^|,,|::)") is(comment)
+  Regexp new("^( +)([.*-])( )") is(by-groups(text, name.builtin, text))
+  Regexp new("^( +)([a-zivx]{1,5}\\.)( )") is(by-groups(text, name.builtin, text))
+  Regexp new("\\[\\[\\w+.*?\\]\\]") is(keyword)
+  Regexp new("(\\[[^\\s\\]]+)(\\s+[^\\]]+?)?(\\])") is(by-groups(keyword, literal.string, keyword))
+  Regexp new("^----+$") is(keyword)
+  Regexp new("[^\\n\\'\\[{!_\126^,|]+") is(text)
+  Regexp new("\\n") is(text)
+  Regexp new(".") is(text)
+
+lex(codeblock):
+  Regexp new("}}}") is(name.builtin) -> pop
+  Regexp new("{{{") is(text) -> push
+  Regexp new("[^{}]+") is(comment.preproc)
+  Regexp new(".") is(comment.preproc)
+

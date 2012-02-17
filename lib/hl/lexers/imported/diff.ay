@@ -1,0 +1,21 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Diff"
+aliases: ["diff", "udiff"]
+extensions: [".diff", ".patch"]
+mimetypes: ["text/x-diff", "text/x-patch"]
+start: .root
+flags: 0
+
+lex(root):
+  Regexp new(" .*\\n") is(text)
+  Regexp new("\\+.*\\n") is(generic.inserted)
+  Regexp new("-.*\\n") is(generic.deleted)
+  Regexp new("!.*\\n") is(generic.strong)
+  Regexp new("@.*\\n") is(generic.subheading)
+  Regexp new("([Ii]ndex|diff).*\\n") is(generic.heading)
+  Regexp new("=.*\\n") is(generic.heading)
+  Regexp new(".*\\n") is(text)
+

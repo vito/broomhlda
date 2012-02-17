@@ -1,0 +1,99 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Ada"
+aliases: ["ada", "ada95ada2005"]
+extensions: [".adb", ".ads", ".ada"]
+mimetypes: ["text/x-ada"]
+start: .root
+flags: Regexp::IGNORECASE
+
+lex(package-instantiation):
+  Regexp new("(\"[^\"]+\"|[a-z0-9_]+)(\\s+)(=>)") is(by-groups(name.variable, text, punctuation))
+  Regexp new("[a-z0-9._\\'\"]") is(text)
+  Regexp new("\\)") is(punctuation) -> pop
+  any-of(root)
+
+lex(formal-part):
+  Regexp new("\\)") is(punctuation) -> pop
+  Regexp new("([a-z0-9_]+)(\\s*)(,|:[^=])") is(by-groups(name.variable, text, punctuation))
+  Regexp new("(in|not|null|out|access)\\b") is(keyword.reserved)
+  any-of(root)
+
+lex(attribute):
+  Regexp new("(')([a-zA-Z0-9_]+)") is(by-groups(punctuation, name.attribute))
+
+lex(subprogram):
+  Regexp new("\\(") is(punctuation) -> do-all(pop, go-to(formal-part))
+  Regexp new(";") is(punctuation) -> pop
+  Regexp new("is\\b") is(keyword.reserved) -> pop
+  Regexp new("\"[^\"]+\"|[a-z0-9_]+") is(name.function)
+  any-of(root)
+
+lex(numbers):
+  Regexp new("[0-9_]+#[0-9a-f]+#") is(literal.number.hex)
+  Regexp new("[0-9_]+\\.[0-9_]*") is(literal.number.float)
+  Regexp new("[0-9_]+") is(literal.number.integer)
+
+lex(type-def):
+  Regexp new(";") is(punctuation) -> pop
+  Regexp new("\\(") is(punctuation) -> go-to(formal-part)
+  Regexp new("with|and|use") is(keyword.reserved)
+  Regexp new("array\\b") is(keyword.reserved) -> do-all(pop, go-to(array-def))
+  Regexp new("record\\b") is(keyword.reserved) -> go-to(formal-part)
+  any-of(root)
+
+lex(end):
+  Regexp new("(if|case|record|loop|select)") is(keyword.reserved)
+  Regexp new("\"[^\"]+\"|[a-zA-Z0-9_]+") is(name.function)
+  Regexp new("[\10\\s]+") is(text)
+  Regexp new(";") is(punctuation) -> pop
+
+lex(array-def):
+  Regexp new(";") is(punctuation) -> pop
+  Regexp new("([a-z0-9_]+)(\\s+)(range)") is(by-groups(keyword.type, text, keyword.reserved))
+  any-of(root)
+
+lex(package):
+  Regexp new("body") is(keyword.declaration)
+  Regexp new("is\\s+new|renames") is(keyword.reserved)
+  Regexp new("is") is(keyword.reserved) -> pop
+  Regexp new(";") is(punctuation) -> pop
+  Regexp new("\\(") is(punctuation) -> go-to(package-instantiation)
+  Regexp new("([a-zA-Z0-9_.]+)") is(name.class)
+  any-of(root)
+
+lex(import):
+  Regexp new("[a-z0-9_.]+") is(name.namespace) -> pop
+
+lex(root):
+  Regexp new("[^\\S\\n]+") is(text)
+  Regexp new("--.*?\\n") is(comment.single)
+  Regexp new("[^\\S\\n]+") is(text)
+  Regexp new("function|procedure|entry") is(keyword.declaration) -> go-to(subprogram)
+  Regexp new("(subtype|type)(\\s+)([a-z0-9_]+)") is(by-groups(keyword.declaration, text, keyword.type)) -> go-to(type-def)
+  Regexp new("task|protected") is(keyword.declaration)
+  Regexp new("(subtype)(\\s+)") is(by-groups(keyword.declaration, text))
+  Regexp new("(end)(\\s+)") is(by-groups(keyword.reserved, text)) -> go-to(end)
+  Regexp new("(pragma)(\\s+)([a-zA-Z0-9_]+)") is(by-groups(keyword.reserved, text, comment.preproc))
+  Regexp new("(true|false|null)\\b") is(keyword.constant)
+  Regexp new("(Byte|Character|Float|Integer|Long_Float|Long_Integer|Long_Long_Float|Long_Long_Integer|Natural|Positive|Short_Float|Short_Integer|Short_Short_Float|Short_Short_Integer|String|Wide_String|Duration)\\b") is(keyword.type)
+  Regexp new("(and(\\s+then)?|in|mod|not|or(\\s+else)|rem)\\b") is(operator.word)
+  Regexp new("generic|private") is(keyword.declaration)
+  Regexp new("package") is(keyword.declaration) -> go-to(package)
+  Regexp new("array\\b") is(keyword.reserved) -> go-to(array-def)
+  Regexp new("(with|use)(\\s+)") is(by-groups(keyword.namespace, text)) -> go-to(import)
+  Regexp new("([a-z0-9_]+)(\\s*)(:)(\\s*)(constant)") is(by-groups(name.constant, text, punctuation, text, keyword.reserved))
+  Regexp new("<<[a-z0-9_]+>>") is(name.label)
+  Regexp new("([a-z0-9_]+)(\\s*)(:)(\\s*)(declare|begin|loop|for|while)") is(by-groups(name.label, text, punctuation, text, keyword.reserved))
+  Regexp new("\\b(abort|abs|abstract|accept|access|aliased|all|array|at|begin|body|case|constant|declare|delay|delta|digits|do|else|elsif|end|entry|exception|exit|interface|for|goto|if|is|limited|loop|new|null|of|or|others|out|overriding|pragma|protected|raise|range|record|renames|requeue|return|reverse|select|separate|subtype|synchronized|task|tagged|terminate|then|type|until|when|while|xor)\\b") is(keyword.reserved)
+  Regexp new("\"[^\"]*\"") is(literal.string)
+  any-of(attribute)
+  any-of(numbers)
+  Regexp new("'[^']'") is(literal.string.character)
+  Regexp new("([a-z0-9_]+)(\\s*|[(,])") is(by-groups(name, using(self class)))
+  Regexp new("(<>|=>|:=|[\\(\\)\\|:;,.'])") is(punctuation)
+  Regexp new("[*<>+=/&-]") is(operator)
+  Regexp new("\\n+") is(text)
+

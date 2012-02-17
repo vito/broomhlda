@@ -1,0 +1,121 @@
+use("atomy")
+
+lexer = require(File expand-path("../lexer", _FILE))
+
+Lexer = lexer::Lexer
+Matcher = lexer::Matcher
+State = require(File expand-path("../state", _FILE))
+Token = require(File expand-path("../token", _FILE))
+
+macro(lexer { ~*body }):
+  `(Lexer class:
+      @matchers = Hash new
+      @info = Hash new
+
+      ~*body)
+
+short-name(["name", "constant"]) := "no"
+short-name(["name", "entity"]) := "ni"
+short-name(["name", "property"]) := "py"
+short-name(["literal", b]) := short-name([b])
+short-name([a, "other"]) := short-name([a]) + "x"
+short-name([a, "error"]) := short-name([a]) + "r"
+short-name([a, "single"]) := short-name([a]) + "1"
+short-name([a, "double"]) := short-name([a]) + "2"
+short-name([a, b]) := short-name([a]) + short-name([b])
+short-name(["error"]) := "err"
+short-name(["number"]) := "m"
+short-name([x]) := x slice(0, 1)
+short-name(_ . xs) := short-name(xs)
+
+type-from(x: Atomy::AST::Word) :=
+  `(Token::Tagged new(~short-name([x text to-s])))
+
+type-from(`((~a). ~(b))) := do:
+  tag = short-name([
+    a text to-s
+    b text to-s])
+  `(Token::Tagged new(~tag))
+
+type-from(`(~_ (~a). ~(b))) := do:
+  tag = short-name([
+    a text to-s
+    b text to-s])
+  `(Token::Tagged new(~tag))
+
+type-from(`(by-groups(~*args))) :=
+  `(Token::ByGroups new([~*(args collect [a]: type-from(a))]))
+
+type-from(`(using(~who))) :=
+  `(Token::Using new(~who))
+
+type-from(x) := raise("unknown match type: " + x inspect)
+
+regexp-from(x) :=
+  `([x]: Regexp new(
+      x source
+      x options | @info fetch(.flags)
+    ); call(~x))
+
+state-from('pop) := '(State::Pop new)
+state-from(`(pop(~n))) := `(State::PopNum new(~n))
+state-from('push) := '(State::Push new)
+state-from(`(do-all(~*args))) :=
+  `(State::DoAll new(~(args collect [a]: state-from(a))))
+state-from(`(combined(~*args))) := do:
+  all = args reverse collect [a]:
+    `(@matchers fetch(.~a))
+
+  `(State::Combined new(~all))
+state-from(`(go-to(~n))) :=
+  `(State::GoTo new(@matchers, .~n))
+state-from(x) :=
+  raise("unknown state: " + x inspect)
+
+
+macro(lex(~name) { ~*tokens }):
+  `(lex(~name) [] { ~*tokens })
+
+macro(lex(~name) [~*args] { ~*tokens }):
+  branches = []
+
+  body = []
+
+  tokens each [c]:
+    c match:
+      -- implicit continue state
+      `(~x is(~y)) ->
+        branches <<
+          `(Matcher new(
+              ~(regexp-from(x))
+              ~(type-from(y))
+              State::Continue new
+            ))
+
+      -- specifying a state
+      `(~x is(~y) -> ~z) -> do:
+        branches <<
+          `(Matcher new(
+              ~(regexp-from(x))
+              ~(type-from(y))
+              ~(state-from(z))
+            ))
+
+      -- goto shortcut
+      `(~x is(~y) => ~z) ->
+        branches <<
+          `(Matcher new(
+              ~(regexp-from(x))
+              ~(type-from(y))
+              State::GoTo new(@matchers, .~z)
+            ))
+
+      `(any-of(~any)) ->
+        branches <<
+          `(@matchers fetch(.~any) call) -- TODO: parameterization?
+
+      _ -> body << c
+
+  body << `([~*branches] flatten)
+
+  `(@matchers [.~name] = [~*args] { ~*body })

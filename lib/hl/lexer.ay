@@ -1,0 +1,99 @@
+use("atomy")
+
+condition = require("condition")
+
+token = require(File expand-path("../token", _FILE))
+
+
+NoMatchFor = condition::Error class:
+  initialize(@input) := .ok
+
+  message :=
+    "no matchers succeeded for: " +
+      @input slice(0, 50) inspect + " [...]"
+
+
+data(Matcher(@regexp, @type, @next))
+
+-- TODO: Using
+tokens(data, gs: token::ByGroups) =
+  gs types zip(data to-a drop(1)) [[t, d]]:
+    when(t nil? || d nil?):
+      return(nil)
+
+    @lexed << token::Token new(t, d)
+
+tokens(data, t: token::Tagged) =
+  @lexed << token::Token new(t, data to-s)
+
+-- go through matchers until one matches the immediate
+-- next input. if none match, try again, but allowing
+-- matches past the start.
+try-all(matchers) = do:
+  closest = nil
+  worked = nil
+
+  matchers each [m]:
+    d = m regexp match(@input)
+    when(d and (not closest or
+                  d pre-match size < closest pre-match size)):
+      closest =! d
+      worked =! m
+
+      when(closest pre-match empty?):
+        break
+
+  unless(closest):
+    error(NoMatchFor new(@input))
+
+  skipped = closest pre-match
+  @input = closest post-match
+
+  worked next apply(@state, closest)
+
+  unless(skipped empty?):
+    @lexed <<
+      token::Token new(
+        token::Tagged new("err")
+        skipped)
+
+  tokens(closest, worked type)
+
+Lexer = class:
+  initialize(input) := do:
+    @input = input dup
+
+    @state = [
+      class matchers[class info[.start]][]
+    ] -- [Matcher]
+
+    @lexed = [] -- [Token]
+
+  -- run the lexer until the input is empty, yielding
+  -- the lexed tokens
+  run := do:
+    until(@input empty?):
+      try-all(@state last)
+
+    @lexed
+
+  singleton:
+    attr-accessor(.matchers, .info)
+
+    name &x :=
+      @info[.name] = x call
+
+    aliases &x :=
+      @info[.aliases] = x call
+
+    extensions &x :=
+      @info[.extensions] = x call
+
+    mimetypes &x :=
+      @info[.mimetypes] = x call
+
+    start &x :=
+      @info[.start] = x call
+
+    flags &x :=
+      @info[.flags] = x call

@@ -1,0 +1,88 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Haskell"
+aliases: ["haskell", "hs"]
+extensions: [".hs"]
+mimetypes: ["text/x-haskell"]
+start: .root
+flags: 0
+
+lex(comment):
+  Regexp new("[^-{}]+") is(comment.multiline)
+  Regexp new("{-") is(comment.multiline) -> push
+  Regexp new("-}") is(comment.multiline) -> pop
+  Regexp new("[-{}]") is(comment.multiline)
+
+lex(funclist):
+  Regexp new("\\s+") is(text)
+  Regexp new("[A-Z][a-zA-Z0-9_]*") is(keyword.type)
+  Regexp new("[_a-z][\\w\\']+") is(name.function)
+  Regexp new("--.*$") is(comment.single)
+  Regexp new("{-") is(comment.multiline) -> go-to(comment)
+  Regexp new(",") is(punctuation)
+  Regexp new("[:!#$%&*+.\\\\/<=>?@^|\126-]+") is(operator)
+  Regexp new("\\(") is(punctuation) -> do-all(go-to(funclist), go-to(funclist))
+  Regexp new("\\)") is(punctuation) -> pop(2)
+
+lex(string):
+  Regexp new("[^\\\\\"]+") is(literal.string)
+  Regexp new("\\\\") is(literal.string.escape) -> go-to(escape)
+  Regexp new("\"") is(literal.string) -> pop
+
+lex(import):
+  Regexp new("\\s+") is(text)
+  Regexp new("\"") is(literal.string) -> go-to(string)
+  Regexp new("\\)") is(punctuation) -> pop
+  Regexp new("qualified\\b") is(keyword)
+  Regexp new("([A-Z][a-zA-Z0-9_.]*)(\\s+)(as)(\\s+)([A-Z][a-zA-Z0-9_.]*)") is(by-groups(name.namespace, text, keyword, text, name)) -> pop
+  Regexp new("([A-Z][a-zA-Z0-9_.]*)(\\s+)(hiding)(\\s+)(\\()") is(by-groups(name.namespace, text, keyword, text, punctuation)) -> go-to(funclist)
+  Regexp new("([A-Z][a-zA-Z0-9_.]*)(\\s+)(\\()") is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
+  Regexp new("[a-zA-Z0-9_.]+") is(name.namespace) -> pop
+
+lex(escape):
+  Regexp new("[abfnrtv\"\\'&\\\\]") is(literal.string.escape) -> pop
+  Regexp new("\\^[\\]\\[A-Z@\\^_]") is(literal.string.escape) -> pop
+  Regexp new("NUL|SOH|[SE]TX|EOT|ENQ|ACK|BEL|BS|HT|LF|VT|FF|CR|S[OI]|DLE|DC[1-4]|NAK|SYN|ETB|CAN|EM|SUB|ESC|[FGRU]S|SP|DEL") is(literal.string.escape) -> pop
+  Regexp new("o[0-7]+") is(literal.string.escape) -> pop
+  Regexp new("x[\\da-fA-F]+") is(literal.string.escape) -> pop
+  Regexp new("\\d+") is(literal.string.escape) -> pop
+  Regexp new("\\s+\\\\") is(literal.string.escape) -> pop
+
+lex(root):
+  Regexp new("\\s+") is(text)
+  Regexp new("--(?![!#$%&*+./<=>?@\\^|_\126]).*?$") is(comment.single)
+  Regexp new("{-") is(comment.multiline) -> go-to(comment)
+  Regexp new("\\bimport\\b") is(keyword.reserved) -> go-to(import)
+  Regexp new("\\bmodule\\b") is(keyword.reserved) -> go-to(module)
+  Regexp new("\\berror\\b") is(name.exception)
+  Regexp new("\\b(case|class|data|default|deriving|do|else|if|in|infix[lr]?|instance|let|newtype|of|then|type|where|_)(?!\\')\\b") is(keyword.reserved)
+  Regexp new("^[_a-z][\\w\\']*") is(name.function)
+  Regexp new("[_a-z][\\w\\']*") is(name)
+  Regexp new("[A-Z][\\w\\']*") is(keyword.type)
+  Regexp new("\\\\(?![:!#$%&*+.\\\\/<=>?@^|\126-]+)") is(name.function)
+  Regexp new("(<-|::|->|=>|=)(?![:!#$%&*+.\\\\/<=>?@^|\126-]+)") is(operator.word)
+  Regexp new(":[:!#$%&*+.\\\\/<=>?@^|\126-]*") is(keyword.type)
+  Regexp new("[:!#$%&*+.\\\\/<=>?@^|\126-]+") is(operator)
+  Regexp new("\\d+[eE][+-]?\\d+") is(literal.number.float)
+  Regexp new("\\d+\\.\\d+([eE][+-]?\\d+)?") is(literal.number.float)
+  Regexp new("0[oO][0-7]+") is(literal.number.oct)
+  Regexp new("0[xX][\\da-fA-F]+") is(literal.number.hex)
+  Regexp new("\\d+") is(literal.number.integer)
+  Regexp new("'") is(literal.string.char) -> go-to(character)
+  Regexp new("\"") is(literal.string) -> go-to(string)
+  Regexp new("\\[\\]") is(keyword.type)
+  Regexp new("\\(\\)") is(name.builtin)
+  Regexp new("[\\]\\[(),;`{}]") is(punctuation)
+
+lex(module):
+  Regexp new("\\s+") is(text)
+  Regexp new("([A-Z][a-zA-Z0-9_.]*)(\\s+)(\\()") is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
+  Regexp new("[A-Z][a-zA-Z0-9_.]*") is(name.namespace) -> pop
+
+lex(character):
+  Regexp new("[^\\\\']") is(literal.string.char)
+  Regexp new("\\\\") is(literal.string.escape) -> go-to(escape)
+  Regexp new("'") is(literal.string.char) -> pop
+

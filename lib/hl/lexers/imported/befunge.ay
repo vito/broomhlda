@@ -1,0 +1,25 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Befunge"
+aliases: ["befunge"]
+extensions: [".befunge"]
+mimetypes: ["application/x-befunge"]
+start: .root
+flags: 0
+
+lex(root):
+  Regexp new("[0-9a-f]") is(literal.number)
+  Regexp new("[\\+\\*/%!`-]") is(operator)
+  Regexp new("[<>^v?\\[\\]rxjk]") is(name.variable)
+  Regexp new("[:\\\\$.,n]") is(name.builtin)
+  Regexp new("[|_mw]") is(keyword)
+  Regexp new("[{}]") is(name.tag)
+  Regexp new("\".*?\"") is(literal.string.double)
+  Regexp new("\\'.") is(literal.string.single)
+  Regexp new("[#;]") is(comment)
+  Regexp new("[pg&\126=@iotsy]") is(keyword)
+  Regexp new("[()A-Z]") is(comment)
+  Regexp new("\\s+") is(text)
+

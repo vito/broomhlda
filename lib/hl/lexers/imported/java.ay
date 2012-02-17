@@ -1,0 +1,41 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Java"
+aliases: ["java"]
+extensions: [".java"]
+mimetypes: ["text/x-java"]
+start: .root
+flags: Regexp::MULTILINE
+
+lex(import):
+  Regexp new("[a-zA-Z0-9_.]+\\*?") is(name.namespace) -> pop
+
+lex(root):
+  Regexp new("^(\\s*(?:[a-zA-Z_][a-zA-Z0-9_\\.\\[\\]]*\\s+)+?)([a-zA-Z_][a-zA-Z0-9_]*)(\\s*)(\\()") is(by-groups(using(self class), name.function, text, operator))
+  Regexp new("[^\\S\\n]+") is(text)
+  Regexp new("//.*?\\n") is(comment.single)
+  Regexp new("/\\*.*?\\*/") is(comment.multiline)
+  Regexp new("@[a-zA-Z_][a-zA-Z0-9_\\.]*") is(name.decorator)
+  Regexp new("(assert|break|case|catch|continue|default|do|else|finally|for|if|goto|instanceof|new|return|switch|this|throw|try|while)\\b") is(keyword)
+  Regexp new("(abstract|const|enum|extends|final|implements|native|private|protected|public|static|strictfp|super|synchronized|throws|transient|volatile)\\b") is(keyword.declaration)
+  Regexp new("(boolean|byte|char|double|float|int|long|short|void)\\b") is(keyword.type)
+  Regexp new("(package)(\\s+)") is(by-groups(keyword.namespace, text))
+  Regexp new("(true|false|null)\\b") is(keyword.constant)
+  Regexp new("(class|interface)(\\s+)") is(by-groups(keyword.declaration, text)) -> go-to(class)
+  Regexp new("(import)(\\s+)") is(by-groups(keyword.namespace, text)) -> go-to(import)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string)
+  Regexp new("'\\\\.'|'[^\\\\]'|'\\\\u[0-9a-f]{4}'") is(literal.string.char)
+  Regexp new("(\\.)([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(operator, name.attribute))
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*:") is(name.label)
+  Regexp new("[a-zA-Z_\\$][a-zA-Z0-9_]*") is(name)
+  Regexp new("[\126\\^\\*!%&\\[\\]\\(\\)\\{\\}<>\\|+=:;,./?-]") is(operator)
+  Regexp new("[0-9][0-9]*\\.[0-9]+([eE][0-9]+)?[fd]?") is(literal.number.float)
+  Regexp new("0x[0-9a-f]+") is(literal.number.hex)
+  Regexp new("[0-9]+L?") is(literal.number.integer)
+  Regexp new("\\n") is(text)
+
+lex(class):
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.class) -> pop
+

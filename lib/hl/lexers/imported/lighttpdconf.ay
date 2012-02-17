@@ -1,0 +1,23 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Lighttpd configuration file"
+aliases: ["lighty", "lighttpd"]
+extensions: []
+mimetypes: ["text/x-lighttpd-conf"]
+start: .root
+flags: 0
+
+lex(root):
+  Regexp new("#.*\\n") is(comment.single)
+  Regexp new("/\\S*") is(name)
+  Regexp new("[a-zA-Z._-]+") is(keyword)
+  Regexp new("\\d+\\.\\d+\\.\\d+\\.\\d+(?:/\\d+)?") is(literal.number)
+  Regexp new("[0-9]+") is(literal.number)
+  Regexp new("=>|=\126|\\+=|==|=|\\+") is(operator)
+  Regexp new("\\$[A-Z]+") is(name.builtin)
+  Regexp new("[(){}\\[\\],]") is(punctuation)
+  Regexp new("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"") is(literal.string.double)
+  Regexp new("\\s+") is(text)
+

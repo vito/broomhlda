@@ -1,0 +1,94 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "ANTLR"
+aliases: ["antlr"]
+extensions: []
+mimetypes: []
+start: .root
+flags: 0
+
+lex(tokens):
+  any-of(whitespace)
+  any-of(comments)
+  Regexp new("{") is(punctuation)
+  Regexp new("([A-Z][A-Za-z_0-9]*)(\\s*)(=)?(\\s*)(\\'(?:\\\\\\\\|\\\\\\'|[^\\']*)\\')?(\\s*)(;)") is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, literal.string, text.whitespace, punctuation))
+  Regexp new("}") is(punctuation) -> pop
+
+lex(exception):
+  Regexp new("\\n") is(text.whitespace) -> pop
+  Regexp new("\\s") is(text.whitespace)
+  any-of(comments)
+  Regexp new("\\[") is(punctuation) -> go-to(nested-arg-action)
+  Regexp new("\\{") is(punctuation) -> go-to(action)
+
+lex(whitespace):
+  Regexp new("\\s+") is(text.whitespace)
+
+lex(action):
+  Regexp new("([^\\${}\\'\"/\\\\]+|\"(\\\\\\\\|\\\\\"|[^\"])*\"|'(\\\\\\\\|\\\\'|[^'])*'|//.*$\\n?|/\\*(.|\\n)*?\\*/|/(?!\\*)(\\\\\\\\|\\\\/|[^/])*/|\\\\(?!%)|/)+") is(other)
+  Regexp new("(\\\\)(%)") is(by-groups(punctuation, other))
+  Regexp new("(\\$[a-zA-Z]+)(\\.?)(text|value)?") is(by-groups(name.variable, punctuation, name.property))
+  Regexp new("{") is(punctuation) -> push
+  Regexp new("}") is(punctuation) -> pop
+
+lex(nested-arg-action):
+  Regexp new("([^\\$\\[\\]\\'\"/]+|\"(\\\\\\\\|\\\\\"|[^\"])*\"|'(\\\\\\\\|\\\\'|[^'])*'|//.*$\\n?|/\\*(.|\\n)*?\\*/|/(?!\\*)(\\\\\\\\|\\\\/|[^/])*/|/)+") is(other)
+  Regexp new("\\[") is(punctuation) -> push
+  Regexp new("\\]") is(punctuation) -> pop
+  Regexp new("(\\$[a-zA-Z]+)(\\.?)(text|value)?") is(by-groups(name.variable, punctuation, name.property))
+  Regexp new("(\\\\\\\\|\\\\\\]|\\\\\\[|[^\\[\\]])+") is(other)
+
+lex(rule-prelims):
+  any-of(whitespace)
+  any-of(comments)
+  Regexp new("returns\\b") is(keyword)
+  Regexp new("\\[") is(punctuation) -> go-to(nested-arg-action)
+  Regexp new("\\{") is(punctuation) -> go-to(action)
+  Regexp new("(throws)(\\s+)([A-Za-z][A-Za-z_0-9]*)") is(by-groups(keyword, text.whitespace, name.label))
+  Regexp new("(?:(,)(\\s*)([A-Za-z][A-Za-z_0-9]*))+") is(by-groups(punctuation, text.whitespace, name.label))
+  Regexp new("options\\b") is(keyword) -> go-to(options)
+  Regexp new("(scope)(\\s+)({)") is(by-groups(keyword, text.whitespace, punctuation)) -> go-to(action)
+  Regexp new("(scope)(\\s+)([A-Za-z][A-Za-z_0-9]*)(\\s*)(;)") is(by-groups(keyword, text.whitespace, name.label, text.whitespace, punctuation))
+  Regexp new("(@[A-Za-z][A-Za-z_0-9]*)(\\s*)({)") is(by-groups(name.label, text.whitespace, punctuation)) -> go-to(action)
+  Regexp new(":") is(punctuation) -> pop
+
+lex(root):
+  any-of(whitespace)
+  any-of(comments)
+  Regexp new("(lexer|parser|tree)?(\\s*)(grammar\\b)(\\s*)([A-Za-z][A-Za-z_0-9]*)(;)") is(by-groups(keyword, text.whitespace, keyword, text.whitespace, name.class, punctuation))
+  Regexp new("options\\b") is(keyword) -> go-to(options)
+  Regexp new("tokens\\b") is(keyword) -> go-to(tokens)
+  Regexp new("(scope)(\\s*)([A-Za-z][A-Za-z_0-9]*)(\\s*)({)") is(by-groups(keyword, text.whitespace, name.variable, text.whitespace, punctuation)) -> go-to(action)
+  Regexp new("(catch|finally)\\b") is(keyword) -> go-to(exception)
+  Regexp new("(@[A-Za-z][A-Za-z_0-9]*)(\\s*)(::)?(\\s*)([A-Za-z][A-Za-z_0-9]*)(\\s*)({)") is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, name.label, text.whitespace, punctuation)) -> go-to(action)
+  Regexp new("((?:protected|private|public|fragment)\\b)?(\\s*)([A-Za-z][A-Za-z_0-9]*)(!)?") is(by-groups(keyword, text.whitespace, name.label, punctuation)) -> do-all(go-to(rule-alts), go-to(rule-prelims))
+
+lex(rule-alts):
+  any-of(whitespace)
+  any-of(comments)
+  Regexp new("options\\b") is(keyword) -> go-to(options)
+  Regexp new(":") is(punctuation)
+  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string)
+  Regexp new("<<([^>]|>[^>])>>") is(literal.string)
+  Regexp new("\\$?[A-Z_][A-Za-z_0-9]*") is(name.constant)
+  Regexp new("\\$?[a-z_][A-Za-z_0-9]*") is(name.variable)
+  Regexp new("(\\+|\\||->|=>|=|\\(|\\)|\\.\\.|\\.|\\?|\\*|\\^|!|\\#|\126)") is(operator)
+  Regexp new(",") is(punctuation)
+  Regexp new("\\[") is(punctuation) -> go-to(nested-arg-action)
+  Regexp new("\\{") is(punctuation) -> go-to(action)
+  Regexp new(";") is(punctuation) -> pop
+
+lex(comments):
+  Regexp new("//.*$") is(comment)
+  Regexp new("/\\*(.|\\n)*?\\*/") is(comment)
+
+lex(options):
+  any-of(whitespace)
+  any-of(comments)
+  Regexp new("{") is(punctuation)
+  Regexp new("([A-Za-z][A-Za-z_0-9]*)(\\s*)(=)(\\s*)([A-Za-z][A-Za-z_0-9]*|\\'(?:\\\\\\\\|\\\\\\'|[^\\']*)\\'|[0-9]+|\\*)(\\s*)(;)") is(by-groups(name.variable, text.whitespace, punctuation, text.whitespace, text, text.whitespace, punctuation))
+  Regexp new("}") is(punctuation) -> pop
+

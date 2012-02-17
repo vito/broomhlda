@@ -1,0 +1,32 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Matlab"
+aliases: ["matlab", "octave"]
+extensions: [".m"]
+mimetypes: ["text/matlab"]
+start: .root
+flags: 0
+
+lex(deffunc):
+  Regexp new("(\\s*)(?:(.+)(\\s*)(=)(\\s*))?(.+)(\\()(.*)(\\))(\\s*)") is(by-groups(text.whitespace, text, text.whitespace, punctuation, text.whitespace, name.function, punctuation, text, punctuation, text.whitespace)) -> pop
+
+lex(root):
+  Regexp new("^!.*") is(literal.string.other)
+  Regexp new("%.*$") is(comment)
+  Regexp new("^\\s*function") is(keyword) -> go-to(deffunc)
+  Regexp new("(break|case|catch|classdef|continue|else|elseif|end|enumerated|events|for|function|global|if|methods|otherwise|parfor|persistent|properties|return|spmd|switch|try|while)\\b") is(keyword)
+  Regexp new("(sin|sind|sinh|asin|asind|asinh|cos|cosd|cosh|acos|acosd|acosh|tan|tand|tanh|atan|atand|atan2|atanh|sec|secd|sech|asec|asecd|asech|csc|cscd|csch|acsc|acscd|acsch|cot|cotd|coth|acot|acotd|acoth|hypot|exp|expm1|log|log1p|log10|log2|pow2|realpow|reallog|realsqrt|sqrt|nthroot|nextpow2|abs|angle|complex|conj|imag|real|unwrap|isreal|cplxpair|fix|floor|ceil|round|mod|rem|sign|airy|besselj|bessely|besselh|besseli|besselk|beta|betainc|betaln|ellipj|ellipke|erf|erfc|erfcx|erfinv|expint|gamma|gammainc|gammaln|psi|legendre|cross|dot|factor|isprime|primes|gcd|lcm|rat|rats|perms|nchoosek|factorial|cart2sph|cart2pol|pol2cart|sph2cart|hsv2rgb|rgb2hsv|zeros|ones|eye|repmat|rand|randn|linspace|logspace|freqspace|meshgrid|accumarray|size|length|ndims|numel|disp|isempty|isequal|isequalwithequalnans|cat|reshape|diag|blkdiag|tril|triu|fliplr|flipud|flipdim|rot90|find|end|sub2ind|ind2sub|bsxfun|ndgrid|permute|ipermute|shiftdim|circshift|squeeze|isscalar|isvector|ans|eps|realmax|realmin|pi|i|inf|nan|isnan|isinf|isfinite|j|why|compan|gallery|hadamard|hankel|hilb|invhilb|magic|pascal|rosser|toeplitz|vander|wilkinson)\\b") is(name.builtin)
+  Regexp new("-|==|\126=|<|>|<=|>=|&&|&|\126|\\|\\|?") is(operator)
+  Regexp new("\\.\\*|\\*|\\+|\\.\\^|\\.\\\\|\\.\\/|\\/|\\\\") is(operator)
+  Regexp new("\\[|\\]|\\(|\\)|\\{|\\}|:|@|\\.|,") is(punctuation)
+  Regexp new("=|:|;") is(punctuation)
+  Regexp new("(?<=[\\w\\)\\]])\\'") is(operator)
+  Regexp new("(?<![\\w\\)\\]])\\'") is(literal.string) -> go-to(string)
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name)
+  Regexp new(".") is(text)
+
+lex(string):
+  Regexp new("[^\\']*\\'") is(literal.string) -> pop
+

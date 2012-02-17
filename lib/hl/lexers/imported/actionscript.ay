@@ -1,0 +1,30 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "ActionScript"
+aliases: ["as", "actionscript"]
+extensions: [".as"]
+mimetypes: ["application/x-actionscript", "text/x-actionscript", "text/actionscript"]
+start: .root
+flags: Regexp::MULTILINE
+
+lex(root):
+  Regexp new("\\s+") is(text)
+  Regexp new("//.*?\\n") is(comment.single)
+  Regexp new("/\\*.*?\\*/") is(comment.multiline)
+  Regexp new("/(\\\\\\\\|\\\\/|[^/\\n])*/[gim]*") is(literal.string.regex)
+  Regexp new("[\126\\^\\*!%&<>\\|+=:;,/?\\\\-]+") is(operator)
+  Regexp new("[{}\\[\\]();.]+") is(punctuation)
+  Regexp new("(case|default|for|each|in|while|do|break|return|continue|if|else|throw|try|catch|var|with|new|typeof|arguments|instanceof|this|switch)\\b") is(keyword)
+  Regexp new("(class|public|final|internal|native|override|private|protected|static|import|extends|implements|interface|intrinsic|return|super|dynamic|function|const|get|namespace|package|set)\\b") is(keyword.declaration)
+  Regexp new("(true|false|null|NaN|Infinity|-Infinity|undefined|Void)\\b") is(keyword.constant)
+  Regexp new("(Accessibility|AccessibilityProperties|ActionScriptVersion|ActivityEvent|AntiAliasType|ApplicationDomain|AsBroadcaster|Array|AsyncErrorEvent|AVM1Movie|BevelFilter|Bitmap|BitmapData|BitmapDataChannel|BitmapFilter|BitmapFilterQuality|BitmapFilterType|BlendMode|BlurFilter|Boolean|ByteArray|Camera|Capabilities|CapsStyle|Class|Color|ColorMatrixFilter|ColorTransform|ContextMenu|ContextMenuBuiltInItems|ContextMenuEvent|ContextMenuItem|ConvultionFilter|CSMSettings|DataEvent|Date|DefinitionError|DeleteObjectSample|Dictionary|DisplacmentMapFilter|DisplayObject|DisplacmentMapFilterMode|DisplayObjectContainer|DropShadowFilter|Endian|EOFError|Error|ErrorEvent|EvalError|Event|EventDispatcher|EventPhase|ExternalInterface|FileFilter|FileReference|FileReferenceList|FocusDirection|FocusEvent|Font|FontStyle|FontType|FrameLabel|FullScreenEvent|Function|GlowFilter|GradientBevelFilter|GradientGlowFilter|GradientType|Graphics|GridFitType|HTTPStatusEvent|IBitmapDrawable|ID3Info|IDataInput|IDataOutput|IDynamicPropertyOutputIDynamicPropertyWriter|IEventDispatcher|IExternalizable|IllegalOperationError|IME|IMEConversionMode|IMEEvent|int|InteractiveObject|InterpolationMethod|InvalidSWFError|InvokeEvent|IOError|IOErrorEvent|JointStyle|Key|Keyboard|KeyboardEvent|KeyLocation|LineScaleMode|Loader|LoaderContext|LoaderInfo|LoadVars|LocalConnection|Locale|Math|Matrix|MemoryError|Microphone|MorphShape|Mouse|MouseEvent|MovieClip|MovieClipLoader|Namespace|NetConnection|NetStatusEvent|NetStream|NewObjectSample|Number|Object|ObjectEncoding|PixelSnapping|Point|PrintJob|PrintJobOptions|PrintJobOrientation|ProgressEvent|Proxy|QName|RangeError|Rectangle|ReferenceError|RegExp|Responder|Sample|Scene|ScriptTimeoutError|Security|SecurityDomain|SecurityError|SecurityErrorEvent|SecurityPanel|Selection|Shape|SharedObject|SharedObjectFlushStatus|SimpleButton|Socket|Sound|SoundChannel|SoundLoaderContext|SoundMixer|SoundTransform|SpreadMethod|Sprite|StackFrame|StackOverflowError|Stage|StageAlign|StageDisplayState|StageQuality|StageScaleMode|StaticText|StatusEvent|String|StyleSheet|SWFVersion|SyncEvent|SyntaxError|System|TextColorType|TextField|TextFieldAutoSize|TextFieldType|TextFormat|TextFormatAlign|TextLineMetrics|TextRenderer|TextSnapshot|Timer|TimerEvent|Transform|TypeError|uint|URIError|URLLoader|URLLoaderDataFormat|URLRequest|URLRequestHeader|URLRequestMethod|URLStream|URLVariabeles|VerifyError|Video|XML|XMLDocument|XMLList|XMLNode|XMLNodeType|XMLSocket|XMLUI)\\b") is(name.builtin)
+  Regexp new("(decodeURI|decodeURIComponent|encodeURI|escape|eval|isFinite|isNaN|isXMLName|clearInterval|fscommand|getTimer|getURL|getVersion|isFinite|parseFloat|parseInt|setInterval|trace|updateAfterEvent|unescape)\\b") is(name.function)
+  Regexp new("[$a-zA-Z_][a-zA-Z0-9_]*") is(name.other)
+  Regexp new("[0-9][0-9]*\\.[0-9]+([eE][0-9]+)?[fd]?") is(literal.number.float)
+  Regexp new("0x[0-9a-f]+") is(literal.number.hex)
+  Regexp new("[0-9]+") is(literal.number.integer)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.double)
+  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string.single)
+

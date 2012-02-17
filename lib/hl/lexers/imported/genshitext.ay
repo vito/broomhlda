@@ -1,0 +1,29 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Genshi Text"
+aliases: ["genshitext"]
+extensions: []
+mimetypes: ["application/x-genshi-text", "text/x-genshi"]
+start: .root
+flags: 0
+
+lex(variable):
+  Regexp new("(?<!\\$)(\\$\\{)(.+?)(\\})") is(by-groups(comment.preproc, using(Python), comment.preproc))
+  Regexp new("(?<!\\$)(\\$)([a-zA-Z_][a-zA-Z0-9_\\.]*)") is(name.variable)
+
+lex(root):
+  Regexp new("[^#\\$\\s]+") is(other)
+  Regexp new("^(\\s*)(##.*)$") is(by-groups(text, comment))
+  Regexp new("^(\\s*)(#)") is(by-groups(text, comment.preproc)) -> go-to(directive)
+  any-of(variable)
+  Regexp new("[#\\$\\s]") is(other)
+
+lex(directive):
+  Regexp new("\\n") is(text) -> pop
+  Regexp new("(?:def|for|if)\\s+.*") is(using(Python)) -> pop
+  Regexp new("(choose|when|with)([^\\S\\n]+)(.*)") is(by-groups(keyword, text, using(Python))) -> pop
+  Regexp new("(choose|otherwise)\\b") is(keyword) -> pop
+  Regexp new("(end\\w*)([^\\S\\n]*)(.*)") is(by-groups(keyword, text, comment)) -> pop
+

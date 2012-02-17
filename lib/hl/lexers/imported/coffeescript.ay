@@ -1,0 +1,43 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "CoffeeScript"
+aliases: ["coffee-script", "coffeescript"]
+extensions: [".coffee"]
+mimetypes: ["text/coffeescript"]
+start: .root
+flags: Regexp::MULTILINE
+
+lex(commentsandwhitespace):
+  Regexp new("\\s+") is(text)
+  Regexp new("#.*?\\n") is(comment.single)
+
+lex(root):
+  Regexp new("^(?=\\s|/|<!--)") is(text) -> go-to(slashstartsregex)
+  any-of(commentsandwhitespace)
+  Regexp new("\\+\\+|--|\126|&&|\\band\\b|\\bor\\b|\\bis\\b|\\bisnt\\b|\\bnot\\b|\\?|:|=|\\|\\||\\\\(?=\\n)|(<<|>>>?|==?|!=?|[-<>+*`%&\\|\\^/])=?") is(operator) -> go-to(slashstartsregex)
+  Regexp new("\\([^()]*\\)\\s*->") is(name.function)
+  Regexp new("[{(\\[;,]") is(punctuation) -> go-to(slashstartsregex)
+  Regexp new("[})\\].]") is(punctuation)
+  Regexp new("(for|in|of|while|break|return|continue|switch|when|then|if|else|throw|try|catch|finally|new|delete|typeof|instanceof|super|extends|this|class|by)\\b") is(keyword) -> go-to(slashstartsregex)
+  Regexp new("(true|false|yes|no|on|off|null|NaN|Infinity|undefined)\\b") is(keyword.constant)
+  Regexp new("(Array|Boolean|Date|Error|Function|Math|netscape|Number|Object|Packages|RegExp|String|sun|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt|document|window)\\b") is(name.builtin)
+  Regexp new("[$a-zA-Z_][a-zA-Z0-9_\\.:]*\\s*[:=]\\s") is(name.variable) -> go-to(slashstartsregex)
+  Regexp new("@[$a-zA-Z_][a-zA-Z0-9_\\.:]*\\s*[:=]\\s") is(name.variable.instance) -> go-to(slashstartsregex)
+  Regexp new("@?[$a-zA-Z_][a-zA-Z0-9_]*") is(name.other) -> go-to(slashstartsregex)
+  Regexp new("[0-9][0-9]*\\.[0-9]+([eE][0-9]+)?[fd]?") is(literal.number.float)
+  Regexp new("0x[0-9a-fA-F]+") is(literal.number.hex)
+  Regexp new("[0-9]+") is(literal.number.integer)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.double)
+  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string.single)
+
+lex(slashstartsregex):
+  any-of(commentsandwhitespace)
+  Regexp new("/(\\\\.|[^\\[/\\\\\\n]|\\[(\\\\.|[^\\]\\\\\\n])*])+/([gim]+\\b|\\B)") is(literal.string.regex) -> pop
+  Regexp new("(?=/)") is(text) -> do-all(pop, go-to(badregex))
+  Regexp new("") is(text) -> pop
+
+lex(badregex):
+  Regexp new("\10") is(text) -> pop
+

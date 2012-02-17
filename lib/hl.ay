@@ -1,15 +1,11 @@
+use("atomy")
+
 here = File expand-path("../", _FILE)
 
-require(here + "/macros")
-require(here + "/token")
-require(here + "/state")
-require(here + "/lexers")
-require(here + "/formatters/html")
+$path unshift(here)
 
 load(lexer) :=
   require(
     File expand-path(
-      "../lexers/" + lexer downcase
-      _FILE
-    )
-  )
+      "../hl/lexers/" + lexer downcase
+      _FILE))::Lexer

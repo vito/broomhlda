@@ -1,0 +1,26 @@
+use("atomy")
+
+data(State):
+  Continue
+  GoTo(@matchers, @next)
+  Pop
+  PopNum(@num)
+  Push
+  DoAll(@states)
+  Combined(@matchers)
+
+Continue apply(_, _) := nil
+
+GoTo apply(s, d) :=
+  s << @matchers fetch(@next) call(d)
+
+Push apply(s, _) := s << s last
+
+Pop apply(s, _) := s pop
+
+PopNum apply(s, _) := s pop(@num)
+
+DoAll apply(s, d) := d each [s]: s apply(s, d)
+
+Combined apply(s, d) :=
+  s << @matchers inject([]) [a, m]: a + m call(d)

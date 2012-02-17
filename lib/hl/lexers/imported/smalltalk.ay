@@ -1,0 +1,92 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Smalltalk"
+aliases: ["smalltalk", "squeak"]
+extensions: [".st"]
+mimetypes: ["text/x-smalltalk"]
+start: .root
+flags: 0
+
+lex(objects):
+  Regexp new("\\[") is(text) -> go-to(blockvariables)
+  Regexp new("\\]") is(text) -> go-to(afterobject)
+  Regexp new("\\b(self|super|true|false|nil|thisContext)\\b") is(name.builtin.pseudo) -> go-to(afterobject)
+  Regexp new("\\b[A-Z]\\w*(?!:)\\b") is(name.class) -> go-to(afterobject)
+  Regexp new("\\b[a-z]\\w*(?!:)\\b") is(name.variable) -> go-to(afterobject)
+  Regexp new("#(\"[^\"]*\"|[-+*/\\\\\126<>=|&!?,@%]+|[\\w:]+)") is(literal.string.symbol) -> go-to(afterobject)
+  any-of(literals)
+
+lex(blockvariables):
+  any-of(whitespaces)
+  Regexp new("(:)(\\s*)([A-Za-z\\w]+)") is(by-groups(operator, text, name.variable))
+  Regexp new("\\|") is(operator) -> pop
+  Regexp new("") is(text) -> pop
+
+lex(_parenth-helper):
+  any-of(whitespaces)
+  Regexp new("(\\d+r)?-?\\d+(\\.\\d+)?(e-?\\d+)?") is(literal.number)
+  Regexp new("[-+*/\\\\\126<>=|&#!?,@%\\w+:]+") is(literal.string.symbol)
+  Regexp new("\\'[^\\']*\\'") is(literal.string)
+  Regexp new("\\$.") is(literal.string.char)
+  Regexp new("#*\\(") is(literal.string.symbol) -> go-to(inner-parenth)
+
+lex(afterobject):
+  Regexp new("! !$") is(keyword) -> pop
+  any-of(whitespaces)
+  Regexp new("\\b(ifTrue:|ifFalse:|whileTrue:|whileFalse:|timesRepeat:)") is(name.builtin) -> pop
+  Regexp new("\\b(new\\b(?!:))") is(name.builtin)
+  Regexp new("\\:=|\\_") is(operator) -> pop
+  Regexp new("\\b[a-zA-Z]+\\w*:") is(name.function) -> pop
+  Regexp new("\\b[a-zA-Z]+\\w*") is(name.function)
+  Regexp new("\\w+:?|[-+*/\\\\\126<>=|&!?,@%]+") is(name.function) -> pop
+  Regexp new("\\.") is(punctuation) -> pop
+  Regexp new(";") is(punctuation)
+  Regexp new("[\\])}]") is(text)
+  Regexp new("[\\[({]") is(text) -> pop
+
+lex(literals):
+  Regexp new("\\'[^\\']*\\'") is(literal.string) -> go-to(afterobject)
+  Regexp new("\\$.") is(literal.string.char) -> go-to(afterobject)
+  Regexp new("#\\(") is(literal.string.symbol) -> go-to(parenth)
+  Regexp new("\\)") is(text) -> go-to(afterobject)
+  Regexp new("(\\d+r)?-?\\d+(\\.\\d+)?(e-?\\d+)?") is(literal.number) -> go-to(afterobject)
+
+lex(method-definition):
+  Regexp new("([a-zA-Z]+\\w*:)(\\s*)(\\w+)") is(by-groups(name.function, text, name.variable))
+  Regexp new("^(\\b[a-zA-Z]+\\w*\\b)(\\s*)$") is(by-groups(name.function, text))
+  Regexp new("^([-+*/\\\\\126<>=|&!?,@%]+)(\\s*)(\\w+)(\\s*)$") is(by-groups(name.function, text, name.variable, text))
+
+lex(parenth):
+  Regexp new("\\)") is(literal.string.symbol) -> do-all(go-to(root), go-to(afterobject))
+  any-of(_parenth-helper)
+
+lex(inner-parenth):
+  Regexp new("\\)") is(literal.string.symbol) -> pop
+  any-of(_parenth-helper)
+
+lex(whitespaces):
+  Regexp new("\\s+") is(text)
+  Regexp new("\"[^\"]*\"") is(comment)
+
+lex(squeak-fileout):
+  Regexp new("^\"[^\"]*\"!") is(keyword)
+  Regexp new("^'[^']*'!") is(keyword)
+  Regexp new("^(!)(\\w+)( commentStamp: )(.*?)( prior: .*?!\\n)(.*?)(!)") is(by-groups(keyword, name.class, keyword, literal.string, keyword, text, keyword))
+  Regexp new("^(!)(\\w+(?: class)?)( methodsFor: )(\\'[^\\']*\\')(.*?!)") is(by-groups(keyword, name.class, keyword, literal.string, keyword))
+  Regexp new("^(\\w+)( subclass: )(#\\w+)(\\s+instanceVariableNames: )(.*?)(\\s+classVariableNames: )(.*?)(\\s+poolDictionaries: )(.*?)(\\s+category: )(.*?)(!)") is(by-groups(name.class, keyword, literal.string.symbol, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword))
+  Regexp new("^(\\w+(?: class)?)(\\s+instanceVariableNames: )(.*?)(!)") is(by-groups(name.class, keyword, literal.string, keyword))
+  Regexp new("(!\\n)(\\].*)(! !)$") is(by-groups(keyword, text, keyword))
+  Regexp new("! !$") is(keyword)
+
+lex(root):
+  Regexp new("(<)(\\w+:)(.*?)(>)") is(by-groups(text, keyword, text, text))
+  any-of(squeak-fileout)
+  any-of(whitespaces)
+  any-of(method-definition)
+  Regexp new("(\\|)([\\w\\s]*)(\\|)") is(by-groups(operator, name.variable, operator))
+  any-of(objects)
+  Regexp new("\\^|\\:=|\\_") is(operator)
+  Regexp new("[\\]({}.;!]") is(text)
+

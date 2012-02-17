@@ -1,0 +1,101 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "D"
+aliases: ["d"]
+extensions: [".d", ".di"]
+mimetypes: ["text/x-dsrc"]
+start: .root
+flags: 0
+
+lex(delimited-parenthesis):
+  Regexp new("[^\\(\\)]+") is(literal.string)
+  Regexp new("\\(") is(literal.string) -> go-to(delimited-inside-parenthesis)
+  Regexp new("\\)\"") is(literal.string) -> pop
+
+lex(delimited-curly):
+  Regexp new("[^{}]+") is(literal.string)
+  Regexp new("{") is(literal.string) -> go-to(delimited-inside-curly)
+  Regexp new("}\"") is(literal.string) -> pop
+
+lex(delimited-angle):
+  Regexp new("[^<>]+") is(literal.string)
+  Regexp new("<") is(literal.string) -> go-to(delimited-inside-angle)
+  Regexp new(">\"") is(literal.string) -> pop
+
+lex(delimited-inside-parenthesis):
+  Regexp new("[^\\(\\)]+") is(literal.string)
+  Regexp new("\\(") is(literal.string) -> push
+  Regexp new("\\)") is(literal.string) -> pop
+
+lex(delimited-inside-curly):
+  Regexp new("[^{}]+") is(literal.string)
+  Regexp new("{") is(literal.string) -> push
+  Regexp new("}") is(literal.string) -> pop
+
+lex(delimited-inside-bracket):
+  Regexp new("[^\\[\\]]+") is(literal.string)
+  Regexp new("\\[") is(literal.string) -> push
+  Regexp new("\\]") is(literal.string) -> pop
+
+lex(token-string-nest):
+  Regexp new("{") is(punctuation) -> push
+  Regexp new("}") is(punctuation) -> pop
+  any-of(root)
+
+lex(delimited-bracket):
+  Regexp new("[^\\[\\]]+") is(literal.string)
+  Regexp new("\\[") is(literal.string) -> go-to(delimited-inside-bracket)
+  Regexp new("\\]\"") is(literal.string) -> pop
+
+lex(token-string):
+  Regexp new("{") is(punctuation) -> go-to(token-string-nest)
+  Regexp new("}") is(literal.string) -> pop
+  any-of(root)
+
+lex(delimited-inside-angle):
+  Regexp new("[^<>]+") is(literal.string)
+  Regexp new("<") is(literal.string) -> push
+  Regexp new(">") is(literal.string) -> pop
+
+lex(root):
+  Regexp new("\\n") is(text)
+  Regexp new("\\s+") is(text)
+  Regexp new("//(.*?)\\n") is(comment.single)
+  Regexp new("/(\\\\\\n)?[*](.|\\n)*?[*](\\\\\\n)?/") is(comment.multiline)
+  Regexp new("/\\+") is(comment.multiline) -> go-to(nested-comment)
+  Regexp new("(abstract|alias|align|asm|assert|auto|body|break|case|cast|catch|class|const|continue|debug|default|delegate|delete|deprecated|do|else|enum|export|extern|finally|final|foreach_reverse|foreach|for|function|goto|if|import|inout|interface|invariant|in|is|lazy|mixin|module|new|nothrow|out|override|package|pragma|private|protected|public|pure|ref|return|scope|static|struct|super|switch|synchronized|template|this|throw|try|typedef|typeid|typeof|union|unittest|version|volatile|while|with|__traits)\\b") is(keyword)
+  Regexp new("(bool|byte|cdouble|cent|cfloat|char|creal|dchar|double|float|idouble|ifloat|int|ireal|long|real|short|ubyte|ucent|uint|ulong|ushort|void|wchar)\\b") is(keyword.type)
+  Regexp new("(false|true|null)\\b") is(keyword.constant)
+  Regexp new("macro\\b") is(keyword.reserved)
+  Regexp new("(string|wstring|dstring)\\b") is(name.builtin)
+  Regexp new("0[xX]([0-9a-fA-F_]*\\.[0-9a-fA-F_]+|[0-9a-fA-F_]+)[pP][+\\-]?[0-9_]+[fFL]?[i]?") is(literal.number.float)
+  Regexp new("[0-9_]+(\\.[0-9_]+[eE][+\\-]?[0-9_]+|\\.[0-9_]*|[eE][+\\-]?[0-9_]+)[fFL]?[i]?") is(literal.number.float)
+  Regexp new("\\.(0|[1-9][0-9_]*)([eE][+\\-]?[0-9_]+)?[fFL]?[i]?") is(literal.number.float)
+  Regexp new("0[Bb][01_]+") is(literal.number)
+  Regexp new("0[0-7_]+") is(literal.number.oct)
+  Regexp new("0[xX][0-9a-fA-F_]+") is(literal.number.hex)
+  Regexp new("(0|[1-9][0-9_]*)([LUu]|Lu|LU|uL|UL)?") is(literal.number.integer)
+  Regexp new("'(\\\\['\"?\\\\abfnrtv]|\\\\x[0-9a-fA-F]{2}|\\\\[0-7]{1,3}|\\\\u[0-9a-fA-F]{4}|\\\\U[0-9a-fA-F]{8}|\\\\&\\w+;|.)'") is(literal.string.char)
+  Regexp new("r\"[^\"]*\"[cwd]?") is(literal.string)
+  Regexp new("`[^`]*`[cwd]?") is(literal.string)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"[cwd]?") is(literal.string)
+  Regexp new("\\\\(['\\\"?\\\\abfnrtv]|x[0-9a-fA-F]{2}|[0-7]{1,3}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|&\\w+;)") is(literal.string)
+  Regexp new("x\"[0-9a-fA-F_\\s]*\"[cwd]?") is(literal.string)
+  Regexp new("q\"\\[") is(literal.string) -> go-to(delimited-bracket)
+  Regexp new("q\"\\(") is(literal.string) -> go-to(delimited-parenthesis)
+  Regexp new("q\"<") is(literal.string) -> go-to(delimited-angle)
+  Regexp new("q\"{") is(literal.string) -> go-to(delimited-curly)
+  Regexp new("q\"([a-zA-Z_]\\w*)\\n.*?\\n\\1\"") is(literal.string)
+  Regexp new("q\"(.).*?\\1\"") is(literal.string)
+  Regexp new("q{") is(literal.string) -> go-to(token-string)
+  Regexp new("(\126=|\\^=|%=|\\*=|==|!>=|!<=|!<>=|!<>|!<|!>|!=|>>>=|>>>|>>=|>>|>=|<>=|<>|<<=|<<|<=|\\+\\+|\\+=|--|-=|\\|\\||\\|=|&&|&=|\\.\\.\\.|\\.\\.|/=)|[/.&|\\-+<>!()\\[\\]{}?,;:$=*%^\126]") is(punctuation)
+  Regexp new("[a-zA-Z_]\\w*") is(name)
+
+lex(nested-comment):
+  Regexp new("[^+/]+") is(comment.multiline)
+  Regexp new("/\\+") is(comment.multiline) -> push
+  Regexp new("\\+/") is(comment.multiline) -> pop
+  Regexp new("[+/]") is(comment.multiline)
+

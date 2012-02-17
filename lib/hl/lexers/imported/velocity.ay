@@ -1,0 +1,49 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Velocity"
+aliases: ["velocity"]
+extensions: [".vm", ".fhtml"]
+mimetypes: []
+start: .root
+flags: Regexp::MULTILINE
+
+lex(variable):
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.variable)
+  Regexp new("\\(") is(punctuation) -> go-to(funcparams)
+  Regexp new("(\\.)([a-zA-Z_][a-zA-Z0-9_]*)") is(by-groups(punctuation, name.variable)) -> push
+  Regexp new("\\}") is(punctuation) -> pop
+  Regexp new("") is(other) -> pop
+
+lex(rangeoperator):
+  Regexp new("\\.\\.") is(operator)
+  any-of(funcparams)
+  Regexp new("\\]") is(operator) -> pop
+
+lex(root):
+  Regexp new("[^{#$]+") is(other)
+  Regexp new("(#)(\\*.*?\\*)(#)") is(by-groups(comment.preproc, comment, comment.preproc))
+  Regexp new("(##)(.*?$)") is(by-groups(comment.preproc, comment))
+  Regexp new("(#\\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\\}?)(\\s?\\()") is(by-groups(comment.preproc, name.function, comment.preproc, punctuation)) -> go-to(directiveparams)
+  Regexp new("(#\\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\\}|\\b)") is(by-groups(comment.preproc, name.function, comment.preproc))
+  Regexp new("\\$\\{?") is(punctuation) -> go-to(variable)
+
+lex(funcparams):
+  Regexp new("\\$\\{?") is(punctuation) -> go-to(variable)
+  Regexp new("\\s+") is(text)
+  Regexp new(",") is(punctuation)
+  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.double)
+  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string.single)
+  Regexp new("0[xX][0-9a-fA-F]+[Ll]?") is(literal.number)
+  Regexp new("\\b[0-9]+\\b") is(literal.number)
+  Regexp new("(true|false|null)\\b") is(keyword.constant)
+  Regexp new("\\(") is(punctuation) -> push
+  Regexp new("\\)") is(punctuation) -> pop
+
+lex(directiveparams):
+  Regexp new("(&&|\\|\\||==?|!=?|[-<>+*%&\\|\\^/])|\\b(eq|ne|gt|lt|ge|le|not|in)\\b") is(operator)
+  Regexp new("\\[") is(operator) -> go-to(rangeoperator)
+  Regexp new("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b") is(name.function)
+  any-of(funcparams)
+

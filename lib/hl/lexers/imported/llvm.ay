@@ -1,0 +1,35 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "LLVM"
+aliases: ["llvm"]
+extensions: [".ll"]
+mimetypes: ["text/x-llvm"]
+start: .root
+flags: 0
+
+lex(root):
+  any-of(whitespace)
+  Regexp new("^\\s*([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")\\s*:") is(name.label)
+  any-of(keyword)
+  Regexp new("%([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")") is(name.variable)
+  Regexp new("@([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")") is(name.variable.global)
+  Regexp new("%\\d+") is(name.variable.anonymous)
+  Regexp new("@\\d+") is(name.variable.global)
+  Regexp new("!([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")") is(name.variable)
+  Regexp new("!\\d+") is(name.variable.anonymous)
+  Regexp new("c?\"[^\"]*?\"") is(literal.string)
+  Regexp new("0[xX][a-fA-F0-9]+") is(literal.number)
+  Regexp new("-?\\d+(?:[.]\\d+)?(?:[eE][-+]?\\d+(?:[.]\\d+)?)?") is(literal.number)
+  Regexp new("[=<>{}\\[\\]()*.,!]|x\\b") is(punctuation)
+
+lex(whitespace):
+  Regexp new("(\\n|\\s)+") is(text)
+  Regexp new(";.*?\\n") is(comment)
+
+lex(keyword):
+  Regexp new("(begin|end|true|false|declare|define|global|constant|private|linker_private|internal|available_externally|linkonce|linkonce_odr|weak|weak_odr|appending|dllimport|dllexport|common|default|hidden|protected|extern_weak|external|thread_local|zeroinitializer|undef|null|to|tail|target|triple|deplibs|datalayout|volatile|nuw|nsw|exact|inbounds|align|addrspace|section|alias|module|asm|sideeffect|gc|dbg|ccc|fastcc|coldcc|x86_stdcallcc|x86_fastcallcc|arm_apcscc|arm_aapcscc|arm_aapcs_vfpcc|cc|c|signext|zeroext|inreg|sret|nounwind|noreturn|noalias|nocapture|byval|nest|readnone|readonly|inlinehint|noinline|alwaysinline|optsize|ssp|sspreq|noredzone|noimplicitfloat|naked|type|opaque|eq|ne|slt|sgt|sle|sge|ult|ugt|ule|uge|oeq|one|olt|ogt|ole|oge|ord|uno|ueq|une|x|add|fadd|sub|fsub|mul|fmul|udiv|sdiv|fdiv|urem|srem|frem|shl|lshr|ashr|and|or|xor|icmp|fcmp|phi|call|trunc|zext|sext|fptrunc|fpext|uitofp|sitofp|fptouifptosi|inttoptr|ptrtoint|bitcast|select|va_arg|ret|br|switch|invoke|unwind|unreachable|malloc|alloca|free|load|store|getelementptr|extractelement|insertelement|shufflevector|getresult|extractvalue|insertvalue)\\b") is(keyword)
+  Regexp new("void|float|double|x86_fp80|fp128|ppc_fp128|label|metadata") is(keyword.type)
+  Regexp new("i[1-9]\\d*") is(keyword)
+

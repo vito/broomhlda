@@ -1,0 +1,87 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Ioke"
+aliases: ["ioke", "ik"]
+extensions: [".ik"]
+mimetypes: ["text/x-iokesrc"]
+start: .root
+flags: 0
+
+lex(squareRegexp):
+  Regexp new("(?<!\\\\)][oxpniums]*") is(literal.string.regex) -> pop
+  any-of(interpolatableText)
+  Regexp new("\\\\]") is(literal.string.regex)
+  Regexp new("[^\\]]") is(literal.string.regex)
+
+lex(textInterpolationRoot):
+  Regexp new("}") is(punctuation) -> pop
+  any-of(root)
+
+lex(interpolatableText):
+  Regexp new("(\\\\b|\\\\e|\\\\t|\\\\n|\\\\f|\\\\r|\\\\\"|\\\\\\\\|\\\\#|\\\\\\Z|\\\\u[0-9a-fA-F]{1,4}|\\\\[0-3]?[0-7]?[0-7])") is(literal.string.escape)
+  Regexp new("#{") is(punctuation) -> go-to(textInterpolationRoot)
+
+lex(text):
+  Regexp new("(?<!\\\\)\"") is(literal.string) -> pop
+  any-of(interpolatableText)
+  Regexp new("[^\"]") is(literal.string)
+
+lex(documentation):
+  Regexp new("(?<!\\\\)\"") is(literal.string.doc) -> pop
+  any-of(interpolatableText)
+  Regexp new("[^\"]") is(literal.string.doc)
+
+lex(slashRegexp):
+  Regexp new("(?<!\\\\)/[oxpniums]*") is(literal.string.regex) -> pop
+  any-of(interpolatableText)
+  Regexp new("\\\\/") is(literal.string.regex)
+  Regexp new("[^/]") is(literal.string.regex)
+
+lex(squareText):
+  Regexp new("(?<!\\\\)]") is(literal.string) -> pop
+  any-of(interpolatableText)
+  Regexp new("[^\\]]") is(literal.string)
+
+lex(root):
+  Regexp new("\\n") is(text)
+  Regexp new("\\s+") is(text)
+  Regexp new(";(.*?)\\n") is(comment)
+  Regexp new("\\A#!(.*?)\\n") is(comment)
+  Regexp new("#/") is(literal.string.regex) -> go-to(slashRegexp)
+  Regexp new("#r\\[") is(literal.string.regex) -> go-to(squareRegexp)
+  Regexp new(":[a-zA-Z0-9_!:?]+") is(literal.string.symbol)
+  Regexp new("[a-zA-Z0-9_!:?]+:(?![a-zA-Z0-9_!?])") is(literal.string.other)
+  Regexp new(":\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.symbol)
+  Regexp new("((?<=fn\\()|(?<=fnx\\()|(?<=method\\()|(?<=macro\\()|(?<=lecro\\()|(?<=syntax\\()|(?<=dmacro\\()|(?<=dlecro\\()|(?<=dlecrox\\()|(?<=dsyntax\\())[\\s\\n\\r]*\"") is(literal.string.doc) -> go-to(documentation)
+  Regexp new("\"") is(literal.string) -> go-to(text)
+  Regexp new("#\\[") is(literal.string) -> go-to(squareText)
+  Regexp new("[a-zA-Z0-9_][a-zA-Z0-9!?_:]+(?=\\s*=.*mimic\\s)") is(name.entity)
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_!:?]*(?=[\\s]*[+*/-]?=[^=].*($|\\.))") is(name.variable)
+  Regexp new("(break|cond|continue|do|ensure|for|for:dict|for:set|if|let|loop|p:for|p:for:dict|p:for:set|return|unless|until|while|with)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(eval|mimic|print|println)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(cell\\?|cellNames|cellOwner\\?|cellOwner|cells|cell|documentation|hash|identity|mimic|removeCell\\!|undefineCell\\!)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(stackTraceAsText)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(dict|list|message|set)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(case|case:and|case:else|case:nand|case:nor|case:not|case:or|case:otherwise|case:xor)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(asText|become\\!|derive|freeze\\!|frozen\\?|in\\?|is\\?|kind\\?|mimic\\!|mimics|mimics\\?|prependMimic\\!|removeAllMimics\\!|removeMimic\\!|same\\?|send|thaw\\!|uniqueHexId)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(after|around|before)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(kind|cellDescriptionDict|cellSummary|genSym|inspect|notice)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(use|destructuring)") is(keyword.reserved)
+  Regexp new("(cell\\?|cellOwner\\?|cellOwner|cellNames|cells|cell|documentation|identity|removeCell!|undefineCell)(?![a-zA-Z0-9!:_?])") is(keyword)
+  Regexp new("(internal:compositeRegexp|internal:concatenateText|internal:createDecimal|internal:createNumber|internal:createRegexp|internal:createText)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(availableRestarts|bind|error\\!|findRestart|handle|invokeRestart|rescue|restart|signal\\!|warn\\!)(?![a-zA-Z0-9!:_?])") is(keyword.reserved)
+  Regexp new("(nil|false|true)(?![a-zA-Z0-9!:_?])") is(name.constant)
+  Regexp new("(Arity|Base|Call|Condition|DateTime|Aspects|Pointcut|Assignment|BaseBehavior|Boolean|Case|AndCombiner|Else|NAndCombiner|NOrCombiner|NotCombiner|OrCombiner|XOrCombiner|Conditions|Definitions|FlowControl|Internal|Literals|Reflection|DefaultMacro|DefaultMethod|DefaultSyntax|Dict|FileSystem|Ground|Handler|Hook|IO|IokeGround|Struct|LexicalBlock|LexicalMacro|List|Message|Method|Mixins|NativeMethod|Number|Origin|Pair|Range|Reflector|Regexp Match|Regexp|Rescue|Restart|Runtime|Sequence|Set|Symbol|System|Text|Tuple)(?![a-zA-Z0-9!:_?])") is(name.builtin)
+  Regexp new("(generateMatchMethod|aliasMethod|\955|\654|fnx|fn|method|dmacro|dlecro|syntax|macro|dlecrox|lecrox|lecro|syntax)(?![a-zA-Z0-9!:_?])") is(name.function)
+  Regexp new("-?0[xX][0-9a-fA-F]+") is(literal.number.hex)
+  Regexp new("-?(\\d+\\.?\\d*|\\d*\\.\\d+)([eE][+-]?[0-9]+)?") is(literal.number.float)
+  Regexp new("-?\\d+") is(literal.number.integer)
+  Regexp new("#\\(") is(punctuation)
+  Regexp new("(&&>>|\\|\\|>>|\\*\\*>>|:::|::|\\.\\.\\.|===|\\*\\*>|\\*\\*=|&&>|&&=|\\|\\|>|\\|\\|=|\\->>|\\+>>|!>>|<>>>|<>>|&>>|%>>|#>>|@>>|/>>|\\*>>|\\?>>|\\|>>|\\^>>|\126>>|\\$>>|=>>|<<=|>>=|<=>|<\\->|=\126|!\126|=>|\\+\\+|\\-\\-|<=|>=|==|!=|&&|\\.\\.|\\+=|\\-=|\\*=|\\/=|%=|&=|\\^=|\\|=|<\\-|\\+>|!>|<>|&>|%>|#>|\\@>|\\/>|\\*>|\\?>|\\|>|\\^>|\126>|\\$>|<\\->|\\->|<<|>>|\\*\\*|\\?\\||\\?&|\\|\\||>|<|\\*|\\/|%|\\+|\\-|&|\\^|\\||=|\\$|!|\126|\\?|#|\8800|\8728|\8712|\8713)") is(operator)
+  Regexp new("(and|nand|or|xor|nor|return|import)(?![a-zA-Z0-9_!?])") is(operator)
+  Regexp new("(\\`\\`|\\`|\\'\\'|\\'|\\.|\\,|@|@@|\\[|\\]|\\(|\\)|{|})") is(punctuation)
+  Regexp new("[A-Z][a-zA-Z0-9_!:?]*") is(name.class)
+  Regexp new("[a-z_][a-zA-Z0-9_!:?]*") is(name)
+

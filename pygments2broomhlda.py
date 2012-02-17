@@ -146,8 +146,9 @@ def convert_type(t):
     elif type(t) is types.FunctionType and isinstance(t.__closure__[0].cell_contents, tuple):
         return "by-groups(" + ", ".join([convert_type(x) for x in t.__closure__[0].cell_contents if x]) + ")"
     elif type(t) is types.FunctionType and len(t.__closure__) == 2:
-        return "using(self send(#class))" # TODO
+        return "using(self class)"
     elif type(t) is types.FunctionType and len(t.__closure__) == 3:
+        # TODO
         return "using(" + convert_modname(t.__closure__[2].cell_contents.__name__) + ")"
     else:
         raise Exception("Could not convert: %s" % repr(t))
@@ -174,17 +175,18 @@ def convert_next(n):
         return "go-to(" + convert_name(n) + ")"
 
 def convert_lexer(mod, name, aliases, filenames, mimetypes, flags):
-  return """lexer(HL::Lexers::%s):
+  return """use("atomy")
+use("hl/define")
 
+Lexer = lexer:
 name: %s
 aliases: %s
 extensions: %s
 mimetypes: %s
-start: #root
+start: .root
 flags: %s
 
-""" % (convert_modname(mod),
-       dq(name), dq(aliases), dq([convert_filename(x) for x in filenames]),
+""" % (dq(name), dq(aliases), dq([convert_filename(x) for x in filenames]),
        dq(mimetypes), convert_flags(flags))
 
 def convert_filename(fn):
@@ -223,7 +225,7 @@ def convert_flags(f):
     else:
       return " | ".join(options)
 
-def try_converting(k, l, to = "lib/lexers/imported"):
+def try_converting(k, l, to = "lib/hl/lexers/imported"):
     cls = pygments.lexers.__getattr__(k)
     if not issubclass(cls, pygments.lexer.RegexLexer) \
             or not hasattr(cls, 'tokens'):

@@ -1,0 +1,22 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Redcode"
+aliases: ["redcode"]
+extensions: [".cw"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  Regexp new("\\s+") is(text)
+  Regexp new(";.*$") is(comment.single)
+  Regexp new("\\b(DAT|MOV|ADD|SUB|MUL|DIV|MOD|JMP|JMZ|JMN|DJN|CMP|SLT|SPL|ORG|EQU|END)\\b") is(name.function)
+  Regexp new("\\b(A|B|AB|BA|F|X|I)\\b") is(name.decorator)
+  Regexp new("[A-Za-z_][A-Za-z_0-9]+") is(name)
+  Regexp new("[-+*/%]") is(operator)
+  Regexp new("[#$@<>]") is(operator)
+  Regexp new("[.,]") is(punctuation)
+  Regexp new("[-+]?\\d+") is(literal.number.integer)
+

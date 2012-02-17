@@ -1,0 +1,47 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "HTML"
+aliases: ["html"]
+extensions: [".html", ".htm", ".xhtml", ".xslt"]
+mimetypes: ["text/html", "application/xhtml+xml"]
+start: .root
+flags: Regexp::IGNORECASE | Regexp::MULTILINE
+
+lex(comment):
+  Regexp new("[^-]+") is(comment)
+  Regexp new("-->") is(comment) -> pop
+  Regexp new("-") is(comment)
+
+lex(style-content):
+  Regexp new("<\\s*/\\s*style\\s*>") is(name.tag) -> pop
+  Regexp new(".+?(?=<\\s*/\\s*style\\s*>)") is(using(Css))
+
+lex(attr):
+  Regexp new("\".*?\"") is(literal.string) -> pop
+  Regexp new("'.*?'") is(literal.string) -> pop
+  Regexp new("[^\\s>]+") is(literal.string) -> pop
+
+lex(script-content):
+  Regexp new("<\\s*/\\s*script\\s*>") is(name.tag) -> pop
+  Regexp new(".+?(?=<\\s*/\\s*script\\s*>)") is(using(Javascript))
+
+lex(tag):
+  Regexp new("\\s+") is(text)
+  Regexp new("[a-zA-Z0-9_:-]+\\s*=") is(name.attribute) -> go-to(attr)
+  Regexp new("[a-zA-Z0-9_:-]+") is(name.attribute)
+  Regexp new("/?\\s*>") is(name.tag) -> pop
+
+lex(root):
+  Regexp new("[^<&]+") is(text)
+  Regexp new("&\\S*?;") is(name.entity)
+  Regexp new("\\<\\!\\[CDATA\\[.*?\\]\\]\\>") is(comment.preproc)
+  Regexp new("<!--") is(comment) -> go-to(comment)
+  Regexp new("<\\?.*?\\?>") is(comment.preproc)
+  Regexp new("<![^>]*>") is(comment.preproc)
+  Regexp new("<\\s*script\\s*") is(name.tag) -> do-all(go-to(script-content), go-to(tag))
+  Regexp new("<\\s*style\\s*") is(name.tag) -> do-all(go-to(style-content), go-to(tag))
+  Regexp new("<\\s*[a-zA-Z0-9:]+") is(name.tag) -> go-to(tag)
+  Regexp new("<\\s*/\\s*[a-zA-Z0-9:]+\\s*>") is(name.tag)
+

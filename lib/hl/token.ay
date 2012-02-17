@@ -1,0 +1,8 @@
+use("atomy")
+
+data(Type):
+  Tagged(@tag)
+  Using(@lexer)
+  ByGroups(@types)
+
+data(Token(@type, @contents))

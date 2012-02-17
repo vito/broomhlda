@@ -1,0 +1,110 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "autohotkey"
+aliases: ["ahk"]
+extensions: [".ahk", ".ahkl"]
+mimetypes: ["text/x-autohotkey"]
+start: .root
+flags: Regexp::IGNORECASE | Regexp::MULTILINE
+
+lex(commands):
+  Regexp new("(autotrim|blockinput|break|click|clipwait|continue|control|controlclick|controlfocus|controlget|controlgetfocus|controlgetpos|controlgettext|controlmove|controlsend|controlsendraw|controlsettext|coordmode|critical|detecthiddentext|detecthiddenwindows|dllcall|drive|driveget|drivespacefree|else|envadd|envdiv|envget|envmult|envset|envsub|envupdate|exit|exitapp|fileappend|filecopy|filecopydir|filecreatedir|filecreateshortcut|filedelete|filegetattrib|filegetshortcut|filegetsize|filegettime|filegetversion|fileinstall|filemove|filemovedir|fileread|filereadline|filerecycle|filerecycleempty|fileremovedir|fileselectfile|fileselectfolder|filesetattrib|filesettime|formattime|gosub|goto|groupactivate|groupadd|groupclose|groupdeactivate|gui|guicontrol|guicontrolget|hotkey|ifexist|ifgreater|ifgreaterorequal|ifinstring|ifless|iflessorequal|ifmsgbox|ifnotequal|ifnotexist|ifnotinstring|ifwinactive|ifwinexist|ifwinnotactive|ifwinnotexist|imagesearch|inidelete|iniread|iniwrite|input|inputbox|keyhistory|keywait|listhotkeys|listlines|listvars|loop|menu|mouseclick|mouseclickdrag|mousegetpos|mousemove|msgbox|onmessage|onexit|outputdebug|pixelgetcolor|pixelsearch|postmessage|process|progress|random|regexmatch|regexreplace|registercallback|regdelete|regread|regwrite|reload|repeat|return|run|runas|runwait|send|sendevent|sendinput|sendmessage|sendmode|sendplay|sendraw|setbatchlines|setcapslockstate|setcontroldelay|setdefaultmousespeed|setenv|setformat|setkeydelay|setmousedelay|setnumlockstate|setscrolllockstate|setstorecapslockmode|settimer|settitlematchmode|setwindelay|setworkingdir|shutdown|sleep|sort|soundbeep|soundget|soundgetwavevolume|soundplay|soundset|soundsetwavevolume|splashimage|splashtextoff|splashtexton|splitpath|statusbargettext|statusbarwait|stringcasesense|stringgetpos|stringleft|stringlen|stringlower|stringmid|stringreplace|stringright|stringsplit|stringtrimleft|stringtrimright|stringupper|suspend|sysget|thread|tooltip|transform|traytip|urldownloadtofile|while|varsetcapacity|winactivate|winactivatebottom|winclose|winget|wingetactivestats|wingetactivetitle|wingetclass|wingetpos|wingettext|wingettitle|winhide|winkill|winmaximize|winmenuselectitem|winminimize|winminimizeall|winminimizeallundo|winmove|winrestore|winset|winsettitle|winshow|winwait|winwaitactive|winwaitclose|winwaitnotactivetrue|false|NULL)\\b") is(keyword) -> go-to(command)
+
+lex(literals):
+  Regexp new("\"") is(literal.string) -> go-to(string)
+  Regexp new("A_\\w+") is(name.builtin)
+  Regexp new("%[\\]\\w#@$?\\[]+?%") is(name.variable)
+  Regexp new("[-\126!%^&*+|?:<>/=]=?") is(operator) -> go-to(expressions)
+  Regexp new("==") is(operator) -> go-to(expressions)
+  Regexp new("[{()},.%#`;]") is(punctuation)
+  Regexp new("\\\\") is(punctuation)
+  any-of(keywords)
+  Regexp new("\\w+") is(text)
+
+lex(string):
+  Regexp new("\"") is(literal.string) -> pop
+  Regexp new("\"\"|`.") is(literal.string.escape)
+  Regexp new("[^\\`\"\\n]+") is(literal.string)
+
+lex(parameters):
+  Regexp new("\\)") is(punctuation) -> pop
+  Regexp new("\\(") is(punctuation) -> push
+  any-of(numbers)
+  any-of(literals)
+  any-of(whitespace)
+
+lex(keynames):
+  Regexp new("\\[[^\\]]+\\]") is(keyword) -> go-to(keynames)
+
+lex(continuation):
+  Regexp new("\\n\\)") is(punctuation) -> pop
+  Regexp new("\\s[^\\n\\)]+") is(literal.string)
+
+lex(labels):
+  Regexp new("(^\\s*)([^:\\s]+?:{1,2})") is(by-groups(text.whitespace, name.label))
+  Regexp new("(^\\s*)(::[\\]\\w#@$?\\[]+?::)") is(by-groups(text.whitespace, name.label))
+
+lex(comments):
+  Regexp new("^;+.*?$") is(comment.single)
+  Regexp new("(?<=\\s);+.*?$") is(comment.single)
+  Regexp new("^/\\*.*?\\n\\*/") is(comment.multiline)
+  Regexp new("(?<!\\n)/\\*.*?\\n\\*/") is(error)
+
+lex(command):
+  any-of(comments)
+  any-of(whitespace)
+  Regexp new("^\\(") is(literal.string) -> go-to(continuation)
+  Regexp new("[^\\n]*?(?=;*|$)") is(literal.string) -> pop
+  any-of(numbers)
+  any-of(literals)
+
+lex(numbers):
+  Regexp new("(\\d+\\.\\d*|\\d*\\.\\d+)([eE][+-]?[0-9]+)?") is(literal.number.float)
+  Regexp new("\\d+[eE][+-]?[0-9]+") is(literal.number.float)
+  Regexp new("0[0-7]+") is(literal.number.oct)
+  Regexp new("0[xX][a-fA-F0-9]+") is(literal.number.hex)
+  Regexp new("\\d+L") is(literal.number.integer.long)
+  Regexp new("\\d+") is(literal.number.integer)
+
+lex(keywords):
+  Regexp new("(static|global|local)\\b") is(keyword.type)
+  Regexp new("(if|else|and|or)\\b") is(keyword.reserved)
+
+lex(directives):
+  Regexp new("#\\w+?\\s") is(keyword)
+
+lex(expressions):
+  any-of(comments)
+  any-of(whitespace)
+  any-of(numbers)
+  any-of(literals)
+  Regexp new("([\\]\\w#@$?\\[]+)(\\s*)(\\()") is(by-groups(name.function, text.whitespace, punctuation)) -> go-to(parameters)
+  Regexp new("A_\\w+") is(name.builtin)
+  Regexp new("%[\\]\\w#@$?\\[]+?%") is(name.variable)
+  Regexp new("{") is(punctuation) -> go-to(block)
+
+lex(root):
+  any-of(whitespace)
+  Regexp new("^\\(") is(literal.string) -> go-to(continuation)
+  any-of(comments)
+  Regexp new("(^\\s*)(\\w+)(\\s*)(=)") is(by-groups(text.whitespace, name, text.whitespace, operator)) -> go-to(command)
+  Regexp new("([\\w#@$?\\[\\]]+)(\\s*)(\\()") is(by-groups(name.function, text.whitespace, punctuation)) -> go-to(parameters)
+  any-of(directives)
+  any-of(labels)
+  any-of(commands)
+  any-of(expressions)
+  any-of(numbers)
+  any-of(literals)
+  any-of(keynames)
+  any-of(keywords)
+
+lex(block):
+  any-of(root)
+  Regexp new("{") is(punctuation) -> push
+  Regexp new("}") is(punctuation) -> pop
+
+lex(whitespace):
+  Regexp new("[ \\t]+") is(text.whitespace)
+

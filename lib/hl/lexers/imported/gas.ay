@@ -1,0 +1,49 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "GAS"
+aliases: ["gas"]
+extensions: [".s", ".S"]
+mimetypes: ["text/x-gas"]
+start: .root
+flags: 0
+
+lex(directive-args):
+  Regexp new("(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.constant)
+  Regexp new("\"(\\\\\"|[^\"])*\"") is(literal.string)
+  Regexp new("@(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.attribute)
+  Regexp new("(?:0[xX][a-zA-Z0-9]+|\\d+)") is(literal.number.integer)
+  Regexp new("[\\r\\n]+") is(text) -> pop
+  Regexp new("#.*?$") is(comment) -> pop
+  any-of(punctuation)
+  any-of(whitespace)
+
+lex(punctuation):
+  Regexp new("[-*,.():]+") is(punctuation)
+
+lex(root):
+  any-of(whitespace)
+  Regexp new("(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+):") is(name.label)
+  Regexp new("\\.(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.attribute) -> go-to(directive-args)
+  Regexp new("lock|rep(n?z)?|data\\d+") is(name.attribute)
+  Regexp new("(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.function) -> go-to(instruction-args)
+  Regexp new("[\\r\\n]+") is(text)
+
+lex(whitespace):
+  Regexp new("\\n") is(text)
+  Regexp new("\\s+") is(text)
+  Regexp new("#.*?\\n") is(comment)
+
+lex(instruction-args):
+  Regexp new("([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+))(>)") is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation))
+  Regexp new("([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+))([-+])((?:0[xX][a-zA-Z0-9]+|\\d+))(>)") is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation, literal.number.integer, punctuation))
+  Regexp new("(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.constant)
+  Regexp new("(?:0[xX][a-zA-Z0-9]+|\\d+)") is(literal.number.integer)
+  Regexp new("%(?:[a-zA-Z$_][a-zA-Z$._0-9@]*|\\.[a-zA-Z$._0-9@]+)") is(name.variable)
+  Regexp new("$(?:0[xX][a-zA-Z0-9]+|\\d+)") is(literal.number.integer)
+  Regexp new("[\\r\\n]+") is(text) -> pop
+  Regexp new("#.*?$") is(comment) -> pop
+  any-of(punctuation)
+  any-of(whitespace)
+

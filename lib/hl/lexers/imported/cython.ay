@@ -1,0 +1,127 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Cython"
+aliases: ["cython", "pyx"]
+extensions: [".pyx", ".pxd", ".pxi"]
+mimetypes: ["text/x-cython", "application/x-cython"]
+start: .root
+flags: 0
+
+lex(tsqs):
+  Regexp new("'''") is(literal.string) -> pop
+  any-of(strings)
+  any-of(nl)
+
+lex(builtins):
+  Regexp new("(?<!\\.)(__import__|abs|all|any|apply|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|exit|file|filter|float|frozenset|getattr|globals|hasattr|hash|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\\b") is(name.builtin)
+  Regexp new("(?<!\\.)(self|None|Ellipsis|NotImplemented|False|True|NULL)\\b") is(name.builtin.pseudo)
+  Regexp new("(?<!\\.)(ArithmeticError|AssertionError|AttributeError|BaseException|DeprecationWarning|EOFError|EnvironmentError|Exception|FloatingPointError|FutureWarning|GeneratorExit|IOError|ImportError|ImportWarning|IndentationError|IndexError|KeyError|KeyboardInterrupt|LookupError|MemoryError|NameError|NotImplemented|NotImplementedError|OSError|OverflowError|OverflowWarning|PendingDeprecationWarning|ReferenceError|RuntimeError|RuntimeWarning|StandardError|StopIteration|SyntaxError|SyntaxWarning|SystemError|SystemExit|TabError|TypeError|UnboundLocalError|UnicodeDecodeError|UnicodeEncodeError|UnicodeError|UnicodeTranslateError|UnicodeWarning|UserWarning|ValueError|Warning|ZeroDivisionError)\\b") is(name.exception)
+
+lex(name):
+  Regexp new("@[a-zA-Z0-9_]+") is(name.decorator)
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name)
+
+lex(dqs):
+  Regexp new("\"") is(literal.string) -> pop
+  Regexp new("\\\\\\\\|\\\\\"|\\\\\\n") is(literal.string.escape)
+  any-of(strings)
+
+lex(sqs):
+  Regexp new("'") is(literal.string) -> pop
+  Regexp new("\\\\\\\\|\\\\'|\\\\\\n") is(literal.string.escape)
+  any-of(strings)
+
+lex(tdqs):
+  Regexp new("\"\"\"") is(literal.string) -> pop
+  any-of(strings)
+  any-of(nl)
+
+lex(backtick):
+  Regexp new("`.*?`") is(literal.string.backtick)
+
+lex(funcname):
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.function) -> pop
+
+lex(classname):
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.class) -> pop
+
+lex(stringescape):
+  Regexp new("\\\\([\\\\abfnrtv\"\\']|\\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})") is(literal.string.escape)
+
+lex(numbers):
+  Regexp new("(\\d+\\.?\\d*|\\d*\\.\\d+)([eE][+-]?[0-9]+)?") is(literal.number.float)
+  Regexp new("0\\d+") is(literal.number.oct)
+  Regexp new("0[xX][a-fA-F0-9]+") is(literal.number.hex)
+  Regexp new("\\d+L") is(literal.number.integer.long)
+  Regexp new("\\d+") is(literal.number.integer)
+
+lex(import):
+  Regexp new("(\\s+)(as)(\\s+)") is(by-groups(text, keyword, text))
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_.]*") is(name.namespace)
+  Regexp new("(\\s*)(,)(\\s*)") is(by-groups(text, operator, text))
+  Regexp new("") is(text) -> pop
+
+lex(keywords):
+  Regexp new("(assert|break|by|continue|ctypedef|del|elif|else|except\\??|exec|finally|for|gil|global|if|include|lambda|nogil|pass|print|raise|return|try|while|yield|as|with)\\b") is(keyword)
+  Regexp new("(DEF|IF|ELIF|ELSE)\\b") is(comment.preproc)
+
+lex(cdef):
+  Regexp new("(public|readonly|extern|api|inline)\\b") is(keyword.reserved)
+  Regexp new("(struct|enum|union|class)\\b") is(keyword)
+  Regexp new("([a-zA-Z_][a-zA-Z0-9_]*)(\\s*)(?=[(:#=]|$)") is(by-groups(name.function, text)) -> pop
+  Regexp new("([a-zA-Z_][a-zA-Z0-9_]*)(\\s*)(,)") is(by-groups(name.function, text, punctuation))
+  Regexp new("from\\b") is(keyword) -> pop
+  Regexp new("as\\b") is(keyword)
+  Regexp new(":") is(punctuation) -> pop
+  Regexp new("(?=[\"\\'])") is(text) -> pop
+  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(keyword.type)
+  Regexp new(".") is(text)
+
+lex(nl):
+  Regexp new("\\n") is(literal.string)
+
+lex(root):
+  Regexp new("\\n") is(text)
+  Regexp new("^(\\s*)(\"\"\"(?:.|\\n)*?\"\"\")") is(by-groups(text, literal.string.doc))
+  Regexp new("^(\\s*)('''(?:.|\\n)*?''')") is(by-groups(text, literal.string.doc))
+  Regexp new("[^\\S\\n]+") is(text)
+  Regexp new("#.*$") is(comment)
+  Regexp new("[\\]{}:(),;\\[]") is(punctuation)
+  Regexp new("\\\\\\n") is(text)
+  Regexp new("\\\\") is(text)
+  Regexp new("(in|is|and|or|not)\\b") is(operator.word)
+  Regexp new("(<)([a-zA-Z0-9.?]+)(>)") is(by-groups(punctuation, keyword.type, punctuation))
+  Regexp new("!=|==|<<|>>|[-\126+/*%=<>&^|.?]") is(operator)
+  Regexp new("(from)(\\d+)(<=)(\\s+)(<)(\\d+)(:)") is(by-groups(keyword, literal.number.integer, operator, name, operator, name, punctuation))
+  any-of(keywords)
+  Regexp new("(def|property)(\\s+)") is(by-groups(keyword, text)) -> go-to(funcname)
+  Regexp new("(cp?def)(\\s+)") is(by-groups(keyword, text)) -> go-to(cdef)
+  Regexp new("(class|struct)(\\s+)") is(by-groups(keyword, text)) -> go-to(classname)
+  Regexp new("(from)(\\s+)") is(by-groups(keyword, text)) -> go-to(fromimport)
+  Regexp new("(c?import)(\\s+)") is(by-groups(keyword, text)) -> go-to(import)
+  any-of(builtins)
+  any-of(backtick)
+  Regexp new("(?:[rR]|[uU][rR]|[rR][uU])\"\"\"") is(literal.string) -> go-to(tdqs)
+  Regexp new("(?:[rR]|[uU][rR]|[rR][uU])'''") is(literal.string) -> go-to(tsqs)
+  Regexp new("(?:[rR]|[uU][rR]|[rR][uU])\"") is(literal.string) -> go-to(dqs)
+  Regexp new("(?:[rR]|[uU][rR]|[rR][uU])'") is(literal.string) -> go-to(sqs)
+  Regexp new("[uU]?\"\"\"") is(literal.string) -> combined(stringescape, tdqs)
+  Regexp new("[uU]?'''") is(literal.string) -> combined(stringescape, tsqs)
+  Regexp new("[uU]?\"") is(literal.string) -> combined(stringescape, dqs)
+  Regexp new("[uU]?'") is(literal.string) -> combined(stringescape, sqs)
+  any-of(name)
+  any-of(numbers)
+
+lex(strings):
+  Regexp new("%(\\([a-zA-Z0-9]+\\))?[-#0 +]*([0-9]+|[*])?(\\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]") is(literal.string.interpol)
+  Regexp new("[^\\\\\\'\"%\\n]+") is(literal.string)
+  Regexp new("[\\'\"\\\\]") is(literal.string)
+  Regexp new("%") is(literal.string)
+
+lex(fromimport):
+  Regexp new("(\\s+)(c?import)\\b") is(by-groups(text, keyword)) -> pop
+  Regexp new("[a-zA-Z_.][a-zA-Z0-9_.]*") is(name.namespace)
+  Regexp new("") is(text) -> pop
+

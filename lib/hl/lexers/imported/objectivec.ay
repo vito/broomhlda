@@ -1,0 +1,91 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Objective-C"
+aliases: ["objective-c", "objectivec", "obj-c", "objc"]
+extensions: [".m"]
+mimetypes: ["text/x-objective-c"]
+start: .root
+flags: 0
+
+lex(classname):
+  Regexp new("([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*:\\s*)([a-zA-Z$_][a-zA-Z0-9$_]*)?") is(by-groups(name.class, text, name.class)) -> pop
+  Regexp new("([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*)(\\([a-zA-Z$_][a-zA-Z0-9$_]*\\))") is(by-groups(name.class, text, name.label)) -> pop
+  Regexp new("([a-zA-Z$_][a-zA-Z0-9$_]*)") is(name.class) -> pop
+
+lex(function):
+  any-of(whitespace)
+  any-of(statements)
+  Regexp new(";") is(punctuation)
+  Regexp new("{") is(punctuation) -> push
+  Regexp new("}") is(punctuation) -> pop
+
+lex(statement):
+  any-of(whitespace)
+  any-of(statements)
+  Regexp new("[{}]") is(punctuation)
+  Regexp new(";") is(punctuation) -> pop
+
+lex(statements):
+  Regexp new("(L|@)?\"") is(literal.string) -> go-to(string)
+  Regexp new("(L|@)?'(\\\\.|\\\\[0-7]{1,3}|\\\\x[a-fA-F0-9]{1,2}|[^\\\\\\'\\n])'") is(literal.string.char)
+  Regexp new("(\\d+\\.\\d*|\\.\\d+|\\d+)[eE][+-]?\\d+[lL]?") is(literal.number.float)
+  Regexp new("(\\d+\\.\\d*|\\.\\d+|\\d+[fF])[fF]?") is(literal.number.float)
+  Regexp new("0x[0-9a-fA-F]+[Ll]?") is(literal.number.hex)
+  Regexp new("0[0-7]+[Ll]?") is(literal.number.oct)
+  Regexp new("\\d+[Ll]?") is(literal.number.integer)
+  Regexp new("[\126!%^&*+=|?:<>/-]") is(operator)
+  Regexp new("[()\\[\\],.]") is(punctuation)
+  Regexp new("(auto|break|case|const|continue|default|do|else|enum|extern|for|goto|if|register|restricted|return|sizeof|static|struct|switch|typedef|union|volatile|virtual|while|in|@selector|@private|@protected|@public|@encode|@synchronized|@try|@throw|@catch|@finally|@end|@property|@synthesize|@dynamic)\\b") is(keyword)
+  Regexp new("(int|long|float|short|double|char|unsigned|signed|void|id|BOOL|IBOutlet|IBAction|SEL)\\b") is(keyword.type)
+  Regexp new("(_{0,2}inline|naked|restrict|thread|typename)\\b") is(keyword.reserved)
+  Regexp new("__(asm|int8|based|except|int16|stdcall|cdecl|fastcall|int32|declspec|finally|int64|try|leave)\\b") is(keyword.reserved)
+  Regexp new("(TRUE|FALSE|nil|NULL)\\b") is(name.builtin)
+  Regexp new("[a-zA-Z$_][a-zA-Z0-9$_]*:(?!:)") is(name.label)
+  Regexp new("[a-zA-Z$_][a-zA-Z0-9$_]*") is(name)
+
+lex(whitespace):
+  Regexp new("^#if\\s+0") is(comment.preproc) -> go-to(if0)
+  Regexp new("^#") is(comment.preproc) -> go-to(macro)
+  Regexp new("^(?:\\s|//.*?\\n|/[*].*?[*]/)+#if\\s+0") is(comment.preproc) -> go-to(if0)
+  Regexp new("^(?:\\s|//.*?\\n|/[*].*?[*]/)+#") is(comment.preproc) -> go-to(macro)
+  Regexp new("\\n") is(text)
+  Regexp new("\\s+") is(text)
+  Regexp new("\\\\\\n") is(text)
+  Regexp new("//(\\n|(.|\\n)*?[^\\\\]\\n)") is(comment.single)
+  Regexp new("/(\\\\\\n)?[*](.|\\n)*?[*](\\\\\\n)?/") is(comment.multiline)
+
+lex(forward-classname):
+  Regexp new("([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*,\\s*)") is(by-groups(name.class, text)) -> go-to(forward-classname)
+  Regexp new("([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*;?)") is(by-groups(name.class, text)) -> pop
+
+lex(if0):
+  Regexp new("^\\s*#if.*?(?<!\\\\)\\n") is(comment.preproc) -> push
+  Regexp new("^\\s*#endif.*?(?<!\\\\)\\n") is(comment.preproc) -> pop
+  Regexp new(".*?\\n") is(comment)
+
+lex(macro):
+  Regexp new("[^/\\n]+") is(comment.preproc)
+  Regexp new("/[*](.|\\n)*?[*]/") is(comment.multiline)
+  Regexp new("//.*?\\n") is(comment.single) -> pop
+  Regexp new("/") is(comment.preproc)
+  Regexp new("(?<=\\\\)\\n") is(comment.preproc)
+  Regexp new("\\n") is(comment.preproc) -> pop
+
+lex(root):
+  any-of(whitespace)
+  Regexp new("((?:[a-zA-Z0-9_*\\s])+?(?:\\s|[*]))([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*\\([^;]*?\\))((?:\\s|//.*?\\n|/[*].*?[*]/)+)({)") is(by-groups(using(self class), name.function, using(self class), text, punctuation)) -> go-to(function)
+  Regexp new("((?:[a-zA-Z0-9_*\\s])+?(?:\\s|[*]))([a-zA-Z$_][a-zA-Z0-9$_]*)(\\s*\\([^;]*?\\))((?:\\s|//.*?\\n|/[*].*?[*]/)+)(;)") is(by-groups(using(self class), name.function, using(self class), text, punctuation))
+  Regexp new("(@interface|@implementation)(\\s+)") is(by-groups(keyword, text)) -> go-to(classname)
+  Regexp new("(@class|@protocol)(\\s+)") is(by-groups(keyword, text)) -> go-to(forward-classname)
+  Regexp new("(\\s*)(@end)(\\s*)") is(by-groups(text, keyword, text))
+  Regexp new("") is(text) -> go-to(statement)
+
+lex(string):
+  Regexp new("\"") is(literal.string) -> pop
+  Regexp new("\\\\([\\\\abfnrtv\"\\']|x[a-fA-F0-9]{2,4}|[0-7]{1,3})") is(literal.string.escape)
+  Regexp new("[^\\\\\"\\n]+") is(literal.string)
+  Regexp new("\\\\\\n") is(literal.string)
+  Regexp new("\\\\") is(literal.string)
+
