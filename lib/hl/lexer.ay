@@ -80,6 +80,8 @@ Lexer = class:
   singleton:
     attr-accessor(.matchers, .info)
 
+    lex(x) := new(x) run
+
     name &x :=
       @info[.name] = x call
 
