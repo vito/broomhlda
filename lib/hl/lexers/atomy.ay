@@ -57,6 +57,14 @@ Lexer = lexer:
     -- particles
     Regexp new("\\." + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
 
+    -- quoting expressions
+    Regexp new("['`]" + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+    r"['`]" is(string.symbol)
+
+    -- unquote
+    Regexp new("~\*?" + @@identifier, Regexp::KCODE_UTF8) is(string.interpolate)
+    r"~" is(string.interpolate)
+
     -- macro-quotes
     Regexp new("(" + @@identifier + ")(\")", Regexp::KCODE_UTF8) is(by-groups(name, string)) => macro-quote
 
@@ -71,14 +79,6 @@ Lexer = lexer:
 
     -- whitespace
     r"\s+" is(text)
-
-    -- quoting expressions
-    Regexp new("['`]" + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
-    r"['`]" is(string.symbol)
-
-    -- unquote
-    Regexp new("~" + @@identifier, Regexp::KCODE_UTF8) is(string.interpolate)
-    r"~" is(string.interpolate)
 
     -- punctuation
     r"[\[\](),;{}|]" is(punctuation)
