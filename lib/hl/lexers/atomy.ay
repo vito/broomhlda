@@ -9,13 +9,8 @@ Lexer = lexer:
   start: .root
   flags: Regexp::MULTILINE
 
-  @@identifier =
-    raw"[\p{Ll}_][\p{L}\d\-_]*"
-
-  @@operator = raw"[\p{S}!@#%&*\-\\:.\/\?]+"
-
-  @@reserved =
-    raw"(#language|macro|self)\b(?!" + @@operator + ")"
+  @@identifier = r"[\p{Ll}_][\p{L}\d\-_]*"
+  @@operator = r"(?!~`):?[\p{S}!@#%&*\-\\.\/\?]+"
 
   @@ascii = [
     "NUL","SOH","[SE]TX","EOT","ENQ","ACK",
@@ -47,32 +42,32 @@ Lexer = lexer:
     r"[\+\-]?\d+" is(number.integer)
 
     -- reserved words
-    Regexp new(@@reserved, Regexp::KCODE_UTF8) is(keyword.reserved)
+    r"(#language|macro)\b" is(keyword.reserved)
 
     -- special variables
-    Regexp new("@@" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.class)
-    Regexp new("\\$" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.global)
-    Regexp new("@" + @@identifier, Regexp::KCODE_UTF8) is(name.variable.instance)
+    r"@@#{@@identifier}" is(name.variable.class)
+    r"\$#{@@identifier}" is(name.variable.global)
+    r"@#{@@identifier}" is(name.variable.instance)
 
     -- particles
-    Regexp new("\\." + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+    r"\.#{@@identifier}" is(string.symbol)
 
     -- quoting expressions
-    Regexp new("['`]" + @@identifier, Regexp::KCODE_UTF8) is(string.symbol)
+    r"['`]#{@@identifier}" is(string.symbol)
     r"['`]" is(string.symbol)
 
     -- unquote
-    Regexp new("~\*?" + @@identifier, Regexp::KCODE_UTF8) is(string.interpolate)
+    r"~\*?#{@@identifier}" is(string.symbol)
     r"~" is(string.interpolate)
 
     -- macro-quotes
-    Regexp new("(" + @@identifier + ")(\")", Regexp::KCODE_UTF8) is(by-groups(name, string)) => macro-quote
+    r"(#{@@identifier})(\")" is(by-groups(name, string)) => macro-quote
 
     -- identifiers
-    Regexp new(@@identifier, Regexp::KCODE_UTF8) is(name)
+    @@identifier is(name)
 
     -- operators
-    Regexp new(@@operator, Regexp::KCODE_UTF8) is(operator)
+    @@operator is(operator)
 
     -- strings
     r"\"" is(string) => in-string
@@ -81,7 +76,7 @@ Lexer = lexer:
     r"\s+" is(text)
 
     -- punctuation
-    r"[\[\](),;{}|]" is(punctuation)
+    r"[\[\](),:;{}|]" is(punctuation)
 
 
   -- inside of a block comment; handle nesting
