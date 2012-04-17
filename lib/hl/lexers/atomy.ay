@@ -9,8 +9,11 @@ Lexer = lexer:
   start: .root
   flags: Regexp::MULTILINE
 
-  @@identifier = r"[\p{Ll}_][\p{L}\d\-_]*"
-  @@operator = r"(?!~`):?[\p{S}!@#%&*\-\\.\/\?]+"
+  @@ident-char = raw"[\p{L}\d\-_]"
+  @@identifier = r"[\p{Ll}_]#{@@ident-char}*"
+
+  @@op-char = raw"[\p{S}!@#%&*\-\\.\/\?]"
+  @@operator = r"(?!~`):?#{@@op-char}+"
 
   @@ascii = [
     "NUL","SOH","[SE]TX","EOT","ENQ","ACK",
@@ -20,6 +23,10 @@ Lexer = lexer:
   ]
 
 
+  { self } word(reg) :=
+    r"(?<!#{@@op-char}|#{@@ident-char})#{reg}(?!#{@@op-char}|#{@@ident-char})"
+
+
   -- starting point for lexing
   lex(root):
     -- comments
@@ -27,7 +34,8 @@ Lexer = lexer:
     r"{-" is(comment.multiline) => in-comment
 
     -- primitive constants
-    r"true|false|nil" is(keyword.constant)
+    word(r"true|false|nil|undefined") is(keyword.constant)
+    word(r"self") is(name.buildin.pseudo)
 
     -- constants
     r"[A-Z][a-zA-Z0-9_]*" is(name.constant)
@@ -42,7 +50,7 @@ Lexer = lexer:
     r"[\+\-]?\d+" is(number.integer)
 
     -- reserved words
-    r"(#language|macro)\b" is(keyword.reserved)
+    word(r"#language") is(keyword.reserved)
 
     -- special variables
     r"@@#{@@identifier}" is(name.variable.class)
