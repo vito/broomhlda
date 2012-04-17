@@ -118,4 +118,4 @@ macro(lex(~name) [~*args] { ~*tokens }):
 
   body << `([~*branches] flatten)
 
-  `(@matchers [.~name] = [~*args] { ~*body })
+  `(@matchers [.~name] = proc [~*args] { ~*body })
