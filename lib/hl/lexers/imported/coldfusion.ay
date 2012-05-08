@@ -7,7 +7,7 @@ aliases: ["cfs"]
 extensions: []
 mimetypes: []
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(root):
   Regexp new("//.*") is(comment)

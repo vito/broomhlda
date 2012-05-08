@@ -7,7 +7,7 @@ aliases: ["modelica"]
 extensions: [".mo"]
 mimetypes: ["text/x-modelica"]
 start: .root
-flags: Regexp::IGNORECASE | Regexp::MULTILINE
+flags: Regexp IGNORECASE | Regexp MULTILINE
 
 lex(functions):
   Regexp new("(abs|acos|acosh|asin|asinh|atan|atan2|atan3|ceil|cos|cosh|cross|div|exp|floor|log|log10|mod|rem|sign|sin|sinh|size|sqrt|tan|tanh|zeros)\\b") is(name.function)

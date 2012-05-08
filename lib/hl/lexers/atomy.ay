@@ -7,7 +7,7 @@ Lexer = lexer:
   extensions: [".ay"]
   mimetypes: "text/x-atomy"
   start: .root
-  flags: Regexp::MULTILINE
+  flags: Regexp MULTILINE
 
   @@ident-char = raw"[\p{L}\d\-_]"
   @@identifier = r"[\p{Ll}_]#{@@ident-char}*"
@@ -65,7 +65,7 @@ Lexer = lexer:
     r"['`]" is(string.symbol)
 
     -- unquote
-    r"~\*?#{@@identifier}" is(string.symbol)
+    r"~#{@@identifier}" is(string.interpolate)
     r"~" is(string.interpolate)
 
     -- macro-quotes

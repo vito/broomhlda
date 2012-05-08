@@ -7,7 +7,7 @@ require("nokogiri")
 Formatter = class:
   initialize(@tokens, @line-numbers = false) := .ok
 
-  format(builder = Nokogiri::XML::Builder new) := do:
+  format(builder = Nokogiri XML Builder new) := do:
     builder
       div(#{ class: "highlight" }) [d]:
         d pre [p]:

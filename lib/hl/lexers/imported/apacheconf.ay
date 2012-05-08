@@ -7,7 +7,7 @@ aliases: ["apacheconf", "aconf", "apache"]
 extensions: [".htaccess", "apache.conf", "apache2.conf"]
 mimetypes: ["text/x-apacheconf"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(root):
   Regexp new("\\s+") is(text)

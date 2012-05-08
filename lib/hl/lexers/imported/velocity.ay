@@ -7,7 +7,7 @@ aliases: ["velocity"]
 extensions: [".vm", ".fhtml"]
 mimetypes: []
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(variable):
   Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.variable)

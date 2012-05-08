@@ -5,7 +5,7 @@ condition = require("condition")
 token = require(File expand-path("../token", _FILE))
 
 
-NoMatchFor = condition::Error class:
+NoMatchFor = condition Error class:
   initialize(@input) := .ok
 
   message :=
@@ -16,15 +16,15 @@ NoMatchFor = condition::Error class:
 data(Matcher(@regexp, @type, @next))
 
 -- TODO: Using
-tokens(data, gs: token::ByGroups) =
+tokens(data, gs: token ByGroups) =
   gs types zip(data to-a drop(1)) [[t, d]]:
     when(t nil? || d nil?):
       return(nil)
 
-    @lexed << token::Token new(t, d)
+    @lexed << token Token new(t, d)
 
-tokens(data, t: token::Tagged) =
-  @lexed << token::Token new(t, data to-s)
+tokens(data, t: token Tagged) =
+  @lexed << token Token new(t, data to-s)
 
 -- go through matchers until one matches the immediate
 -- next input. if none match, try again, but allowing
@@ -53,8 +53,8 @@ try-all(matchers) = do:
 
   unless(skipped empty?):
     @lexed <<
-      token::Token new(
-        token::Tagged new("err")
+      token Token new(
+        token Tagged new("err")
         skipped)
 
   tokens(closest, worked type)

@@ -7,7 +7,7 @@ aliases: ["django", "jinja"]
 extensions: []
 mimetypes: ["application/x-django-templating", "application/x-jinja"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(var):
   Regexp new("\\s+") is(text)

@@ -7,7 +7,7 @@ aliases: ["objective-j", "objectivej", "obj-j", "objj"]
 extensions: [".j"]
 mimetypes: ["text/x-objective-j"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(statements):
   Regexp new("(L|@)?\"") is(literal.string) -> go-to(string)

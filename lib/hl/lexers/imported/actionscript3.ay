@@ -7,7 +7,7 @@ aliases: ["as3", "actionscript3"]
 extensions: [".as"]
 mimetypes: ["application/x-actionscript", "text/x-actionscript", "text/actionscript"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(defval):
   Regexp new("(=)(\\s*)([^(),]+)(\\s*)(,?)") is(by-groups(operator, text, using(self class), text, operator)) -> pop

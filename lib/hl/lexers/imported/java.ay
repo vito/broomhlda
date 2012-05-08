@@ -7,7 +7,7 @@ aliases: ["java"]
 extensions: [".java"]
 mimetypes: ["text/x-java"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(import):
   Regexp new("[a-zA-Z0-9_.]+\\*?") is(name.namespace) -> pop

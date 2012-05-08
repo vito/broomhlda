@@ -7,7 +7,7 @@ aliases: ["hx", "haXe"]
 extensions: [".hx"]
 mimetypes: ["text/haxe"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(anonfundef):
   Regexp new("\\bfunction\\b") is(keyword.declaration) -> go-to(fundecl)

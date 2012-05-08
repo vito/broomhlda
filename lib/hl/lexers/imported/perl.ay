@@ -7,7 +7,7 @@ aliases: ["perl", "pl"]
 extensions: [".pl", ".pm"]
 mimetypes: ["text/x-perl", "application/x-perl"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(modulename):
   Regexp new("[a-zA-Z_][\\w_]*") is(name.namespace) -> pop

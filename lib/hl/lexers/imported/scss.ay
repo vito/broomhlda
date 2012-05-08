@@ -7,7 +7,7 @@ aliases: ["scss"]
 extensions: [".scss"]
 mimetypes: ["text/x-scss"]
 start: .root
-flags: Regexp::IGNORECASE | Regexp::MULTILINE
+flags: Regexp IGNORECASE | Regexp MULTILINE
 
 lex(string-url):
   Regexp new("(\\\\#|#(?=[^\\n{])|[^\\n#)])+") is(literal.string.other)

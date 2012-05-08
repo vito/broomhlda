@@ -7,7 +7,7 @@ aliases: ["hybris", "hy"]
 extensions: [".hy", ".hyb"]
 mimetypes: ["text/x-hybris", "application/x-hybris"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(import):
   Regexp new("[a-zA-Z0-9_.]+\\*?") is(name.namespace) -> pop

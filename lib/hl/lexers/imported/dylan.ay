@@ -7,7 +7,7 @@ aliases: ["dylan"]
 extensions: [".dylan", ".dyl"]
 mimetypes: ["text/x-dylan"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(root):
   Regexp new("\\b(subclass|abstract|block|c(on(crete|stant)|lass)|domain|ex(c(eption|lude)|port)|f(unction(|al))|generic|handler|i(n(herited|line|stance|terface)|mport)|library|m(acro|ethod)|open|primary|sealed|si(deways|ngleton)|slot|v(ariable|irtual))\\b") is(name.builtin)

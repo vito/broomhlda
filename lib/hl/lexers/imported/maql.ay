@@ -7,7 +7,7 @@ aliases: ["maql"]
 extensions: [".maql"]
 mimetypes: ["text/x-gooddata-maql", "application/x-gooddata-maql"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(root):
   Regexp new("IDENTIFIER\\b") is(name.builtin)

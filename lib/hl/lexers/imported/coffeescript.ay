@@ -7,7 +7,7 @@ aliases: ["coffee-script", "coffeescript"]
 extensions: [".coffee"]
 mimetypes: ["text/coffeescript"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(commentsandwhitespace):
   Regexp new("\\s+") is(text)

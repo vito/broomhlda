@@ -7,7 +7,7 @@ aliases: ["bat"]
 extensions: [".bat", ".cmd"]
 mimetypes: ["application/x-dos-batch"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(basic):
   Regexp new("\".*?\"") is(literal.string.double)

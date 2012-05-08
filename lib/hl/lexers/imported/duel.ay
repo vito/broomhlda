@@ -7,7 +7,7 @@ aliases: ["duel", "Duel Engine", "Duel View", "JBST", "jbst", "JsonML+BST"]
 extensions: [".duel", ".jbst"]
 mimetypes: ["text/x-duel", "text/x-jbst"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(root):
   Regexp new("(<%[@=#!:]?)(.*?)(%>)") is(by-groups(name.tag, using(Javascript), name.tag))

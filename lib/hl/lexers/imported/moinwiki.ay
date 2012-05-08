@@ -7,7 +7,7 @@ aliases: ["trac-wiki", "moin"]
 extensions: []
 mimetypes: ["text/x-trac-wiki"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(root):
   Regexp new("^#.*$") is(comment)

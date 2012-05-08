@@ -7,7 +7,7 @@ aliases: ["abap"]
 extensions: [".abap"]
 mimetypes: ["text/x-abap"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(variable-names):
   Regexp new("<[\\S_]+>") is(name.variable)

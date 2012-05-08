@@ -7,7 +7,7 @@ aliases: ["modula2", "m2"]
 extensions: [".def", ".mod"]
 mimetypes: ["text/x-modula2"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(punctuation):
   Regexp new("[\\(\\)\\[\\]{},.:;|]") is(punctuation)

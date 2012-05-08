@@ -206,14 +206,14 @@ def convert_flags(f):
             break
 
         if f & re.IGNORECASE:
-            options.append("Regexp::IGNORECASE")
+            options.append("Regexp IGNORECASE")
             f = f ^ re.IGNORECASE
         elif f & re.LOCALE:
             f = f ^ re.LOCALE
         elif f & re.MULTILINE:
             f = f ^ re.MULTILINE
         elif f & re.DOTALL:
-            options.append("Regexp::MULTILINE") # yes, really
+            options.append("Regexp MULTILINE") # yes, really
             f = f ^ re.DOTALL
         elif f & re.UNICODE:
             f = f ^ re.UNICODE

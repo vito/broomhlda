@@ -7,7 +7,7 @@ aliases: ["nasm"]
 extensions: [".asm", ".ASM"]
 mimetypes: ["text/x-nasm"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(preproc):
   Regexp new("[^;\\n]+") is(comment.preproc)

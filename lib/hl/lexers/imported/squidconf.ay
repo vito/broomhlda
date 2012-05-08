@@ -7,7 +7,7 @@ aliases: ["squidconf", "squid.conf", "squid"]
 extensions: ["squid.conf"]
 mimetypes: ["text/x-squidconf"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(comment):
   Regexp new("\\s*TAG:.*") is(literal.string.escape) -> pop

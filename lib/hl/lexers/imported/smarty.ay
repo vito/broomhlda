@@ -7,7 +7,7 @@ aliases: ["smarty"]
 extensions: [".tpl"]
 mimetypes: ["application/x-smarty"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(root):
   Regexp new("[^{]+") is(other)

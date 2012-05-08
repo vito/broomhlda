@@ -7,7 +7,7 @@ aliases: ["blitzmax", "bmax"]
 extensions: [".bmx"]
 mimetypes: ["text/x-bmx"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(root):
   Regexp new("[ \\t]+") is(text)

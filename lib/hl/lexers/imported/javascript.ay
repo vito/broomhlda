@@ -7,7 +7,7 @@ aliases: ["js", "javascript"]
 extensions: [".js"]
 mimetypes: ["application/javascript", "application/x-javascript", "text/x-javascript", "text/javascript"]
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(commentsandwhitespace):
   Regexp new("\\s+") is(text)

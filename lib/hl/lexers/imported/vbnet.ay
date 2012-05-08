@@ -7,7 +7,7 @@ aliases: ["vb.net", "vbnet"]
 extensions: [".vb", ".bas"]
 mimetypes: ["text/x-vbnet", "text/x-vba"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(dim):
   Regexp new("[a-z_][a-z0-9_]*") is(name.variable) -> pop

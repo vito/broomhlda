@@ -7,7 +7,7 @@ aliases: ["sql"]
 extensions: [".sql"]
 mimetypes: ["text/x-sql"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(multiline-comments):
   Regexp new("/\\*") is(comment.multiline) -> go-to(multiline-comments)

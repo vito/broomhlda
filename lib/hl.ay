@@ -8,4 +8,4 @@ load(lexer) :=
   require(
     File expand-path(
       "../hl/lexers/" + lexer downcase
-      _FILE))::Lexer
+      _FILE)) Lexer

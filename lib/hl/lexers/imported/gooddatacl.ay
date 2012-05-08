@@ -7,7 +7,7 @@ aliases: ["gooddata-cl"]
 extensions: [".gdc"]
 mimetypes: ["text/x-gooddata-cl"]
 start: .root
-flags: Regexp::IGNORECASE
+flags: Regexp IGNORECASE
 
 lex(args-list):
   Regexp new("\\)") is(punctuation) -> pop

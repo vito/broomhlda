@@ -7,7 +7,7 @@ aliases: ["mxml"]
 extensions: [".mxml"]
 mimetypes: []
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(comment):
   Regexp new("[^-]+") is(comment)

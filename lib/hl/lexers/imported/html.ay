@@ -7,7 +7,7 @@ aliases: ["html"]
 extensions: [".html", ".htm", ".xhtml", ".xslt"]
 mimetypes: ["text/html", "application/xhtml+xml"]
 start: .root
-flags: Regexp::IGNORECASE | Regexp::MULTILINE
+flags: Regexp IGNORECASE | Regexp MULTILINE
 
 lex(comment):
   Regexp new("[^-]+") is(comment)

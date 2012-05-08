@@ -7,7 +7,7 @@ aliases: ["applescript"]
 extensions: [".applescript"]
 mimetypes: []
 start: .root
-flags: Regexp::MULTILINE
+flags: Regexp MULTILINE
 
 lex(comment):
   Regexp new("\\(\\*") is(comment.multiline) -> push
