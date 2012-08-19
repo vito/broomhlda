@@ -1,0 +1,236 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Ruby"
+aliases: ["rb", "ruby", "duby"]
+extensions: [".rb", ".rbw", "Rakefile", ".rake", ".gemspec", ".rbx", ".duby"]
+mimetypes: ["text/x-ruby", "application/x-ruby"]
+start: .root
+flags: Regexp MULTILINE
+
+lex(interpolated-string):
+  any-of(string-intp)
+  r"[\\\#]" is(literal.string.other)
+  r"[^\\\#]+" is(literal.string.other)
+
+lex(simple-sym):
+  any-of(string-intp-escaped)
+  r"[^\\\"\#]+" is(literal.string.symbol)
+  r"[\\\#]" is(literal.string.symbol)
+  r"\"" is(literal.string.symbol) -> pop
+
+lex(end-part):
+  r".+" is(comment.preproc) -> pop
+
+lex(cb-regex):
+  r"\\[\\\{\}]" is(literal.string.regex)
+  r"(?<!\\)\{" is(literal.string.regex) -> push
+  r"(?<!\\)\}[mixounse]*" is(literal.string.regex) -> pop
+  any-of(string-intp)
+  r"[\\\#\{\}]" is(literal.string.regex)
+  r"[^\\\#\{\}]+" is(literal.string.regex)
+
+lex(cb-string):
+  r"\\[\\\{\}]" is(literal.string.other)
+  r"(?<!\\)\{" is(literal.string.other) -> push
+  r"(?<!\\)\}" is(literal.string.other) -> pop
+  r"[\\\#\{\}]" is(literal.string.other)
+  r"[^\\\#\{\}]+" is(literal.string.other)
+
+lex(string-intp-escaped):
+  any-of(string-intp)
+  r"\\([\\abefnrstv\#\"\']|x[a-fA-F0-9]{1,2}|[0-7]{1,3})" is(literal.string.escape)
+
+lex(pa-regex):
+  r"\\[\\\(\)]" is(literal.string.regex)
+  r"(?<!\\)\(" is(literal.string.regex) -> push
+  r"(?<!\\)\)[mixounse]*" is(literal.string.regex) -> pop
+  any-of(string-intp)
+  r"[\\\#\(\)]" is(literal.string.regex)
+  r"[^\\\#\(\)]+" is(literal.string.regex)
+
+lex(classname):
+  r"\(" is(punctuation) -> go-to(defexpr)
+  r"<<" is(operator) -> pop
+  r"[A-Z_]\w*" is(name.class) -> pop
+  r"" is(text) -> pop
+
+lex(ab-intp-string):
+  r"\\[\\<>]" is(literal.string.other)
+  r"(?<!\\)<" is(literal.string.other) -> push
+  r"(?<!\\)>" is(literal.string.other) -> pop
+  any-of(string-intp-escaped)
+  r"[\\\#<>]" is(literal.string.other)
+  r"[^\\\#<>]+" is(literal.string.other)
+
+lex(simple-backtick):
+  any-of(string-intp-escaped)
+  r"[^\\`\#]+" is(literal.string.backtick)
+  r"[\\\#]" is(literal.string.backtick)
+  r"`" is(literal.string.backtick) -> pop
+
+lex(pa-string):
+  r"\\[\\\(\)]" is(literal.string.other)
+  r"(?<!\\)\(" is(literal.string.other) -> push
+  r"(?<!\\)\)" is(literal.string.other) -> pop
+  r"[\\\#\(\)]" is(literal.string.other)
+  r"[^\\\#\(\)]+" is(literal.string.other)
+
+lex(cb-intp-string):
+  r"\\[\\\{\}]" is(literal.string.other)
+  r"(?<!\\)\{" is(literal.string.other) -> push
+  r"(?<!\\)\}" is(literal.string.other) -> pop
+  any-of(string-intp-escaped)
+  r"[\\\#\{\}]" is(literal.string.other)
+  r"[^\\\#\{\}]+" is(literal.string.other)
+
+lex(ab-regex):
+  r"\\[\\<>]" is(literal.string.regex)
+  r"(?<!\\)<" is(literal.string.regex) -> push
+  r"(?<!\\)>[mixounse]*" is(literal.string.regex) -> pop
+  any-of(string-intp)
+  r"[\\\#<>]" is(literal.string.regex)
+  r"[^\\\#<>]+" is(literal.string.regex)
+
+lex(pa-intp-string):
+  r"\\[\\\(\)]" is(literal.string.other)
+  r"(?<!\\)\(" is(literal.string.other) -> push
+  r"(?<!\\)\)" is(literal.string.other) -> pop
+  any-of(string-intp-escaped)
+  r"[\\\#\(\)]" is(literal.string.other)
+  r"[^\\\#\(\)]+" is(literal.string.other)
+
+lex(ab-string):
+  r"\\[\\<>]" is(literal.string.other)
+  r"(?<!\\)<" is(literal.string.other) -> push
+  r"(?<!\\)>" is(literal.string.other) -> pop
+  r"[\\\#<>]" is(literal.string.other)
+  r"[^\\\#<>]+" is(literal.string.other)
+
+lex(root):
+  r"\#.*?$" is(comment.single)
+  r"=begin\s.*?\n=end.*?$" is(comment.multiline)
+  r"(BEGIN|END|alias|begin|break|case|defined\?|do|else|elsif|end|ensure|for|if|in|next|redo|rescue|raise|retry|return|super|then|undef|unless|until|when|while|yield)\b" is(keyword)
+  r"(module)(\s+)([a-zA-Z_][a-zA-Z0-9_]*(::[a-zA-Z_][a-zA-Z0-9_]*)*)" is(by-groups(keyword, text, name.namespace))
+  r"(def)(\s+)" is(by-groups(keyword, text)) -> go-to(funcname)
+  r"def(?=[*%&^`\126+-/\[<>=])" is(keyword) -> go-to(funcname)
+  r"(class)(\s+)" is(by-groups(keyword, text)) -> go-to(classname)
+  r"(initialize|new|loop|include|extend|raise|attr_reader|attr_writer|attr_accessor|attr|catch|throw|private|module_function|public|protected|true|false|nil)\b" is(keyword.pseudo)
+  r"(not|and|or)\b" is(operator.word)
+  r"(autoload|block_given|const_defined|eql|equal|frozen|include|instance_of|is_a|iterator|kind_of|method_defined|nil|private_method_defined|protected_method_defined|public_method_defined|respond_to|tainted)\?" is(name.builtin)
+  r"(chomp|chop|exit|gsub|sub)!" is(name.builtin)
+  r"(?<!\.)(Array|Float|Integer|String|__id__|__send__|abort|ancestors|at_exit|autoload|binding|callcc|caller|catch|chomp|chop|class_eval|class_variables|clone|const_defined\?|const_get|const_missing|const_set|constants|display|dup|eval|exec|exit|extend|fail|fork|format|freeze|getc|gets|global_variables|gsub|hash|id|included_modules|inspect|instance_eval|instance_method|instance_methods|instance_variable_get|instance_variable_set|instance_variables|lambda|load|local_variables|loop|method|method_missing|methods|module_eval|name|object_id|open|p|print|printf|private_class_method|private_instance_methods|private_methods|proc|protected_instance_methods|protected_methods|public_class_method|public_instance_methods|public_methods|putc|puts|raise|rand|readline|readlines|require|scan|select|self|send|set_trace_func|singleton_methods|sleep|split|sprintf|srand|sub|syscall|system|taint|test|throw|to_a|to_s|trace_var|trap|untaint|untrace_var|warn)\b" is(name.builtin)
+  r"__(FILE|LINE)__\b" is(name.builtin.pseudo)
+  --r"(?<!\w)(<<-?)([\"`\']?)([a-zA-Z_]\w*)(\2)(.*?\n)" is(TODO)
+  --r"(<<-?)(\"|\')()(\2)(.*?\n)" is(TODO)
+  r"__END__" is(comment.preproc) -> go-to(end-part)
+  r"(?:^|(?<=[=<>\126!])|(?<=(?:\s|;)when\s)|(?<=(?:\s|;)or\s)|(?<=(?:\s|;)and\s)|(?<=(?:\s|;|\.)index\s)|(?<=(?:\s|;|\.)scan\s)|(?<=(?:\s|;|\.)sub\s)|(?<=(?:\s|;|\.)sub!\s)|(?<=(?:\s|;|\.)gsub\s)|(?<=(?:\s|;|\.)gsub!\s)|(?<=(?:\s|;|\.)match\s)|(?<=(?:\s|;)if\s)|(?<=(?:\s|;)elsif\s)|(?<=^when\s)|(?<=^index\s)|(?<=^scan\s)|(?<=^sub\s)|(?<=^gsub\s)|(?<=^sub!\s)|(?<=^gsub!\s)|(?<=^match\s)|(?<=^if\s)|(?<=^elsif\s))(\s*)(/)" is(by-groups(text, literal.string.regex)) -> go-to(multiline-regex)
+  r"(?<=\(|,|\[)/" is(literal.string.regex) -> go-to(multiline-regex)
+  r"(\s+)(/)(?![\s=])" is(by-groups(text, literal.string.regex)) -> go-to(multiline-regex)
+  r"(0_?[0-7]+(?:_[0-7]+)*)(\s*)([/?])?" is(by-groups(literal.number.oct, text, operator))
+  r"(0x[0-9A-Fa-f]+(?:_[0-9A-Fa-f]+)*)(\s*)([/?])?" is(by-groups(literal.number.hex, text, operator))
+  r"(0b[01]+(?:_[01]+)*)(\s*)([/?])?" is(by-groups(literal.number.bin, text, operator))
+  r"([\d]+(?:_\d+)*)(\s*)([/?])?" is(by-groups(literal.number.integer, text, operator))
+  r"@@[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable.class)
+  r"@[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable.instance)
+  r"\$[a-zA-Z0-9_]+" is(name.variable.global)
+  r"\$[!@&`\'+\126=/\\,;.<>_*$?:\"]" is(name.variable.global)
+  r"\$-[0adFiIlpvw]" is(name.variable.global)
+  r"::" is(operator)
+  any-of(strings)
+  r"\?(\\[MC]-)*(\\([\\abefnrstv\#\"\']|x[a-fA-F0-9]{1,2}|[0-7]{1,3})|\S)(?!\w)" is(literal.string.char)
+  r"[A-Z][a-zA-Z0-9_]+" is(name.constant)
+  r"(\.|::)([a-zA-Z_]\w*[\!\?]?|[*%&^`\126+-/\[<>=])" is(by-groups(operator, name))
+  r"[a-zA-Z_]\w*[\!\?]?" is(name)
+  r"(\[|\]|\*\*|<<?|>>?|>=|<=|<=>|=\126|={3}|!\126|&&?|\|\||\.{1,3})" is(operator)
+  r"[-+/*%=<>&!^|\126]=?" is(operator)
+  r"[(){};,/?:\\]" is(punctuation)
+  r"\s+" is(text)
+
+lex(sb-intp-string):
+  r"\\[\\\[\]]" is(literal.string.other)
+  r"(?<!\\)\[" is(literal.string.other) -> push
+  r"(?<!\\)\]" is(literal.string.other) -> pop
+  any-of(string-intp-escaped)
+  r"[\\\#\[\]]" is(literal.string.other)
+  r"[^\\\#\[\]]+" is(literal.string.other)
+
+lex(sb-string):
+  r"\\[\\\[\]]" is(literal.string.other)
+  r"(?<!\\)\[" is(literal.string.other) -> push
+  r"(?<!\\)\]" is(literal.string.other) -> pop
+  r"[\\\#\[\]]" is(literal.string.other)
+  r"[^\\\#\[\]]+" is(literal.string.other)
+
+lex(funcname):
+  r"\(" is(punctuation) -> go-to(defexpr)
+  r"(?:([a-zA-Z_][a-zA-Z0-9_]*)(\.))?([a-zA-Z_]\w*[\!\?]?|\*\*?|[-+]@?|[/%&|^`\126]|\[\]=?|<<|>>|<=?>|>=?|===?)" is(by-groups(name.class, operator, name.function)) -> pop
+  r"" is(text) -> pop
+
+lex(in-intp):
+  r"}" is(literal.string.interpol) -> pop
+  any-of(root)
+
+lex(interpolated-regex):
+  any-of(string-intp)
+  r"[\\\#]" is(literal.string.regex)
+  r"[^\\\#]+" is(literal.string.regex)
+
+lex(simple-string):
+  any-of(string-intp-escaped)
+  r"[^\\\"\#]+" is(literal.string.double)
+  r"[\\\#]" is(literal.string.double)
+  r"\"" is(literal.string.double) -> pop
+
+lex(sb-regex):
+  r"\\[\\\[\]]" is(literal.string.regex)
+  r"(?<!\\)\[" is(literal.string.regex) -> push
+  r"(?<!\\)\][mixounse]*" is(literal.string.regex) -> pop
+  any-of(string-intp)
+  r"[\\\#\[\]]" is(literal.string.regex)
+  r"[^\\\#\[\]]+" is(literal.string.regex)
+
+lex(defexpr):
+  r"(\))(\.|::)?" is(by-groups(punctuation, operator)) -> pop
+  r"\(" is(operator) -> push
+  any-of(root)
+
+lex(multiline-regex):
+  any-of(string-intp)
+  r"\\\\" is(literal.string.regex)
+  r"\\/" is(literal.string.regex)
+  r"[\\\#]" is(literal.string.regex)
+  r"[^\\/\#]+" is(literal.string.regex)
+  r"/[mixounse]*" is(literal.string.regex) -> pop
+
+lex(strings):
+  r"\:@{0,2}([a-zA-Z_]\w*[\!\?]?|\*\*?|[-+]@?|[/%&|^`\126]|\[\]=?|<<|>>|<=?>|>=?|===?)" is(literal.string.symbol)
+  r":'(\\\\|\\'|[^'])*'" is(literal.string.symbol)
+  r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
+  r":\"" is(literal.string.symbol) -> go-to(simple-sym)
+  r"\"" is(literal.string.double) -> go-to(simple-string)
+  r"(?<!\.)`" is(literal.string.backtick) -> go-to(simple-backtick)
+  r"%[QWx]?\{" is(literal.string.other) -> go-to(cb-intp-string)
+  r"%[qsw]\{" is(literal.string.other) -> go-to(cb-string)
+  r"%r\{" is(literal.string.regex) -> go-to(cb-regex)
+  r"%[QWx]?\[" is(literal.string.other) -> go-to(sb-intp-string)
+  r"%[qsw]\[" is(literal.string.other) -> go-to(sb-string)
+  r"%r\[" is(literal.string.regex) -> go-to(sb-regex)
+  r"%[QWx]?\(" is(literal.string.other) -> go-to(pa-intp-string)
+  r"%[qsw]\(" is(literal.string.other) -> go-to(pa-string)
+  r"%r\(" is(literal.string.regex) -> go-to(pa-regex)
+  r"%[QWx]?<" is(literal.string.other) -> go-to(ab-intp-string)
+  r"%[qsw]<" is(literal.string.other) -> go-to(ab-string)
+  r"%r<" is(literal.string.regex) -> go-to(ab-regex)
+  r"%r([^a-zA-Z0-9])((?:\\\2|(?!\2).)*)(\2[mixounse]*)" is(literal.string.regex)
+  r"%[qsw]([^a-zA-Z0-9])((?:\\\1|(?!\1).)*)\1" is(literal.string.other)
+  r"(%[QWx]([^a-zA-Z0-9]))((?:\\\2|(?!\2).)*)(\2)" is(literal.string)
+  r"(?<=[-+/*%=<>&!^|\126,(])(\s*)(%([\t ])(?:(?:\\\3|(?!\3).)*)\3)" is(by-groups(text, literal.string.other))
+  r"^(\s*)(%([\t ])(?:(?:\\\3|(?!\3).)*)\3)" is(by-groups(text, literal.string.other))
+  r"(%([^a-zA-Z0-9\s]))((?:\\\2|(?!\2).)*)(\2)" is(literal.string)
+
+lex(string-intp):
+  r"\#{" is(literal.string.interpol) -> go-to(in-intp)
+  r"\#@@?[a-zA-Z_][a-zA-Z0-9_]*" is(literal.string.interpol)
+  r"\#\$[a-zA-Z_][a-zA-Z0-9_]*" is(literal.string.interpol)
