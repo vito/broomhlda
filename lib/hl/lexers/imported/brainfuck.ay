@@ -10,18 +10,18 @@ start: .root
 flags: 0
 
 lex(root):
-  Regexp new("\\[") is(keyword) -> go-to(loop)
-  Regexp new("\\]") is(error)
+  r"\[" is(keyword) -> go-to(loop)
+  r"\]" is(error)
   any-of(common)
 
 lex(common):
-  Regexp new("[.,]+") is(name.tag)
-  Regexp new("[+-]+") is(name.builtin)
-  Regexp new("[<>]+") is(name.variable)
-  Regexp new("[^.,+\\-<>\\[\\]]+") is(comment)
+  r"[.,]+" is(name.tag)
+  r"[+-]+" is(name.builtin)
+  r"[<>]+" is(name.variable)
+  r"[^.,+\-<>\[\]]+" is(comment)
 
 lex(loop):
-  Regexp new("\\[") is(keyword) -> push
-  Regexp new("\\]") is(keyword) -> pop
+  r"\[" is(keyword) -> push
+  r"\]" is(keyword) -> pop
   any-of(common)
 

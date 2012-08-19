@@ -10,21 +10,21 @@ start: .root
 flags: Regexp MULTILINE
 
 lex(root):
-  Regexp new("[^{]+") is(other)
-  Regexp new("(\\{)(\\*.*?\\*)(\\})") is(by-groups(comment.preproc, comment, comment.preproc))
-  Regexp new("(\\{php\\})(.*?)(\\{/php\\})") is(by-groups(comment.preproc, using(Php), comment.preproc))
-  Regexp new("(\\{)(/?[a-zA-Z_][a-zA-Z0-9_]*)(\\s*)") is(by-groups(comment.preproc, name.function, text)) -> go-to(smarty)
-  Regexp new("\\{") is(comment.preproc) -> go-to(smarty)
+  r"[^{]+" is(other)
+  r"(\{)(\*.*?\*)(\})" is(by-groups(comment.preproc, comment, comment.preproc))
+  r"(\{php\})(.*?)(\{/php\})" is(by-groups(comment.preproc, using(Php), comment.preproc))
+  r"(\{)(/?[a-zA-Z_][a-zA-Z0-9_]*)(\s*)" is(by-groups(comment.preproc, name.function, text)) -> go-to(smarty)
+  r"\{" is(comment.preproc) -> go-to(smarty)
 
 lex(smarty):
-  Regexp new("\\s+") is(text)
-  Regexp new("\\}") is(comment.preproc) -> pop
-  Regexp new("#[a-zA-Z_][a-zA-Z0-9_]*#") is(name.variable)
-  Regexp new("\\$[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z0-9_]+)*") is(name.variable)
-  Regexp new("[\126!%^&*()+=|\\[\\]:;,.<>/?{}@-]") is(operator)
-  Regexp new("(true|false|null)\8") is(keyword.constant)
-  Regexp new("[0-9](\\.[0-9]*)?(eE[+-][0-9])?[flFLdD]?|0[xX][0-9a-fA-F]+[Ll]?") is(literal.number)
-  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string.double)
-  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string.single)
-  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.attribute)
+  r"\s+" is(text)
+  r"\}" is(comment.preproc) -> pop
+  r"\#[a-zA-Z_][a-zA-Z0-9_]*\#" is(name.variable)
+  r"\$[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)*" is(name.variable)
+  r"[\126!%^&*()+=|\[\]:;,.<>/?{}@-]" is(operator)
+  r"(true|false|null)\b" is(keyword.constant)
+  r"[0-9](\.[0-9]*)?(eE[+-][0-9])?[flFLdD]?|0[xX][0-9a-fA-F]+[Ll]?" is(literal.number)
+  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
+  r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.attribute)
 

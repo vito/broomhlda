@@ -10,29 +10,29 @@ start: .root
 flags: 0
 
 lex(root):
-  Regexp new("^%!.+\\n") is(comment.preproc)
-  Regexp new("%%.*\\n") is(comment.special)
-  Regexp new("(^%.*\\n){2,}") is(comment.multiline)
-  Regexp new("%.*\\n") is(comment.single)
-  Regexp new("\\(") is(literal.string) -> go-to(stringliteral)
-  Regexp new("[\\{\\}(\\<\\<)(\\>\\>)\\[\\]]") is(punctuation)
-  Regexp new("<[0-9A-Fa-f]+>(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(literal.number.hex)
-  Regexp new("[0-9]+\\#(\\-|\\+)?([0-9]+\\.?|[0-9]*\\.[0-9]+|[0-9]+\\.[0-9]*)((e|E)[0-9]+)?(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(literal.number.oct)
-  Regexp new("(\\-|\\+)?([0-9]+\\.?|[0-9]*\\.[0-9]+|[0-9]+\\.[0-9]*)((e|E)[0-9]+)?(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(literal.number.float)
-  Regexp new("(\\-|\\+)?[0-9]+(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(literal.number.integer)
-  Regexp new("\\/[^\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s]+(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(name.variable)
-  Regexp new("[^\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s]+(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(name.function)
-  Regexp new("(false|true)(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(keyword.constant)
-  Regexp new("(eq|ne|ge|gt|le|lt|and|or|not|if|ifelse|for|forall)(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(keyword.reserved)
-  Regexp new("(abs|add|aload|arc|arcn|array|atan|begin|bind|ceiling|charpath|clip|closepath|concat|concatmatrix|copy|cos|currentlinewidth|currentmatrix|currentpoint|curveto|cvi|cvs|def|defaultmatrix|dict|dictstackoverflow|div|dtransform|dup|end|exch|exec|exit|exp|fill|findfont|floor|get|getinterval|grestore|gsave|gt|identmatrix|idiv|idtransform|index|invertmatrix|itransform|length|lineto|ln|load|log|loop|matrix|mod|moveto|mul|neg|newpath|pathforall|pathbbox|pop|print|pstack|put|quit|rand|rangecheck|rcurveto|repeat|restore|rlineto|rmoveto|roll|rotate|round|run|save|scale|scalefont|setdash|setfont|setgray|setlinecap|setlinejoin|setlinewidth|setmatrix|setrgbcolor|shfill|show|showpage|sin|sqrt|stack|stringwidth|stroke|strokepath|sub|syntaxerror|transform|translate|truncate|typecheck|undefined|undefinedfilename|undefinedresult)(?=[\\(\\)\\<\\>\\[\\]\\{\\}\\/\\%\\s])") is(name.builtin)
-  Regexp new("\\s+") is(text)
+  r"^%!.+\n" is(comment.preproc)
+  r"%%.*\n" is(comment.special)
+  r"(^%.*\n){2,}" is(comment.multiline)
+  r"%.*\n" is(comment.single)
+  r"\(" is(literal.string) -> go-to(stringliteral)
+  r"[\{\}(\<\<)(\>\>)\[\]]" is(punctuation)
+  r"<[0-9A-Fa-f]+>(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.hex)
+  r"[0-9]+\\#(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.oct)
+  r"(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.float)
+  r"(\-|\+)?[0-9]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.integer)
+  r"\/[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.variable)
+  r"[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.function)
+  r"(false|true)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.constant)
+  r"(eq|ne|ge|gt|le|lt|and|or|not|if|ifelse|for|forall)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.reserved)
+  r"(abs|add|aload|arc|arcn|array|atan|begin|bind|ceiling|charpath|clip|closepath|concat|concatmatrix|copy|cos|currentlinewidth|currentmatrix|currentpoint|curveto|cvi|cvs|def|defaultmatrix|dict|dictstackoverflow|div|dtransform|dup|end|exch|exec|exit|exp|fill|findfont|floor|get|getinterval|grestore|gsave|gt|identmatrix|idiv|idtransform|index|invertmatrix|itransform|length|lineto|ln|load|log|loop|matrix|mod|moveto|mul|neg|newpath|pathforall|pathbbox|pop|print|pstack|put|quit|rand|rangecheck|rcurveto|repeat|restore|rlineto|rmoveto|roll|rotate|round|run|save|scale|scalefont|setdash|setfont|setgray|setlinecap|setlinejoin|setlinewidth|setmatrix|setrgbcolor|shfill|show|showpage|sin|sqrt|stack|stringwidth|stroke|strokepath|sub|syntaxerror|transform|translate|truncate|typecheck|undefined|undefinedfilename|undefinedresult)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.builtin)
+  r"\s+" is(text)
 
 lex(stringliteral):
-  Regexp new("[^\\(\\)\\\\]+") is(literal.string)
-  Regexp new("\\\\") is(literal.string.escape) -> go-to(escape)
-  Regexp new("\\(") is(literal.string) -> push
-  Regexp new("\\)") is(literal.string) -> pop
+  r"[^\(\)\\]+" is(literal.string)
+  r"\\" is(literal.string.escape) -> go-to(escape)
+  r"\(" is(literal.string) -> push
+  r"\)" is(literal.string) -> pop
 
 lex(escape):
-  Regexp new("([0-8]{3}|n|r|t|b|f|\\\\|\\(|\\)|)") is(literal.string.escape) -> pop
+  r"([0-8]{3}|n|r|t|b|f|\\|\(|\))?" is(literal.string.escape) -> pop
 

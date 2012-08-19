@@ -10,45 +10,45 @@ start: .root
 flags: 0
 
 lex(comment):
-  Regexp new("/[*]") is(comment.multiline) -> push
-  Regexp new("[*]/") is(comment.multiline) -> pop
-  Regexp new("[^/*]") is(comment.multiline)
-  Regexp new("[*/]") is(comment.multiline)
+  r"/[*]" is(comment.multiline) -> push
+  r"[*]/" is(comment.multiline) -> pop
+  r"[^/*]" is(comment.multiline)
+  r"[*/]" is(comment.multiline)
 
 lex(classname):
-  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.class) -> pop
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
 
 lex(namespace):
-  Regexp new("[a-zA-Z_][a-zA-Z0-9_.]*") is(name.namespace) -> pop
+  r"[a-zA-Z_][a-zA-Z0-9_.]*" is(name.namespace) -> pop
 
 lex(root):
-  Regexp new("\\s+") is(text)
-  Regexp new("(#|//).*$") is(comment.single)
-  Regexp new("/[*]") is(comment.multiline) -> go-to(comment)
-  Regexp new("[\\]{}:(),.;\\[]") is(punctuation)
-  Regexp new("\\\\\\n") is(text)
-  Regexp new("\\\\") is(text)
-  Regexp new("(in|is|and|or|not)\\b") is(operator.word)
-  Regexp new("/(\\\\\\\\|\\\\/|[^/\\s])/") is(literal.string.regex)
-  Regexp new("@/(\\\\\\\\|\\\\/|[^/])*/") is(literal.string.regex)
-  Regexp new("=\126|!=|==|<<|>>|[-+/*%=<>&^|]") is(operator)
-  Regexp new("(as|abstract|callable|constructor|destructor|do|import|enum|event|final|get|interface|internal|of|override|partial|private|protected|public|return|set|static|struct|transient|virtual|yield|super|and|break|cast|continue|elif|else|ensure|except|for|given|goto|if|in|is|isa|not|or|otherwise|pass|raise|ref|try|unless|when|while|from|as)\\b") is(keyword)
-  Regexp new("def(?=\\s+\\(.*?\\))") is(keyword)
-  Regexp new("(def)(\\s+)") is(by-groups(keyword, text)) -> go-to(funcname)
-  Regexp new("(class)(\\s+)") is(by-groups(keyword, text)) -> go-to(classname)
-  Regexp new("(namespace)(\\s+)") is(by-groups(keyword, text)) -> go-to(namespace)
-  Regexp new("(?<!\\.)(true|false|null|self|__eval__|__switch__|array|assert|checked|enumerate|filter|getter|len|lock|map|matrix|max|min|normalArrayIndexing|print|property|range|rawArrayIndexing|required|typeof|unchecked|using|yieldAll|zip)\\b") is(name.builtin)
-  Regexp new("\"\"\"(\\\\|\\\"|.*?)\"\"\"") is(literal.string.double)
-  Regexp new("\"(\\\\|\\\"|[^\"]*?)\"") is(literal.string.double)
-  Regexp new("'(\\\\|\\'|[^']*?)'") is(literal.string.single)
-  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name)
-  Regexp new("(\\d+\\.\\d*|\\d*\\.\\d+)([fF][+-]?[0-9]+)?") is(literal.number.float)
-  Regexp new("[0-9][0-9\\.]*(m|ms|d|h|s)") is(literal.number)
-  Regexp new("0\\d+") is(literal.number.oct)
-  Regexp new("0x[a-fA-F0-9]+") is(literal.number.hex)
-  Regexp new("\\d+L") is(literal.number.integer.long)
-  Regexp new("\\d+") is(literal.number.integer)
+  r"\s+" is(text)
+  r"(\#|//).*$" is(comment.single)
+  r"/[*]" is(comment.multiline) -> go-to(comment)
+  r"[\]{}:(),.;\[]" is(punctuation)
+  r"\\\n" is(text)
+  r"\\" is(text)
+  r"(in|is|and|or|not)\b" is(operator.word)
+  r"/(\\\\|\\/|[^/\s])/" is(literal.string.regex)
+  r"@/(\\\\|\\/|[^/])*/" is(literal.string.regex)
+  r"=\126|!=|==|<<|>>|[-+/*%=<>&^|]" is(operator)
+  r"(as|abstract|callable|constructor|destructor|do|import|enum|event|final|get|interface|internal|of|override|partial|private|protected|public|return|set|static|struct|transient|virtual|yield|super|and|break|cast|continue|elif|else|ensure|except|for|given|goto|if|in|is|isa|not|or|otherwise|pass|raise|ref|try|unless|when|while|from|as)\b" is(keyword)
+  r"def(?=\s+\(.*?\))" is(keyword)
+  r"(def)(\s+)" is(by-groups(keyword, text)) -> go-to(funcname)
+  r"(class)(\s+)" is(by-groups(keyword, text)) -> go-to(classname)
+  r"(namespace)(\s+)" is(by-groups(keyword, text)) -> go-to(namespace)
+  r"(?<!\.)(true|false|null|self|__eval__|__switch__|array|assert|checked|enumerate|filter|getter|len|lock|map|matrix|max|min|normalArrayIndexing|print|property|range|rawArrayIndexing|required|typeof|unchecked|using|yieldAll|zip)\b" is(name.builtin)
+  r"\"\"\"(\\\\|\\\"|.*?)\"\"\"" is(literal.string.double)
+  r"\"(\\\\|\\\"|[^\"]*?)\"" is(literal.string.double)
+  r"'(\\\\|\\'|[^']*?)'" is(literal.string.single)
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
+  r"(\d+\.\d*|\d*\.\d+)([fF][+-]?[0-9]+)?" is(literal.number.float)
+  r"[0-9][0-9\.]*(ms?|d|h|s)" is(literal.number)
+  r"0\d+" is(literal.number.oct)
+  r"0x[a-fA-F0-9]+" is(literal.number.hex)
+  r"\d+L" is(literal.number.integer.long)
+  r"\d+" is(literal.number.integer)
 
 lex(funcname):
-  Regexp new("[a-zA-Z_][a-zA-Z0-9_]*") is(name.function) -> pop
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.function) -> pop
 

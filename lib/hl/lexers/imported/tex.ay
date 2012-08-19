@@ -10,39 +10,39 @@ start: .root
 flags: 0
 
 lex(displaymath):
-  Regexp new("\\\\\\]") is(literal.string) -> pop
-  Regexp new("\\$\\$") is(literal.string) -> pop
-  Regexp new("\\$") is(name.builtin)
+  r"\\\]" is(literal.string) -> pop
+  r"\$\$" is(literal.string) -> pop
+  r"\$" is(name.builtin)
   any-of(math)
 
 lex(general):
-  Regexp new("%.*?\\n") is(comment)
-  Regexp new("[{}]") is(name.builtin)
-  Regexp new("[&_^]") is(name.builtin)
+  r"%.*?\n" is(comment)
+  r"[{}]" is(name.builtin)
+  r"[&_^]" is(name.builtin)
 
 lex(command):
-  Regexp new("\\[.*?\\]") is(name.attribute)
-  Regexp new("\\*") is(keyword)
-  Regexp new("") is(text) -> pop
+  r"\[.*?\]" is(name.attribute)
+  r"\*" is(keyword)
+  r"" is(text) -> pop
 
 lex(inlinemath):
-  Regexp new("\\\\\\)") is(literal.string) -> pop
-  Regexp new("\\$") is(literal.string) -> pop
+  r"\\\)" is(literal.string) -> pop
+  r"\$" is(literal.string) -> pop
   any-of(math)
 
 lex(root):
-  Regexp new("\\\\\\[") is(literal.string.backtick) -> go-to(displaymath)
-  Regexp new("\\\\\\(") is(literal.string) -> go-to(inlinemath)
-  Regexp new("\\$\\$") is(literal.string.backtick) -> go-to(displaymath)
-  Regexp new("\\$") is(literal.string) -> go-to(inlinemath)
-  Regexp new("\\\\([a-zA-Z]+|.)") is(keyword) -> go-to(command)
+  r"\\\[" is(literal.string.backtick) -> go-to(displaymath)
+  r"\\\(" is(literal.string) -> go-to(inlinemath)
+  r"\$\$" is(literal.string.backtick) -> go-to(displaymath)
+  r"\$" is(literal.string) -> go-to(inlinemath)
+  r"\\([a-zA-Z]+|.)" is(keyword) -> go-to(command)
   any-of(general)
-  Regexp new("[^\\\\$%&_^{}]+") is(text)
+  r"[^\\$%&_^{}]+" is(text)
 
 lex(math):
-  Regexp new("\\\\([a-zA-Z]+|.)") is(name.variable)
+  r"\\([a-zA-Z]+|.)" is(name.variable)
   any-of(general)
-  Regexp new("[0-9]+") is(literal.number)
-  Regexp new("[-=!+*/()\\[\\]]") is(operator)
-  Regexp new("[^=!+*/()\\[\\]\\\\$%&_^{}0-9-]+") is(name.builtin)
+  r"[0-9]+" is(literal.number)
+  r"[-=!+*/()\[\]]" is(operator)
+  r"[^=!+*/()\[\]\\$%&_^{}0-9-]+" is(name.builtin)
 

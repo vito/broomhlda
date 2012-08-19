@@ -23,7 +23,7 @@ Lexer = lexer:
   ]
 
 
-  { self } word(reg) :=
+  word(reg) =
     r"(?<!#{@@op-char}|#{@@ident-char})#{reg}(?!#{@@op-char}|#{@@ident-char})"
 
 

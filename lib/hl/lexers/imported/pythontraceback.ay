@@ -10,15 +10,15 @@ start: .root
 flags: 0
 
 lex(root):
-  Regexp new("^Traceback \\(most recent call last\\):\\n") is(generic.traceback) -> go-to(intb)
-  Regexp new("^(?=  File \"[^\"]+\", line \\d+)") is(generic.traceback) -> go-to(intb)
-  Regexp new("^.*\\n") is(other)
+  r"^Traceback \(most recent call last\):\n" is(generic.traceback) -> go-to(intb)
+  r"^(?=  File \"[^\"]+\", line \d+)" is(generic.traceback) -> go-to(intb)
+  r"^.*\n" is(other)
 
 lex(intb):
-  Regexp new("^(  File )(\"[^\"]+\")(, line )(\\d+)(, in )(.+)(\\n)") is(by-groups(text, name.builtin, text, literal.number, text, name, text))
-  Regexp new("^(  File )(\"[^\"]+\")(, line )(\\d+)(\\n)") is(by-groups(text, name.builtin, text, literal.number, text))
-  Regexp new("^(    )(.+)(\\n)") is(by-groups(text, using(Python), text))
-  Regexp new("^([ \\t]*)(...)(\\n)") is(by-groups(text, comment, text))
-  Regexp new("^(.+)(: )(.+)(\\n)") is(by-groups(generic.error, text, name, text)) -> pop
-  Regexp new("^([a-zA-Z_][a-zA-Z0-9_]*)(:?\\n)") is(by-groups(generic.error, text)) -> pop
+  r"^(  File )(\"[^\"]+\")(, line )(\d+)(, in )(.+)(\n)" is(by-groups(text, name.builtin, text, literal.number, text, name, text))
+  r"^(  File )(\"[^\"]+\")(, line )(\d+)(\n)" is(by-groups(text, name.builtin, text, literal.number, text))
+  r"^(    )(.+)(\n)" is(by-groups(text, using(Python), text))
+  r"^([ \t]*)(\.\.\.)(\n)" is(by-groups(text, comment, text))
+  r"^(.+)(: )(.+)(\n)" is(by-groups(generic.error, text, name, text)) -> pop
+  r"^([a-zA-Z_][a-zA-Z0-9_]*)(:?\n)" is(by-groups(generic.error, text)) -> pop
 

@@ -10,41 +10,41 @@ start: .root
 flags: 0
 
 lex(maintainer):
-  Regexp new("<[^>]+>") is(generic.strong)
-  Regexp new("<[^>]+>$") is(generic.strong) -> pop
-  Regexp new(",\\n?") is(text)
-  Regexp new(".") is(text)
+  r"<[^>]+>" is(generic.strong)
+  r"<[^>]+>$" is(generic.strong) -> pop
+  r",\n?" is(text)
+  r"." is(text)
 
 lex(depends):
-  Regexp new(":\\s*") is(text)
-  Regexp new("(\\$)(\\{)(\\w+\\s*:\\s*\\w+)") is(by-groups(operator, text, name.entity))
-  Regexp new("\\(") is(text) -> go-to(depend-vers)
-  Regexp new(",") is(text)
-  Regexp new("\\|") is(operator)
-  Regexp new("[\\s]+") is(text)
-  Regexp new("[}\\)]\\s*$") is(text) -> pop
-  Regexp new("[}]") is(text)
-  Regexp new("[^,]$") is(name.function) -> pop
-  Regexp new("([\\+\\.a-zA-Z0-9-][\\s\\n]*)") is(name.function)
-  Regexp new("\\[.*?\\]") is(name.entity)
+  r":\s*" is(text)
+  r"(\$)(\{)(\w+\s*:\s*\w+)" is(by-groups(operator, text, name.entity))
+  r"\(" is(text) -> go-to(depend-vers)
+  r"," is(text)
+  r"\|" is(operator)
+  r"[\s]+" is(text)
+  r"[}\)]\s*$" is(text) -> pop
+  r"}" is(text)
+  r"[^,]$" is(name.function) -> pop
+  r"([\+\.a-zA-Z0-9-])(\s*)" is(by-groups(name.function, text))
+  r"\[.*?\]" is(name.entity)
 
 lex(root):
-  Regexp new("^(Description)") is(keyword) -> go-to(description)
-  Regexp new("^(Maintainer)(:\\s*)") is(by-groups(keyword, text)) -> go-to(maintainer)
-  Regexp new("^((Build-)?Depends)") is(keyword) -> go-to(depends)
-  Regexp new("^((?:Python-)?Version)(:\\s*)([^\\s]+)$") is(by-groups(keyword, text, literal.number))
-  Regexp new("^((?:Installed-)?Size)(:\\s*)([^\\s]+)$") is(by-groups(keyword, text, literal.number))
-  Regexp new("^(MD5Sum|SHA1|SHA256)(:\\s*)([^\\s]+)$") is(by-groups(keyword, text, literal.number))
-  Regexp new("^([a-zA-Z\\-0-9\\.]*?)(:\\s*)(.*?)$") is(by-groups(keyword, text.whitespace, literal.string))
+  r"^(Description)" is(keyword) -> go-to(description)
+  r"^(Maintainer)(:\s*)" is(by-groups(keyword, text)) -> go-to(maintainer)
+  r"^((Build-)?Depends)" is(keyword) -> go-to(depends)
+  r"^((?:Python-)?Version)(:\s*)(\S+)$" is(by-groups(keyword, text, literal.number))
+  r"^((?:Installed-)?Size)(:\s*)(\S+)$" is(by-groups(keyword, text, literal.number))
+  r"^(MD5Sum|SHA1|SHA256)(:\s*)(\S+)$" is(by-groups(keyword, text, literal.number))
+  r"^([a-zA-Z\-0-9\.]*?)(:\s*)(.*?)$" is(by-groups(keyword, text.whitespace, literal.string))
 
 lex(description):
-  Regexp new("(.*)(Homepage)(: )([^\\s]+)") is(by-groups(text, literal.string, name, name.class))
-  Regexp new(":.*\\n") is(generic.strong)
-  Regexp new(" .*\\n") is(text)
-  Regexp new("") is(text) -> pop
+  r"(.*)(Homepage)(: )(\S+)" is(by-groups(text, literal.string, name, name.class))
+  r":.*\n" is(generic.strong)
+  r" .*\n" is(text)
+  r"" is(text) -> pop
 
 lex(depend-vers):
-  Regexp new("\\),") is(text) -> pop
-  Regexp new("\\)[^,]") is(text) -> pop(2)
-  Regexp new("([><=]+)(\\s*)([^\\)]+)") is(by-groups(operator, text, literal.number))
+  r"\)," is(text) -> pop
+  r"\)[^,]" is(text) -> pop(2)
+  r"([><=]+)(\s*)([^\)]+)" is(by-groups(operator, text, literal.number))
 

@@ -10,13 +10,13 @@ start: .root
 flags: 0
 
 lex(tag):
-  Regexp new("\\s+") is(text)
-  Regexp new("(\\w+)(=)(\"?[^\\s\"\\]]+\"?)") is(by-groups(name.attribute, operator, literal.string))
-  Regexp new("(=)(\"?[^\\s\"\\]]+\"?)") is(by-groups(operator, literal.string))
-  Regexp new("\\]") is(keyword) -> pop
+  r"\s+" is(text)
+  r"(\w+)(=)(\"?[^\s\"\]]+\"?)" is(by-groups(name.attribute, operator, literal.string))
+  r"(=)(\"?[^\s\"\]]+\"?)" is(by-groups(operator, literal.string))
+  r"\]" is(keyword) -> pop
 
 lex(root):
-  Regexp new("[^\\[]+") is(text)
-  Regexp new("\\[/?\\w+") is(keyword) -> go-to(tag)
-  Regexp new("\\[") is(text)
+  r"[^\[]+" is(text)
+  r"\[/?\w+" is(keyword) -> go-to(tag)
+  r"\[" is(text)
 

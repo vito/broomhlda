@@ -9,50 +9,47 @@ mimetypes: ["text/x-lua", "application/x-lua"]
 start: .root
 flags: 0
 
-lex(classname):
-  Regexp new("[A-Za-z_][A-Za-z0-9_]*") is(name.class) -> pop
-
-lex(stringescape):
-  Regexp new("\\\\([abfnrtv\\\\\"']|\\d{1,3})") is(literal.string.escape)
-
-lex(base):
-  Regexp new("(?s)--\\[(=*)\\[.*?\\]\\1\\]") is(comment.multiline)
-  Regexp new("--.*$") is(comment.single)
-  Regexp new("(?i)(\\d*\\.\\d+|\\d+\\.\\d*)(e[+-]?\\d+)?") is(literal.number.float)
-  Regexp new("(?i)\\d+e[+-]?\\d+") is(literal.number.float)
-  Regexp new("(?i)0x[0-9a-f]*") is(literal.number.hex)
-  Regexp new("\\d+") is(literal.number.integer)
-  Regexp new("\\n") is(text)
-  Regexp new("[^\\S\\n]") is(text)
-  Regexp new("(?s)\\[(=*)\\[.*?\\]\\1\\]") is(literal.string)
-  Regexp new("(==|\126=|<=|>=|\\.\\.|\\.\\.\\.|[=+\\-*/%^<>#])") is(operator)
-  Regexp new("[\\[\\]\\{\\}\\(\\)\\.,:;]") is(punctuation)
-  Regexp new("(and|or|not)\\b") is(operator.word)
-  Regexp new("(break|do|else|elseif|end|for|if|in|repeat|return|then|until|while)\\b") is(keyword)
-  Regexp new("(local)\\b") is(keyword.declaration)
-  Regexp new("(true|false|nil)\\b") is(keyword.constant)
-  Regexp new("(function)(\\s+)") is(by-groups(keyword, text)) -> go-to(funcname)
-  Regexp new("(class)(\\s+)") is(by-groups(keyword, text)) -> go-to(classname)
-  Regexp new("[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)?") is(name)
-  Regexp new("'") is(literal.string.single) -> combined(stringescape, sqs)
-  Regexp new("\"") is(literal.string.double) -> combined(stringescape, dqs)
-
 lex(string):
-  Regexp new(".") is(literal.string)
+  r"." is(literal.string)
 
 lex(dqs):
-  Regexp new("\"") is(literal.string) -> pop
+  r"\"" is(literal.string) -> pop
   any-of(string)
 
 lex(sqs):
-  Regexp new("'") is(literal.string) -> pop
+  r"'" is(literal.string) -> pop
   any-of(string)
 
-lex(root):
-  Regexp new("#!(.*?)$") is(comment.preproc)
-  Regexp new("") is(text) -> go-to(base)
-
 lex(funcname):
-  Regexp new("(?:([A-Za-z_][A-Za-z0-9_]*)(\\.))?([A-Za-z_][A-Za-z0-9_]*)") is(by-groups(name.class, punctuation, name.function)) -> pop
-  Regexp new("\\(") is(punctuation) -> pop
+  r"\s+" is(text)
+  r"(?:([A-Za-z_][A-Za-z0-9_]*)(\.))?([A-Za-z_][A-Za-z0-9_]*)" is(by-groups(name.class, punctuation, name.function)) -> pop
+  r"\(" is(punctuation) -> pop
+
+lex(stringescape):
+  r"\\([abfnrtv\\\"']|\d{1,3})" is(literal.string.escape)
+
+lex(base):
+  r"(?s)--\[(=*)\[.*?\]\1\]" is(comment.multiline)
+  r"--.*$" is(comment.single)
+  r"(?i)(\d*\.\d+|\d+\.\d*)(e[+-]?\d+)?" is(literal.number.float)
+  r"(?i)\d+e[+-]?\d+" is(literal.number.float)
+  r"(?i)0x[0-9a-f]*" is(literal.number.hex)
+  r"\d+" is(literal.number.integer)
+  r"\n" is(text)
+  r"[^\S\n]" is(text)
+  r"(?s)\[(=*)\[.*?\]\1\]" is(literal.string)
+  r"(==|\126=|<=|>=|\.\.\.|\.\.|[=+\-*/%^<>\#])" is(operator)
+  r"[\[\]\{\}\(\)\.,:;]" is(punctuation)
+  r"(and|or|not)\b" is(operator.word)
+  r"(break|do|else|elseif|end|for|if|in|repeat|return|then|until|while)\b" is(keyword)
+  r"(local)\b" is(keyword.declaration)
+  r"(true|false|nil)\b" is(keyword.constant)
+  r"(function)\b" is(keyword) -> go-to(funcname)
+  r"[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?" is(name)
+  r"'" is(literal.string.single) -> combined(stringescape, sqs)
+  r"\"" is(literal.string.double) -> combined(stringescape, dqs)
+
+lex(root):
+  r"\#!(.*?)$" is(comment.preproc)
+  r"" is(text) -> go-to(base)
 

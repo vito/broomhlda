@@ -10,10 +10,10 @@ start: .root
 flags: Regexp MULTILINE
 
 lex(root):
-  Regexp new("(<%[@=#!:]?)(.*?)(%>)") is(by-groups(name.tag, using(Javascript), name.tag))
-  Regexp new("(<%\\$)(.*?)(:)(.*?)(%>)") is(by-groups(name.tag, name.function, punctuation, literal.string, name.tag))
-  Regexp new("(<%--)(.*?)(--%>)") is(by-groups(name.tag, comment.multiline, name.tag))
-  Regexp new("(<script.*?>)(.*?)(</script>)") is(by-groups(using(Html), using(Javascript), using(Html)))
-  Regexp new("(.+?)(?=<)") is(using(Html))
-  Regexp new(".+") is(using(Html))
+  r"(<%[@=\#!:]?)(.*?)(%>)" is(by-groups(name.tag, using(Javascript), name.tag))
+  r"(<%\$)(.*?)(:)(.*?)(%>)" is(by-groups(name.tag, name.function, punctuation, literal.string, name.tag))
+  r"(<%--)(.*?)(--%>)" is(by-groups(name.tag, comment.multiline, name.tag))
+  r"(<script.*?>)(.*?)(</script>)" is(by-groups(using(Html), using(Javascript), using(Html)))
+  r"(.+?)(?=<)" is(using(Html))
+  r".+" is(using(Html))
 

@@ -10,28 +10,28 @@ start: .root
 flags: 0
 
 lex(request):
-  Regexp new("\\n") is(text) -> pop
+  r"\n" is(text) -> pop
   any-of(escapes)
-  Regexp new("\"[^\\n\"]+\"") is(literal.string.double)
-  Regexp new("\\d+") is(literal.number)
-  Regexp new("\\S+") is(literal.string)
-  Regexp new("\\s+") is(text)
+  r"\"[^\n\"]+\"" is(literal.string.double)
+  r"\d+" is(literal.number)
+  r"\S+" is(literal.string)
+  r"\s+" is(text)
 
 lex(escapes):
-  Regexp new("\\\\\"[^\\n]*") is(comment)
-  Regexp new("\\\\[fn]\\w") is(literal.string.escape)
-  Regexp new("\\\\\\(..") is(literal.string.escape)
-  Regexp new("\\\\.\\[.*\\]") is(literal.string.escape)
-  Regexp new("\\\\.") is(literal.string.escape)
-  Regexp new("\\\\\\n") is(text) -> go-to(request)
+  r"\\\"[^\n]*" is(comment)
+  r"\\[fn]\w" is(literal.string.escape)
+  r"\\\(.{2}" is(literal.string.escape)
+  r"\\.\[.*\]" is(literal.string.escape)
+  r"\\." is(literal.string.escape)
+  r"\\\n" is(text) -> go-to(request)
 
 lex(root):
-  Regexp new("(?i)(\\.)(\\w+)") is(by-groups(text, keyword)) -> go-to(request)
-  Regexp new("\\.") is(punctuation) -> go-to(request)
-  Regexp new("[^\\\\\\n]*") is(text) -> go-to(textline)
+  r"(\.)(\w+)" is(by-groups(text, keyword)) -> go-to(request)
+  r"\." is(punctuation) -> go-to(request)
+  r"[^\\\n]*" is(text) -> go-to(textline)
 
 lex(textline):
   any-of(escapes)
-  Regexp new("[^\\\\\\n]+") is(text)
-  Regexp new("\\n") is(text) -> pop
+  r"[^\\\n]+" is(text)
+  r"\n" is(text) -> pop
 

@@ -10,26 +10,26 @@ start: .root
 flags: Regexp IGNORECASE
 
 lex(root):
-  Regexp new("//.*") is(comment)
-  Regexp new("\\+\\+|--") is(operator)
-  Regexp new("[-+*/^&=!]") is(operator)
-  Regexp new("<=|>=|<|>") is(operator)
-  Regexp new("mod\\b") is(operator)
-  Regexp new("(eq|lt|gt|lte|gte|not|is|and|or)\\b") is(operator)
-  Regexp new("\\|\\||&&") is(operator)
-  Regexp new("\"") is(literal.string.double) -> go-to(string)
-  Regexp new("'.*?'") is(literal.string.single)
-  Regexp new("\\d+") is(literal.number)
-  Regexp new("(if|else|len|var|case|default|break|switch)\\b") is(keyword)
-  Regexp new("([A-Za-z_$][A-Za-z0-9_.]*)\\s*(\\()") is(by-groups(name.function, punctuation))
-  Regexp new("[A-Za-z_$][A-Za-z0-9_.]*") is(name.variable)
-  Regexp new("[()\\[\\]{};:,.\\\\]") is(punctuation)
-  Regexp new("\\s+") is(text)
+  r"//.*" is(comment)
+  r"\+\+|--" is(operator)
+  r"[-+*/^&=!]" is(operator)
+  r"<=|>=|<|>" is(operator)
+  r"mod\b" is(operator)
+  r"(eq|lt|gt|lte|gte|not|is|and|or)\b" is(operator)
+  r"\|\||&&" is(operator)
+  r"\"" is(literal.string.double) -> go-to(string)
+  r"'.*?'" is(literal.string.single)
+  r"\d+" is(literal.number)
+  r"(if|else|len|var|case|default|break|switch)\b" is(keyword)
+  r"([A-Za-z_$][A-Za-z0-9_.]*)(\s*)(\()" is(by-groups(name.function, text, punctuation))
+  r"[A-Za-z_$][A-Za-z0-9_.]*" is(name.variable)
+  r"[()\[\]{};:,.\\]" is(punctuation)
+  r"\s+" is(text)
 
 lex(string):
-  Regexp new("\"\"") is(literal.string.double)
-  Regexp new("#.+?#") is(literal.string.interp)
-  Regexp new("[^\"#]+") is(literal.string.double)
-  Regexp new("#") is(literal.string.double)
-  Regexp new("\"") is(literal.string.double) -> pop
+  r"\"\"" is(literal.string.double)
+  r"\#.+?\#" is(literal.string.interp)
+  r"[^\"\#]+" is(literal.string.double)
+  r"\#" is(literal.string.double)
+  r"\"" is(literal.string.double) -> pop
 

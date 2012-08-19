@@ -7,104 +7,69 @@ aliases: ["ahk"]
 extensions: [".ahk", ".ahkl"]
 mimetypes: ["text/x-autohotkey"]
 start: .root
-flags: Regexp IGNORECASE | Regexp MULTILINE
+flags: 0
 
-lex(commands):
-  Regexp new("(autotrim|blockinput|break|click|clipwait|continue|control|controlclick|controlfocus|controlget|controlgetfocus|controlgetpos|controlgettext|controlmove|controlsend|controlsendraw|controlsettext|coordmode|critical|detecthiddentext|detecthiddenwindows|dllcall|drive|driveget|drivespacefree|else|envadd|envdiv|envget|envmult|envset|envsub|envupdate|exit|exitapp|fileappend|filecopy|filecopydir|filecreatedir|filecreateshortcut|filedelete|filegetattrib|filegetshortcut|filegetsize|filegettime|filegetversion|fileinstall|filemove|filemovedir|fileread|filereadline|filerecycle|filerecycleempty|fileremovedir|fileselectfile|fileselectfolder|filesetattrib|filesettime|formattime|gosub|goto|groupactivate|groupadd|groupclose|groupdeactivate|gui|guicontrol|guicontrolget|hotkey|ifexist|ifgreater|ifgreaterorequal|ifinstring|ifless|iflessorequal|ifmsgbox|ifnotequal|ifnotexist|ifnotinstring|ifwinactive|ifwinexist|ifwinnotactive|ifwinnotexist|imagesearch|inidelete|iniread|iniwrite|input|inputbox|keyhistory|keywait|listhotkeys|listlines|listvars|loop|menu|mouseclick|mouseclickdrag|mousegetpos|mousemove|msgbox|onmessage|onexit|outputdebug|pixelgetcolor|pixelsearch|postmessage|process|progress|random|regexmatch|regexreplace|registercallback|regdelete|regread|regwrite|reload|repeat|return|run|runas|runwait|send|sendevent|sendinput|sendmessage|sendmode|sendplay|sendraw|setbatchlines|setcapslockstate|setcontroldelay|setdefaultmousespeed|setenv|setformat|setkeydelay|setmousedelay|setnumlockstate|setscrolllockstate|setstorecapslockmode|settimer|settitlematchmode|setwindelay|setworkingdir|shutdown|sleep|sort|soundbeep|soundget|soundgetwavevolume|soundplay|soundset|soundsetwavevolume|splashimage|splashtextoff|splashtexton|splitpath|statusbargettext|statusbarwait|stringcasesense|stringgetpos|stringleft|stringlen|stringlower|stringmid|stringreplace|stringright|stringsplit|stringtrimleft|stringtrimright|stringupper|suspend|sysget|thread|tooltip|transform|traytip|urldownloadtofile|while|varsetcapacity|winactivate|winactivatebottom|winclose|winget|wingetactivestats|wingetactivetitle|wingetclass|wingetpos|wingettext|wingettitle|winhide|winkill|winmaximize|winmenuselectitem|winminimize|winminimizeall|winminimizeallundo|winmove|winrestore|winset|winsettitle|winshow|winwait|winwaitactive|winwaitclose|winwaitnotactivetrue|false|NULL)\\b") is(keyword) -> go-to(command)
+lex(builtInVariables):
+  r"(?i)(A_AhkPath|A_AhkVersion|A_AppData|A_AppDataCommon|A_AutoTrim|A_BatchLines|A_CaretX|A_CaretY|A_ComputerName|A_ControlDelay|A_Cursor|A_DDDD|A_DDD|A_DD|A_DefaultMouseSpeed|A_Desktop|A_DesktopCommon|A_DetectHiddenText|A_DetectHiddenWindows|A_EndChar|A_EventInfo|A_ExitReason|A_FormatFloat|A_FormatInteger|A_Gui|A_GuiEvent|A_GuiControl|A_GuiControlEvent|A_GuiHeight|A_GuiWidth|A_GuiX|A_GuiY|A_Hour|A_IconFile|A_IconHidden|A_IconNumber|A_IconTip|A_Index|A_IPAddress1|A_IPAddress2|A_IPAddress3|A_IPAddress4|A_ISAdmin|A_IsCompiled|A_IsCritical|A_IsPaused|A_IsSuspended|A_KeyDelay|A_Language|A_LastError|A_LineFile|A_LineNumber|A_LoopField|A_LoopFileAttrib|A_LoopFileDir|A_LoopFileExt|A_LoopFileFullPath|A_LoopFileLongPath|A_LoopFileName|A_LoopFileShortName|A_LoopFileShortPath|A_LoopFileSize|A_LoopFileSizeKB|A_LoopFileSizeMB|A_LoopFileTimeAccessed|A_LoopFileTimeCreated|A_LoopFileTimeModified|A_LoopReadLine|A_LoopRegKey|A_LoopRegName|A_LoopRegSubkey|A_LoopRegTimeModified|A_LoopRegType|A_MDAY|A_Min|A_MM|A_MMM|A_MMMM|A_Mon|A_MouseDelay|A_MSec|A_MyDocuments|A_Now|A_NowUTC|A_NumBatchLines|A_OSType|A_OSVersion|A_PriorHotkey|A_ProgramFiles|A_Programs|A_ProgramsCommon|A_ScreenHeight|A_ScreenWidth|A_ScriptDir|A_ScriptFullPath|A_ScriptName|A_Sec|A_Space|A_StartMenu|A_StartMenuCommon|A_Startup|A_StartupCommon|A_StringCaseSense|A_Tab|A_Temp|A_ThisFunc|A_ThisHotkey|A_ThisLabel|A_ThisMenu|A_ThisMenuItem|A_ThisMenuItemPos|A_TickCount|A_TimeIdle|A_TimeIdlePhysical|A_TimeSincePriorHotkey|A_TimeSinceThisHotkey|A_TitleMatchMode|A_TitleMatchModeSpeed|A_UserName|A_WDay|A_WinDelay|A_WinDir|A_WorkingDir|A_YDay|A_YEAR|A_YWeek|A_YYYY|Clipboard|ClipboardAll|ComSpec|ErrorLevel|ProgramFiles|True|False|A_IsUnicode|A_FileEncoding|A_OSVersion|A_PtrSize)\b" is(name.variable)
 
-lex(literals):
-  Regexp new("\"") is(literal.string) -> go-to(string)
-  Regexp new("A_\\w+") is(name.builtin)
-  Regexp new("%[\\]\\w#@$?\\[]+?%") is(name.variable)
-  Regexp new("[-\126!%^&*+|?:<>/=]=?") is(operator) -> go-to(expressions)
-  Regexp new("==") is(operator) -> go-to(expressions)
-  Regexp new("[{()},.%#`;]") is(punctuation)
-  Regexp new("\\\\") is(punctuation)
-  any-of(keywords)
-  Regexp new("\\w+") is(text)
+lex(garbage):
+  r"[^\S\n]" is(text)
 
-lex(string):
-  Regexp new("\"") is(literal.string) -> pop
-  Regexp new("\"\"|`.") is(literal.string.escape)
-  Regexp new("[^\\`\"\\n]+") is(literal.string)
-
-lex(parameters):
-  Regexp new("\\)") is(punctuation) -> pop
-  Regexp new("\\(") is(punctuation) -> push
-  any-of(numbers)
-  any-of(literals)
-  any-of(whitespace)
-
-lex(keynames):
-  Regexp new("\\[[^\\]]+\\]") is(keyword) -> go-to(keynames)
-
-lex(continuation):
-  Regexp new("\\n\\)") is(punctuation) -> pop
-  Regexp new("\\s[^\\n\\)]+") is(literal.string)
+lex(incontinuation):
+  r"^\s*\)" is(generic) -> pop
+  r"[^)]" is(generic)
+  r"[)]" is(generic)
 
 lex(labels):
-  Regexp new("(^\\s*)([^:\\s]+?:{1,2})") is(by-groups(text.whitespace, name.label))
-  Regexp new("(^\\s*)(::[\\]\\w#@$?\\[]+?::)") is(by-groups(text.whitespace, name.label))
+  r"(^\s*)([^:\s\(\\"]+?:{1,2})" is(by-groups(text, name.label))
+  r"(^\s*)(::[^:\s]+?::)" is(by-groups(text, name.label))
 
-lex(comments):
-  Regexp new("^;+.*?$") is(comment.single)
-  Regexp new("(?<=\\s);+.*?$") is(comment.single)
-  Regexp new("^/\\*.*?\\n\\*/") is(comment.multiline)
-  Regexp new("(?<!\\n)/\\*.*?\\n\\*/") is(error)
-
-lex(command):
-  any-of(comments)
-  any-of(whitespace)
-  Regexp new("^\\(") is(literal.string) -> go-to(continuation)
-  Regexp new("[^\\n]*?(?=;*|$)") is(literal.string) -> pop
-  any-of(numbers)
-  any-of(literals)
+lex(stringescape):
+  r"\\"\\"|\`([\,\%\`abfnrtv])" is(literal.string.escape)
 
 lex(numbers):
-  Regexp new("(\\d+\\.\\d*|\\d*\\.\\d+)([eE][+-]?[0-9]+)?") is(literal.number.float)
-  Regexp new("\\d+[eE][+-]?[0-9]+") is(literal.number.float)
-  Regexp new("0[0-7]+") is(literal.number.oct)
-  Regexp new("0[xX][a-fA-F0-9]+") is(literal.number.hex)
-  Regexp new("\\d+L") is(literal.number.integer.long)
-  Regexp new("\\d+") is(literal.number.integer)
+  r"(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?" is(literal.number.float)
+  r"\d+[eE][+-]?[0-9]+" is(literal.number.float)
+  r"0\d+" is(literal.number.oct)
+  r"0[xX][a-fA-F0-9]+" is(literal.number.hex)
+  r"\d+L" is(literal.number.integer.long)
+  r"\d+" is(literal.number.integer)
 
-lex(keywords):
-  Regexp new("(static|global|local)\\b") is(keyword.type)
-  Regexp new("(if|else|and|or)\\b") is(keyword.reserved)
+lex(commands):
+  r"(?i)^(\s*)(global|local|static|\#AllowSameLineComments|\#ClipboardTimeout|\#CommentFlag|\#ErrorStdOut|\#EscapeChar|\#HotkeyInterval|\#HotkeyModifierTimeout|\#Hotstring|\#IfWinActive|\#IfWinExist|\#IfWinNotActive|\#IfWinNotExist|\#IncludeAgain|\#Include|\#InstallKeybdHook|\#InstallMouseHook|\#KeyHistory|\#LTrim|\#MaxHotkeysPerInterval|\#MaxMem|\#MaxThreads|\#MaxThreadsBuffer|\#MaxThreadsPerHotkey|\#NoEnv|\#NoTrayIcon|\#Persistent|\#SingleInstance|\#UseHook|\#WinActivateForce|AutoTrim|BlockInput|Break|Click|ClipWait|Continue|Control|ControlClick|ControlFocus|ControlGetFocus|ControlGetPos|ControlGetText|ControlGet|ControlMove|ControlSend|ControlSendRaw|ControlSetText|CoordMode|Critical|DetectHiddenText|DetectHiddenWindows|Drive|DriveGet|DriveSpaceFree|Edit|Else|EnvAdd|EnvDiv|EnvGet|EnvMult|EnvSet|EnvSub|EnvUpdate|Exit|ExitApp|FileAppend|FileCopy|FileCopyDir|FileCreateDir|FileCreateShortcut|FileDelete|FileGetAttrib|FileGetShortcut|FileGetSize|FileGetTime|FileGetVersion|FileInstall|FileMove|FileMoveDir|FileRead|FileReadLine|FileRecycle|FileRecycleEmpty|FileRemoveDir|FileSelectFile|FileSelectFolder|FileSetAttrib|FileSetTime|FormatTime|GetKeyState|Gosub|Goto|GroupActivate|GroupAdd|GroupClose|GroupDeactivate|Gui|GuiControl|GuiControlGet|Hotkey|IfEqual|IfExist|IfGreaterOrEqual|IfGreater|IfInString|IfLess|IfLessOrEqual|IfMsgBox|IfNotEqual|IfNotExist|IfNotInString|IfWinActive|IfWinExist|IfWinNotActive|IfWinNotExist|If |ImageSearch|IniDelete|IniRead|IniWrite|InputBox|Input|KeyHistory|KeyWait|ListHotkeys|ListLines|ListVars|Loop|Menu|MouseClickDrag|MouseClick|MouseGetPos|MouseMove|MsgBox|OnExit|OutputDebug|Pause|PixelGetColor|PixelSearch|PostMessage|Process|Progress|Random|RegDelete|RegRead|RegWrite|Reload|Repeat|Return|RunAs|RunWait|Run|SendEvent|SendInput|SendMessage|SendMode|SendPlay|SendRaw|Send|SetBatchLines|SetCapslockState|SetControlDelay|SetDefaultMouseSpeed|SetEnv|SetFormat|SetKeyDelay|SetMouseDelay|SetNumlockState|SetScrollLockState|SetStoreCapslockMode|SetTimer|SetTitleMatchMode|SetWinDelay|SetWorkingDir|Shutdown|Sleep|Sort|SoundBeep|SoundGet|SoundGetWaveVolume|SoundPlay|SoundSet|SoundSetWaveVolume|SplashImage|SplashTextOff|SplashTextOn|SplitPath|StatusBarGetText|StatusBarWait|StringCaseSense|StringGetPos|StringLeft|StringLen|StringLower|StringMid|StringReplace|StringRight|StringSplit|StringTrimLeft|StringTrimRight|StringUpper|Suspend|SysGet|Thread|ToolTip|Transform|TrayTip|URLDownloadToFile|While|WinActivate|WinActivateBottom|WinClose|WinGetActiveStats|WinGetActiveTitle|WinGetClass|WinGetPos|WinGetText|WinGetTitle|WinGet|WinHide|WinKill|WinMaximize|WinMenuSelectItem|WinMinimizeAllUndo|WinMinimizeAll|WinMinimize|WinMove|WinRestore|WinSetTitle|WinSet|WinShow|WinWaitActive|WinWaitClose|WinWaitNotActive|WinWait)\b" is(by-groups(text, name.builtin))
 
-lex(directives):
-  Regexp new("#\\w+?\\s") is(keyword)
+lex(dqs):
+  r"\"" is(literal.string) -> pop
+  any-of(strings)
 
-lex(expressions):
-  any-of(comments)
-  any-of(whitespace)
-  any-of(numbers)
-  any-of(literals)
-  Regexp new("([\\]\\w#@$?\\[]+)(\\s*)(\\()") is(by-groups(name.function, text.whitespace, punctuation)) -> go-to(parameters)
-  Regexp new("A_\\w+") is(name.builtin)
-  Regexp new("%[\\]\\w#@$?\\[]+?%") is(name.variable)
-  Regexp new("{") is(punctuation) -> go-to(block)
+lex(builtInFunctions):
+  r"(?i)(Abs|ACos|Asc|ASin|ATan|Ceil|Chr|Cos|DllCall|Exp|FileExist|Floor|GetKeyState|IL_Add|IL_Create|IL_Destroy|InStr|IsFunc|IsLabel|Ln|Log|LV_Add|LV_Delete|LV_DeleteCol|LV_GetCount|LV_GetNext|LV_GetText|LV_Insert|LV_InsertCol|LV_Modify|LV_ModifyCol|LV_SetImageList|Mod|NumGet|NumPut|OnMessage|RegExMatch|RegExReplace|RegisterCallback|Round|SB_SetIcon|SB_SetParts|SB_SetText|Sin|Sqrt|StrLen|SubStr|Tan|TV_Add|TV_Delete|TV_GetChild|TV_GetCount|TV_GetNext|TV_Get|TV_GetParent|TV_GetPrev|TV_GetSelection|TV_GetText|TV_Modify|VarSetCapacity|WinActive|WinExist|Object|ComObjActive|ComObjArray|ComObjEnwrap|ComObjUnwrap|ComObjParameter|ComObjType|ComObjConnect|ComObjCreate|ComObjGet|ComObjError|ComObjValue|Insert|MinIndex|MaxIndex|Remove|SetCapacity|GetCapacity|GetAddress|_NewEnum|FileOpen|Read|Write|ReadLine|WriteLine|ReadNumType|WriteNumType|RawRead|RawWrite|Seek|Tell|Close|Next|IsObject|StrPut|StrGet|Trim|LTrim|RTrim)\b" is(name.function)
+
+lex(incomment):
+  r"^\s*\*/" is(comment.multiline) -> pop
+  r"[^*/]" is(comment.multiline)
+  r"[*/]" is(comment.multiline)
 
 lex(root):
-  any-of(whitespace)
-  Regexp new("^\\(") is(literal.string) -> go-to(continuation)
-  any-of(comments)
-  Regexp new("(^\\s*)(\\w+)(\\s*)(=)") is(by-groups(text.whitespace, name, text.whitespace, operator)) -> go-to(command)
-  Regexp new("([\\w#@$?\\[\\]]+)(\\s*)(\\()") is(by-groups(name.function, text.whitespace, punctuation)) -> go-to(parameters)
-  any-of(directives)
-  any-of(labels)
+  r"^(\s*)(/\*)" is(by-groups(text, comment.multiline)) -> go-to(incomment)
+  r"^(\s*)(\()" is(by-groups(text, generic)) -> go-to(incontinuation)
+  r"\s+;.*?$" is(comment.singleline)
+  r"^;.*?$" is(comment.singleline)
+  r"[\]{}(),;\[]" is(punctuation)
+  r"(in|is|and|or|not)\b" is(operator.word)
+  r"\%[a-zA-Z_\#@$][a-zA-Z0-9_\#@$]*\%" is(name.variable)
+  r"!=|==|:=|\.=|<<|>>|[-\126+/*%=<>&^|?:!.]" is(operator)
   any-of(commands)
-  any-of(expressions)
+  any-of(labels)
+  any-of(builtInFunctions)
+  any-of(builtInVariables)
+  r"\"" is(literal.string) -> combined(stringescape, dqs)
   any-of(numbers)
-  any-of(literals)
-  any-of(keynames)
-  any-of(keywords)
+  r"[a-zA-Z_\#@$][a-zA-Z0-9_\#@$]*" is(name)
+  r"\\|\'" is(text)
+  r"\`([\,\%\`abfnrtv\-\+;])" is(literal.string.escape)
+  any-of(garbage)
 
-lex(block):
-  any-of(root)
-  Regexp new("{") is(punctuation) -> push
-  Regexp new("}") is(punctuation) -> pop
-
-lex(whitespace):
-  Regexp new("[ \\t]+") is(text.whitespace)
+lex(strings):
+  r"[^\"\n]+" is(literal.string)
 

@@ -10,26 +10,26 @@ start: .root
 flags: 0
 
 lex(comment):
-  Regexp new("[^*/]") is(comment.multiline)
-  Regexp new("/\\*") is(comment.multiline) -> push
-  Regexp new("\\*/") is(comment.multiline) -> pop
-  Regexp new("[*/]") is(comment.multiline)
+  r"[^*/]" is(comment.multiline)
+  r"/\*" is(comment.multiline) -> push
+  r"\*/" is(comment.multiline) -> pop
+  r"[*/]" is(comment.multiline)
 
 lex(root):
-  Regexp new("//.*?$") is(comment.single)
-  Regexp new("/\\*") is(comment.multiline) -> go-to(comment)
-  Regexp new("\"(?:[^\"\\\\]|\\\\.)*\"") is(literal.string)
-  Regexp new("\\(|\\)|\\[|\\]|\\{|\\}") is(punctuation)
-  Regexp new("(?x)\\b(?:\10            next|break|end|\10            axiom|end_axiom|category|end_category|domain|end_domain|inherits|\10            if|%if|then|elif|else|end_if|\10            case|of|do|otherwise|end_case|\10            while|end_while|\10            repeat|until|end_repeat|\10            for|from|to|downto|step|end_for|\10            proc|local|option|save|begin|end_proc|\10            delete|frame\10          )\\b") is(keyword)
-  Regexp new("(?x)\\b(?:\10            DOM_ARRAY|DOM_BOOL|DOM_COMPLEX|DOM_DOMAIN|DOM_EXEC|DOM_EXPR|\10            DOM_FAIL|DOM_FLOAT|DOM_FRAME|DOM_FUNC_ENV|DOM_HFARRAY|DOM_IDENT|\10            DOM_INT|DOM_INTERVAL|DOM_LIST|DOM_NIL|DOM_NULL|DOM_POLY|DOM_PROC|\10            DOM_PROC_ENV|DOM_RAT|DOM_SET|DOM_STRING|DOM_TABLE|DOM_VAR\10          )\\b") is(name.class)
-  Regexp new("(?x)\\b(?:\10            PI|EULER|E|CATALAN|\10            NIL|FAIL|undefined|infinity|\10            TRUE|FALSE|UNKNOWN\10          )\\b") is(name.constant)
-  Regexp new("\\b(?:dom|procname)\\b") is(name.builtin.pseudo)
-  Regexp new("\\.|,|:|;|=|\\+|-|\\*|/|\\^|@|>|<|\\$|\\||!|\\'|%|\126=") is(operator)
-  Regexp new("(?x)\\b(?:\10            and|or|not|xor|\10            assuming|\10            div|mod|\10            union|minus|intersect|in|subset\10          )\\b") is(operator.word)
-  Regexp new("\\b(?:I|RDN_INF|RD_NINF|RD_NAN)\\b") is(literal.number)
-  Regexp new("(?x)\10          ((?:[a-zA-Z_#][a-zA-Z_#0-9]*|`[^`]*`)\10          (?:::[a-zA-Z_#][a-zA-Z_#0-9]*|`[^`]*`)*)\\s*([(])") is(by-groups(name.function, punctuation))
-  Regexp new("(?x)\10          (?:[a-zA-Z_#][a-zA-Z_#0-9]*|`[^`]*`)\10          (?:::[a-zA-Z_#][a-zA-Z_#0-9]*|`[^`]*`)*") is(name.variable)
-  Regexp new("[0-9]+(?:\\.[0-9]*)?(?:e[0-9]+)?") is(literal.number)
-  Regexp new("\\.[0-9]+(?:e[0-9]+)?") is(literal.number)
-  Regexp new(".") is(text)
+  r"//.*?$" is(comment.single)
+  r"/\*" is(comment.multiline) -> go-to(comment)
+  r"\"(?:[^\"\\]|\\.)*\"" is(literal.string)
+  r"\(|\)|\[|\]|\{|\}" is(punctuation)
+  r"(?x)\b(?:\10            next|break|end|\10            axiom|end_axiom|category|end_category|domain|end_domain|inherits|\10            if|%if|then|elif|else|end_if|\10            case|of|do|otherwise|end_case|\10            while|end_while|\10            repeat|until|end_repeat|\10            for|from|to|downto|step|end_for|\10            proc|local|option|save|begin|end_proc|\10            delete|frame\10          )\b" is(keyword)
+  r"(?x)\b(?:\10            DOM_ARRAY|DOM_BOOL|DOM_COMPLEX|DOM_DOMAIN|DOM_EXEC|DOM_EXPR|\10            DOM_FAIL|DOM_FLOAT|DOM_FRAME|DOM_FUNC_ENV|DOM_HFARRAY|DOM_IDENT|\10            DOM_INT|DOM_INTERVAL|DOM_LIST|DOM_NIL|DOM_NULL|DOM_POLY|DOM_PROC|\10            DOM_PROC_ENV|DOM_RAT|DOM_SET|DOM_STRING|DOM_TABLE|DOM_VAR\10          )\b" is(name.class)
+  r"(?x)\b(?:\10            PI|EULER|E|CATALAN|\10            NIL|FAIL|undefined|infinity|\10            TRUE|FALSE|UNKNOWN\10          )\b" is(name.constant)
+  r"\b(?:dom|procname)\b" is(name.builtin.pseudo)
+  r"\.|,|:|;|=|\+|-|\*|/|\^|@|>|<|\$|\||!|\'|%|\126=" is(operator)
+  r"(?x)\b(?:\10            and|or|not|xor|\10            assuming|\10            div|mod|\10            union|minus|intersect|in|subset\10          )\b" is(operator.word)
+  r"\b(?:I|RDN_INF|RD_NINF|RD_NAN)\b" is(literal.number)
+  r"(?x)\10          ((?:[a-zA-Z_\#][a-zA-Z_\#0-9]*|`[^`]*`)\10          (?:::[a-zA-Z_\#][a-zA-Z_\#0-9]*|`[^`]*`)*)(\s*)([(])" is(by-groups(name.function, text, punctuation))
+  r"(?x)\10          (?:[a-zA-Z_\#][a-zA-Z_\#0-9]*|`[^`]*`)\10          (?:::[a-zA-Z_\#][a-zA-Z_\#0-9]*|`[^`]*`)*" is(name.variable)
+  r"[0-9]+(?:\.[0-9]*)?(?:e[0-9]+)?" is(literal.number)
+  r"\.[0-9]+(?:e[0-9]+)?" is(literal.number)
+  r"." is(text)
 

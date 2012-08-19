@@ -10,23 +10,23 @@ start: .root
 flags: Regexp IGNORECASE
 
 lex(root):
-  Regexp new("^#.*$") is(comment)
-  Regexp new("(!)(\\S+)") is(by-groups(keyword, text))
-  Regexp new("^(=+)([^=]+)(=+)(\\s*#.+)?$") is(by-groups(generic.heading, using(self class), generic.heading, literal.string))
-  Regexp new("({{{)(\\n#!.+)?") is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
-  Regexp new("(\\'\\'\\'?|\\|\\||`|__|\126\126|\\^|,,|::)") is(comment)
-  Regexp new("^( +)([.*-])( )") is(by-groups(text, name.builtin, text))
-  Regexp new("^( +)([a-zivx]{1,5}\\.)( )") is(by-groups(text, name.builtin, text))
-  Regexp new("\\[\\[\\w+.*?\\]\\]") is(keyword)
-  Regexp new("(\\[[^\\s\\]]+)(\\s+[^\\]]+?)?(\\])") is(by-groups(keyword, literal.string, keyword))
-  Regexp new("^----+$") is(keyword)
-  Regexp new("[^\\n\\'\\[{!_\126^,|]+") is(text)
-  Regexp new("\\n") is(text)
-  Regexp new(".") is(text)
+  r"^\#.*$" is(comment)
+  r"(!)(\S+)" is(by-groups(keyword, text))
+  r"^(=+)([^=]+)(=+)(\s*\#.+)?$" is(by-groups(generic.heading, using(self class), generic.heading, literal.string))
+  r"({{{)(\n\#!.+)?" is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
+  r"(\'\'\'?|\|\||`|__|\126\126|\^|,,|::)" is(comment)
+  r"^( +)([.*-])( )" is(by-groups(text, name.builtin, text))
+  r"^( +)([a-zivx]{1,5}\.)( )" is(by-groups(text, name.builtin, text))
+  r"\[\[\w+.*?\]\]" is(keyword)
+  r"(\[[^\s\]]+)(\s+[^\]]+?)?(\])" is(by-groups(keyword, literal.string, keyword))
+  r"^----+$" is(keyword)
+  r"[^\n\'\[{!_\126^,|]+" is(text)
+  r"\n" is(text)
+  r"." is(text)
 
 lex(codeblock):
-  Regexp new("}}}") is(name.builtin) -> pop
-  Regexp new("{{{") is(text) -> push
-  Regexp new("[^{}]+") is(comment.preproc)
-  Regexp new(".") is(comment.preproc)
+  r"}}}" is(name.builtin) -> pop
+  r"{{{" is(text) -> push
+  r"[^{}]+" is(comment.preproc)
+  r"." is(comment.preproc)
 

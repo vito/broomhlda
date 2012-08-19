@@ -10,120 +10,120 @@ start: .root
 flags: Regexp MULTILINE
 
 lex(modulename):
-  Regexp new("[a-zA-Z_][\\w_]*") is(name.namespace) -> pop
+  r"[a-zA-Z_]\w*" is(name.namespace) -> pop
 
 lex(format):
-  Regexp new("\\.\\n") is(literal.string.interpol) -> pop
-  Regexp new("[^\\n]*\\n") is(literal.string.interpol)
+  r"\.\n" is(literal.string.interpol) -> pop
+  r"[^\n]*\n" is(literal.string.interpol)
 
 lex(rb-string):
-  Regexp new("\\\\[\\(\\)\\\\]") is(literal.string.other)
-  Regexp new("\\\\") is(literal.string.other)
-  Regexp new("\\(") is(literal.string.other) -> go-to(rb-string)
-  Regexp new("\\)") is(literal.string.other) -> pop
-  Regexp new("[^\\(\\)]+") is(literal.string.other)
+  r"\\[\(\)\\]" is(literal.string.other)
+  r"\\" is(literal.string.other)
+  r"\(" is(literal.string.other) -> go-to(rb-string)
+  r"\)" is(literal.string.other) -> pop
+  r"[^\(\)]+" is(literal.string.other)
 
 lex(balanced-regex):
-  Regexp new("/(\\\\\\\\|\\\\/|[^/])*/[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("!(\\\\\\\\|\\\\!|[^!])*![egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("\\\\(\\\\\\\\|[^\\\\])*\\\\[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("{(\\\\\\\\|\\\\}|[^}])*}[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("<(\\\\\\\\|\\\\>|[^>])*>[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("\\[(\\\\\\\\|\\\\\\]|[^\\]])*\\][egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("\\((\\\\\\\\|\\\\\\)|[^\\)])*\\)[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("@(\\\\\\\\|\\\\\\@|[^\\@])*@[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("%(\\\\\\\\|\\\\\\%|[^\\%])*%[egimosx]*") is(literal.string.regex) -> pop
-  Regexp new("\\$(\\\\\\\\|\\\\\\$|[^\\$])*\\$[egimosx]*") is(literal.string.regex) -> pop
+  r"/(\\\\|\\[^\\]|[^\\/])*/[egimosx]*" is(literal.string.regex) -> pop
+  r"!(\\\\|\\[^\\]|[^\\!])*![egimosx]*" is(literal.string.regex) -> pop
+  r"\\(\\\\|[^\\])*\\[egimosx]*" is(literal.string.regex) -> pop
+  r"{(\\\\|\\[^\\]|[^\\}])*}[egimosx]*" is(literal.string.regex) -> pop
+  r"<(\\\\|\\[^\\]|[^\\>])*>[egimosx]*" is(literal.string.regex) -> pop
+  r"\[(\\\\|\\[^\\]|[^\\\]])*\][egimosx]*" is(literal.string.regex) -> pop
+  r"\((\\\\|\\[^\\]|[^\\\)])*\)[egimosx]*" is(literal.string.regex) -> pop
+  r"@(\\\\|\\[^\\]|[^\\\@])*@[egimosx]*" is(literal.string.regex) -> pop
+  r"%(\\\\|\\[^\\]|[^\\\%])*%[egimosx]*" is(literal.string.regex) -> pop
+  r"\$(\\\\|\\[^\\]|[^\\\$])*\$[egimosx]*" is(literal.string.regex) -> pop
 
 lex(name):
-  Regexp new("[a-zA-Z0-9_]+::") is(name.namespace)
-  Regexp new("[a-zA-Z0-9_:]+") is(name) -> pop
-  Regexp new("[A-Z_]+(?=[^a-zA-Z0-9_])") is(name.constant) -> pop
-  Regexp new("(?=[^a-zA-Z0-9_])") is(text) -> pop
+  r"[a-zA-Z0-9_]+::" is(name.namespace)
+  r"[a-zA-Z0-9_:]+" is(name) -> pop
+  r"[A-Z_]+(?=[^a-zA-Z0-9_])" is(name.constant) -> pop
+  r"(?=[^a-zA-Z0-9_])" is(text) -> pop
 
 lex(varname):
-  Regexp new("\\s+") is(text)
-  Regexp new("\\{") is(punctuation) -> pop
-  Regexp new("\\)|,") is(punctuation) -> pop
-  Regexp new("[a-zA-Z0-9_]+::") is(name.namespace)
-  Regexp new("[a-zA-Z0-9_:]+") is(name.variable) -> pop
+  r"\s+" is(text)
+  r"\{" is(punctuation) -> pop
+  r"\)|," is(punctuation) -> pop
+  r"[a-zA-Z0-9_]+::" is(name.namespace)
+  r"[a-zA-Z0-9_:]+" is(name.variable) -> pop
 
 lex(end-part):
-  Regexp new(".+") is(comment.preproc) -> pop
+  r".+" is(comment.preproc) -> pop
 
 lex(sb-string):
-  Regexp new("\\\\[\\[\\]\\\\]") is(literal.string.other)
-  Regexp new("\\\\") is(literal.string.other)
-  Regexp new("\\[") is(literal.string.other) -> go-to(sb-string)
-  Regexp new("\\]") is(literal.string.other) -> pop
-  Regexp new("[^\\[\\]]+") is(literal.string.other)
+  r"\\[\[\]\\]" is(literal.string.other)
+  r"\\" is(literal.string.other)
+  r"\[" is(literal.string.other) -> go-to(sb-string)
+  r"\]" is(literal.string.other) -> pop
+  r"[^\[\]]+" is(literal.string.other)
 
 lex(funcname):
-  Regexp new("[a-zA-Z_][\\w_]*[\\!\\?]?") is(name.function)
-  Regexp new("\\s+") is(text)
-  Regexp new("(\\([$@%]*\\))(\\s*)") is(by-groups(punctuation, text))
-  Regexp new(".*?{") is(punctuation) -> pop
-  Regexp new(";") is(punctuation) -> pop
+  r"[a-zA-Z_]\w*[\!\?]?" is(name.function)
+  r"\s+" is(text)
+  r"(\([$@%]*\))(\s*)" is(by-groups(punctuation, text))
+  r".*?{" is(punctuation) -> pop
+  r";" is(punctuation) -> pop
 
 lex(root):
-  Regexp new("\\#.*?$") is(comment.single)
-  Regexp new("^=[a-zA-Z0-9]+\\s+.*?\\n=cut") is(comment.multiline)
-  Regexp new("(case|continue|do|else|elsif|for|foreach|if|last|my|next|our|redo|reset|then|unless|until|while|use|print|new|BEGIN|CHECK|INIT|END|return)\\b") is(keyword)
-  Regexp new("(format)(\\s+)([a-zA-Z0-9_]+)(\\s*)(=)(\\s*\\n)") is(by-groups(keyword, text, name, text, punctuation, text)) -> go-to(format)
-  Regexp new("(eq|lt|gt|le|ge|ne|not|and|or|cmp)\\b") is(operator.word)
-  Regexp new("s/(\\\\\\\\|\\\\/|[^/])*/(\\\\\\\\|\\\\/|[^/])*/[egimosx]*") is(literal.string.regex)
-  Regexp new("s!(\\\\\\\\|\\\\!|[^!])*!(\\\\\\\\|\\\\!|[^!])*![egimosx]*") is(literal.string.regex)
-  Regexp new("s\\\\(\\\\\\\\|[^\\\\])*\\\\(\\\\\\\\|[^\\\\])*\\\\[egimosx]*") is(literal.string.regex)
-  Regexp new("s@(\\\\\\\\|\\\\@|[^@])*@(\\\\\\\\|\\\\@|[^@])*@[egimosx]*") is(literal.string.regex)
-  Regexp new("s%(\\\\\\\\|\\\\%|[^%])*%(\\\\\\\\|\\\\%|[^%])*%[egimosx]*") is(literal.string.regex)
-  Regexp new("s{(\\\\\\\\|\\\\}|[^}])*}\\s*") is(literal.string.regex) -> go-to(balanced-regex)
-  Regexp new("s<(\\\\\\\\|\\\\>|[^>])*>\\s*") is(literal.string.regex) -> go-to(balanced-regex)
-  Regexp new("s\\[(\\\\\\\\|\\\\\\]|[^\\]])*\\]\\s*") is(literal.string.regex) -> go-to(balanced-regex)
-  Regexp new("s\\((\\\\\\\\|\\\\\\)|[^\\)])*\\)\\s*") is(literal.string.regex) -> go-to(balanced-regex)
-  Regexp new("m?/(\\\\\\\\|\\\\/|[^/\\n])*/[gcimosx]*") is(literal.string.regex)
-  Regexp new("m(?=[/!\\\\{<\\[\\(@%\\$])") is(literal.string.regex) -> go-to(balanced-regex)
-  Regexp new("((?<==\126)|(?<=\\())\\s*/(\\\\\\\\|\\\\/|[^/])*/[gcimosx]*") is(literal.string.regex)
-  Regexp new("\\s+") is(text)
-  Regexp new("(abs|accept|alarm|atan2|bind|binmode|bless|caller|chdir|chmod|chomp|chop|chown|chr|chroot|close|closedir|connect|continue|cos|crypt|dbmclose|dbmopen|defined|delete|die|dump|each|endgrent|endhostent|endnetent|endprotoent|endpwent|endservent|eof|eval|exec|exists|exit|exp|fcntl|fileno|flock|fork|format|formline|getc|getgrent|getgrgid|getgrnam|gethostbyaddr|gethostbyname|gethostent|getlogin|getnetbyaddr|getnetbyname|getnetent|getpeername|getpgrp|getppid|getpriority|getprotobyname|getprotobynumber|getprotoent|getpwent|getpwnam|getpwuid|getservbyname|getservbyport|getservent|getsockname|getsockopt|glob|gmtime|goto|grep|hex|import|index|int|ioctl|join|keys|kill|last|lc|lcfirst|length|link|listen|local|localtime|log|lstat|map|mkdir|msgctl|msgget|msgrcv|msgsnd|my|next|no|oct|open|opendir|ord|our|pack|package|pipe|pop|pos|printf|prototype|push|quotemeta|rand|read|readdir|readline|readlink|readpipe|recv|redo|ref|rename|require|reverse|rewinddir|rindex|rmdir|scalar|seek|seekdir|select|semctl|semget|semop|send|setgrent|sethostent|setnetent|setpgrp|setpriority|setprotoent|setpwent|setservent|setsockopt|shift|shmctl|shmget|shmread|shmwrite|shutdown|sin|sleep|socket|socketpair|sort|splice|split|sprintf|sqrt|srand|stat|study|substr|symlink|syscall|sysopen|sysread|sysseek|system|syswrite|tell|telldir|tie|tied|time|times|tr|truncate|uc|ucfirst|umask|undef|unlink|unpack|unshift|untie|utime|values|vec|wait|waitpid|wantarray|warn|write)\\b") is(name.builtin)
-  Regexp new("((__(DATA|DIE|WARN)__)|(STD(IN|OUT|ERR)))\\b") is(name.builtin.pseudo)
-  Regexp new("<<([\\'\"]?)([a-zA-Z_][a-zA-Z0-9_]*)\\1;?\\n.*?\\n\\2\\n") is(literal.string)
-  Regexp new("__END__") is(comment.preproc) -> go-to(end-part)
-  Regexp new("\\$\\^[ADEFHILMOPSTWX]") is(name.variable.global)
-  Regexp new("\\$[\\\\\\\"\\[\\]'&`+*.,;=%\126?@$!<>(^|/-](?!\\w)") is(name.variable.global)
-  Regexp new("[$@%#]+") is(name.variable) -> go-to(varname)
-  Regexp new("0_?[0-7]+(_[0-7]+)*") is(literal.number.oct)
-  Regexp new("0x[0-9A-Fa-f]+(_[0-9A-Fa-f]+)*") is(literal.number.hex)
-  Regexp new("0b[01]+(_[01]+)*") is(literal.number.bin)
-  Regexp new("(?i)(\\d*(_\\d*)*\\.\\d+(_\\d*)*|\\d+(_\\d*)*\\.\\d+(_\\d*)*)(e[+-]?\\d+)?") is(literal.number.float)
-  Regexp new("(?i)\\d+(_\\d*)*e[+-]?\\d+(_\\d*)*") is(literal.number.float)
-  Regexp new("\\d+(_\\d+)*") is(literal.number.integer)
-  Regexp new("'(\\\\\\\\|\\\\'|[^'])*'") is(literal.string)
-  Regexp new("\"(\\\\\\\\|\\\\\"|[^\"])*\"") is(literal.string)
-  Regexp new("`(\\\\\\\\|\\\\`|[^`])*`") is(literal.string.backtick)
-  Regexp new("<([^\\s>]+)>") is(literal.string.regex)
-  Regexp new("(q|qq|qw|qr|qx)\\{") is(literal.string.other) -> go-to(cb-string)
-  Regexp new("(q|qq|qw|qr|qx)\\(") is(literal.string.other) -> go-to(rb-string)
-  Regexp new("(q|qq|qw|qr|qx)\\[") is(literal.string.other) -> go-to(sb-string)
-  Regexp new("(q|qq|qw|qr|qx)\\<") is(literal.string.other) -> go-to(lt-string)
-  Regexp new("(q|qq|qw|qr|qx)([^a-zA-Z0-9])(.|\\n)*?\\2") is(literal.string.other)
-  Regexp new("package\\s+") is(keyword) -> go-to(modulename)
-  Regexp new("sub\\s+") is(keyword) -> go-to(funcname)
-  Regexp new("(\\[\\]|\\*\\*|::|<<|>>|>=|<=|<=>|={3}|!=|=\126|!\126|&&?|\\|\\||\\.{1,3})") is(operator)
-  Regexp new("[-+/*%=<>&^|!\\\\\126]=?") is(operator)
-  Regexp new("[\\(\\)\\[\\]:;,<>/\\?\\{\\}]") is(punctuation)
-  Regexp new("(?=\\w)") is(name) -> go-to(name)
+  r"\\#.*?$" is(comment.single)
+  r"^=[a-zA-Z0-9]+\s+.*?\n=cut" is(comment.multiline)
+  r"(case|continue|do|else|elsif|for|foreach|if|last|my|next|our|redo|reset|then|unless|until|while|use|print|new|BEGIN|CHECK|INIT|END|return)\b" is(keyword)
+  r"(format)(\s+)([a-zA-Z0-9_]+)(\s*)(=)(\s*\n)" is(by-groups(keyword, text, name, text, punctuation, text)) -> go-to(format)
+  r"(eq|lt|gt|le|ge|ne|not|and|or|cmp)\b" is(operator.word)
+  r"s/(\\\\|\\[^\\]|[^\\/])*/(\\\\|\\[^\\]|[^\\/])*/[egimosx]*" is(literal.string.regex)
+  r"s!(\\\\|\\!|[^!])*!(\\\\|\\!|[^!])*![egimosx]*" is(literal.string.regex)
+  r"s\\(\\\\|[^\\])*\\(\\\\|[^\\])*\\[egimosx]*" is(literal.string.regex)
+  r"s@(\\\\|\\[^\\]|[^\\@])*@(\\\\|\\[^\\]|[^\\@])*@[egimosx]*" is(literal.string.regex)
+  r"s%(\\\\|\\[^\\]|[^\\%])*%(\\\\|\\[^\\]|[^\\%])*%[egimosx]*" is(literal.string.regex)
+  r"s{(\\\\|\\[^\\]|[^\\}])*}\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s<(\\\\|\\[^\\]|[^\\>])*>\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s\[(\\\\|\\[^\\]|[^\\\]])*\]\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s\((\\\\|\\[^\\]|[^\\\)])*\)\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"m?/(\\\\|\\[^\\]|[^\\/\n])*/[gcimosx]*" is(literal.string.regex)
+  r"m(?=[/!\\{<\[\(@%\$])" is(literal.string.regex) -> go-to(balanced-regex)
+  r"((?<==\126)|(?<=\())\s*/(\\\\|\\[^\\]|[^\\/])*/[gcimosx]*" is(literal.string.regex)
+  r"\s+" is(text)
+  r"(abs|accept|alarm|atan2|bind|binmode|bless|caller|chdir|chmod|chomp|chop|chown|chr|chroot|close|closedir|connect|continue|cos|crypt|dbmclose|dbmopen|defined|delete|die|dump|each|endgrent|endhostent|endnetent|endprotoent|endpwent|endservent|eof|eval|exec|exists|exit|exp|fcntl|fileno|flock|fork|format|formline|getc|getgrent|getgrgid|getgrnam|gethostbyaddr|gethostbyname|gethostent|getlogin|getnetbyaddr|getnetbyname|getnetent|getpeername|getpgrp|getppid|getpriority|getprotobyname|getprotobynumber|getprotoent|getpwent|getpwnam|getpwuid|getservbyname|getservbyport|getservent|getsockname|getsockopt|glob|gmtime|goto|grep|hex|import|index|int|ioctl|join|keys|kill|last|lc|lcfirst|length|link|listen|local|localtime|log|lstat|map|mkdir|msgctl|msgget|msgrcv|msgsnd|my|next|no|oct|open|opendir|ord|our|pack|package|pipe|pop|pos|printf|prototype|push|quotemeta|rand|read|readdir|readline|readlink|readpipe|recv|redo|ref|rename|require|reverse|rewinddir|rindex|rmdir|scalar|seek|seekdir|select|semctl|semget|semop|send|setgrent|sethostent|setnetent|setpgrp|setpriority|setprotoent|setpwent|setservent|setsockopt|shift|shmctl|shmget|shmread|shmwrite|shutdown|sin|sleep|socket|socketpair|sort|splice|split|sprintf|sqrt|srand|stat|study|substr|symlink|syscall|sysopen|sysread|sysseek|system|syswrite|tell|telldir|tie|tied|time|times|tr|truncate|uc|ucfirst|umask|undef|unlink|unpack|unshift|untie|utime|values|vec|wait|waitpid|wantarray|warn|write)\b" is(name.builtin)
+  r"((__(DATA|DIE|WARN)__)|(STD(IN|OUT|ERR)))\b" is(name.builtin.pseudo)
+  r"<<([\'\"]?)([a-zA-Z_][a-zA-Z0-9_]*)\1;?\n.*?\n\2\n" is(literal.string)
+  r"__END__" is(comment.preproc) -> go-to(end-part)
+  r"\$\^[ADEFHILMOPSTWX]" is(name.variable.global)
+  r"\$[\\\\"\[\]'&`+*.,;=%\126?@$!<>(^|/-](?!\w)" is(name.variable.global)
+  r"[$@%\#]+" is(name.variable) -> go-to(varname)
+  r"0_?[0-7]+(_[0-7]+)*" is(literal.number.oct)
+  r"0x[0-9A-Fa-f]+(_[0-9A-Fa-f]+)*" is(literal.number.hex)
+  r"0b[01]+(_[01]+)*" is(literal.number.bin)
+  r"(?i)(\d*(_\d*)*\.\d+(_\d*)*|\d+(_\d*)*\.\d+(_\d*)*)(e[+-]?\d+)?" is(literal.number.float)
+  r"(?i)\d+(_\d*)*e[+-]?\d+(_\d*)*" is(literal.number.float)
+  r"\d+(_\d+)*" is(literal.number.integer)
+  r"'(\\\\|\\[^\\]|[^'\\])*'" is(literal.string)
+  r"\"(\\\\|\\[^\\]|[^\"\\])*\"" is(literal.string)
+  r"`(\\\\|\\[^\\]|[^`\\])*`" is(literal.string.backtick)
+  r"<([^\s>]+)>" is(literal.string.regex)
+  r"(q|qq|qw|qr|qx)\{" is(literal.string.other) -> go-to(cb-string)
+  r"(q|qq|qw|qr|qx)\(" is(literal.string.other) -> go-to(rb-string)
+  r"(q|qq|qw|qr|qx)\[" is(literal.string.other) -> go-to(sb-string)
+  r"(q|qq|qw|qr|qx)\<" is(literal.string.other) -> go-to(lt-string)
+  r"(q|qq|qw|qr|qx)([^a-zA-Z0-9])(.|\n)*?\2" is(literal.string.other)
+  r"package\s+" is(keyword) -> go-to(modulename)
+  r"sub\s+" is(keyword) -> go-to(funcname)
+  r"(\[\]|\*\*|::|<<|>>|>=|<=>|<=|={3}|!=|=\126|!\126|&&?|\|\||\.{1,3})" is(operator)
+  r"[-+/*%=<>&^|!\\\126]=?" is(operator)
+  r"[\(\)\[\]:;,<>/\?\{\}]" is(punctuation)
+  r"(?=\w)" is(name) -> go-to(name)
 
 lex(cb-string):
-  Regexp new("\\\\[\\{\\}\\\\]") is(literal.string.other)
-  Regexp new("\\\\") is(literal.string.other)
-  Regexp new("\\{") is(literal.string.other) -> go-to(cb-string)
-  Regexp new("\\}") is(literal.string.other) -> pop
-  Regexp new("[^\\{\\}\\\\]+") is(literal.string.other)
+  r"\\[\{\}\\]" is(literal.string.other)
+  r"\\" is(literal.string.other)
+  r"\{" is(literal.string.other) -> go-to(cb-string)
+  r"\}" is(literal.string.other) -> pop
+  r"[^\{\}\\]+" is(literal.string.other)
 
 lex(lt-string):
-  Regexp new("\\\\[\\<\\>\\\\]") is(literal.string.other)
-  Regexp new("\\\\") is(literal.string.other)
-  Regexp new("\\<") is(literal.string.other) -> go-to(lt-string)
-  Regexp new("\\>") is(literal.string.other) -> pop
-  Regexp new("[^\\<\\>]+") is(literal.string.other)
+  r"\\[\<\>\\]" is(literal.string.other)
+  r"\\" is(literal.string.other)
+  r"\<" is(literal.string.other) -> go-to(lt-string)
+  r"\>" is(literal.string.other) -> pop
+  r"[^\<\>]+" is(literal.string.other)
 

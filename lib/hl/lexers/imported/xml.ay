@@ -5,33 +5,33 @@ Lexer = lexer:
 name: "XML"
 aliases: ["xml"]
 extensions: [".xml", ".xsl", ".rss", ".xslt", ".xsd", ".wsdl"]
-mimetypes: ["text/xml", "application/xml", "image/svg+xml", "application/rss+xml", "application/atom+xml", "application/xsl+xml", "application/xslt+xml"]
+mimetypes: ["text/xml", "application/xml", "image/svg+xml", "application/rss+xml", "application/atom+xml"]
 start: .root
 flags: Regexp MULTILINE
 
 lex(comment):
-  Regexp new("[^-]+") is(comment)
-  Regexp new("-->") is(comment) -> pop
-  Regexp new("-") is(comment)
+  r"[^-]+" is(comment)
+  r"-->" is(comment) -> pop
+  r"-" is(comment)
 
 lex(tag):
-  Regexp new("\\s+") is(text)
-  Regexp new("[a-zA-Z0-9_.:-]+\\s*=") is(name.attribute) -> go-to(attr)
-  Regexp new("/?\\s*>") is(name.tag) -> pop
+  r"\s+" is(text)
+  r"[a-zA-Z0-9_.:-]+\s*=" is(name.attribute) -> go-to(attr)
+  r"/?\s*>" is(name.tag) -> pop
 
 lex(root):
-  Regexp new("[^<&]+") is(text)
-  Regexp new("&\\S*?;") is(name.entity)
-  Regexp new("\\<\\!\\[CDATA\\[.*?\\]\\]\\>") is(comment.preproc)
-  Regexp new("<!--") is(comment) -> go-to(comment)
-  Regexp new("<\\?.*?\\?>") is(comment.preproc)
-  Regexp new("<![^>]*>") is(comment.preproc)
-  Regexp new("<\\s*[a-zA-Z0-9:._-]+") is(name.tag) -> go-to(tag)
-  Regexp new("<\\s*/\\s*[a-zA-Z0-9:._-]+\\s*>") is(name.tag)
+  r"[^<&]+" is(text)
+  r"&\S*?;" is(name.entity)
+  r"\<\!\[CDATA\[.*?\]\]\>" is(comment.preproc)
+  r"<!--" is(comment) -> go-to(comment)
+  r"<\?.*?\?>" is(comment.preproc)
+  r"<![^>]*>" is(comment.preproc)
+  r"<\s*[a-zA-Z0-9:._-]+" is(name.tag) -> go-to(tag)
+  r"<\s*/\s*[a-zA-Z0-9:._-]+\s*>" is(name.tag)
 
 lex(attr):
-  Regexp new("\\s+") is(text)
-  Regexp new("\".*?\"") is(literal.string) -> pop
-  Regexp new("'.*?'") is(literal.string) -> pop
-  Regexp new("[^\\s>]+") is(literal.string) -> pop
+  r"\s+" is(text)
+  r"\".*?\"" is(literal.string) -> pop
+  r"'.*?'" is(literal.string) -> pop
+  r"[^\s>]+" is(literal.string) -> pop
 

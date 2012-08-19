@@ -10,7 +10,7 @@ start: .root
 flags: 0
 
 lex(root):
-  Regexp new("\\s+") is(text)
-  Regexp new("(?:[;#]|//).*$") is(comment)
-  Regexp new("(.*?)([ \\t]*)([=:])([ \\t]*)(.*(?:(?<=\\\\)\\n.*)*)") is(by-groups(name.attribute, text, operator, text, literal.string))
+  r"\s+" is(text)
+  r"(?:[;\#]|//).*$" is(comment)
+  r"(.*?)([ \t]*)([=:])([ \t]*)(.*(?:(?<=\\)\n.*)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
 

@@ -11,9 +11,9 @@ flags: 0
 
 lex(statements):
   any-of(comments)
-  Regexp new("\\s+") is(text)
-  Regexp new("\\'") is(literal.string) -> go-to(string-squote)
-  Regexp new("\\\"") is(literal.string) -> go-to(string-dquote)
+  r"\s+" is(text)
+  r"\'" is(literal.string) -> go-to(string-squote)
+  r"\\"" is(literal.string) -> go-to(string-dquote)
   any-of(builtin-symbols)
   any-of(numbers)
   any-of(keywords)
@@ -22,39 +22,39 @@ lex(statements):
   any-of(valid-name)
 
 lex(string-dquote):
-  Regexp new("[^\\\"]*\\\"") is(literal.string) -> pop
+  r"[^\\"]*\\"" is(literal.string) -> pop
 
 lex(operators):
-  Regexp new("<-|-|==|<=|>=|<|>|&&|&|!=|\\|\\|?") is(operator)
-  Regexp new("\\*|\\+|\\^|/|%%|%/%|=") is(operator)
-  Regexp new("%in%|%*%") is(operator)
+  r"<-|-|==|<=|>=|<|>|&&|&|!=|\|\|?" is(operator)
+  r"\*|\+|\^|/|%%|%/%|=" is(operator)
+  r"%in%|%*%" is(operator)
 
 lex(keywords):
-  Regexp new("for(?=\\s*\\()|while(?=\\s*\\()|if(?=\\s*\\()|(?<=\\s)else|(?<=\\s)break(?=;|$)|return(?=\\s*\\()|function(?=\\s*\\()") is(keyword.reserved)
+  r"for(?=\s*\()|while(?=\s*\()|if(?=\s*\()|(?<=\s)else|(?<=\s)break(?=;|$)|return(?=\s*\()|function(?=\s*\()" is(keyword.reserved)
 
 lex(numbers):
-  Regexp new("(?<![0-9a-zA-Z\\)\\}\\]`\\\"])(?=\\s*)[-\\+]?[0-9]+(\\.[0-9]*)?(E[0-9][-\\+]?(\\.[0-9]*)?)?") is(literal.number)
-  Regexp new("\\.[0-9]*(E[0-9][-\\+]?(\\.[0-9]*)?)?") is(literal.number)
+  r"(?<![0-9a-zA-Z\)\}\]`\\"])(?=\s*)[-\+]?[0-9]+(\.[0-9]*)?(E[0-9][-\+]?(\.[0-9]*)?)?" is(literal.number)
+  r"\.[0-9]*(E[0-9][-\+]?(\.[0-9]*)?)?" is(literal.number)
 
 lex(valid-name):
-  Regexp new("[a-zA-Z][0-9a-zA-Z\\._]+") is(text)
-  Regexp new("`.+`") is(literal.string.backtick)
+  r"[a-zA-Z][0-9a-zA-Z\._]+" is(text)
+  r"`.+`" is(literal.string.backtick)
 
 lex(builtin-symbols):
-  Regexp new("(NULL|NA|TRUE|FALSE|NaN)\\b") is(keyword.constant)
-  Regexp new("(T|F)\\b") is(keyword.variable)
+  r"(NULL|NA|TRUE|FALSE|NaN)\b" is(keyword.constant)
+  r"(T|F)\b" is(keyword.variable)
 
 lex(punctuation):
-  Regexp new("\\[|\\]|\\[\\[|\\]\\]|\\$|\\(|\\)|@|:::?|;|,") is(punctuation)
+  r"\[|\]|\[\[|\]\]|\$|\(|\)|@|:::?|;|," is(punctuation)
 
 lex(comments):
-  Regexp new("#.*$") is(comment.single)
+  r"\#.*$" is(comment.single)
 
 lex(root):
   any-of(statements)
-  Regexp new("\\{|\\}") is(punctuation)
-  Regexp new(".") is(text)
+  r"\{|\}" is(punctuation)
+  r"." is(text)
 
 lex(string-squote):
-  Regexp new("[^\\']*\\'") is(literal.string) -> pop
+  r"[^\']*\'" is(literal.string) -> pop
 

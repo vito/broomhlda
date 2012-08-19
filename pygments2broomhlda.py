@@ -45,13 +45,31 @@ def rr(x):
 
         sane += c
 
-    return dq(sane)
+    return rq(sane)
+
+def rq(x):
+    if isinstance(x, str) or isinstance(x, unicode):
+        return '"%s"' % "".join([reg_esc(y) for y in x])
+    elif isinstance(x, list) or isinstance(x, tuple):
+        return "[" + ", ".join([rq(y) for y in x]) + "]"
+    else:
+        raise Exception("Cannot rq: %s" % repr(x))
 
 def esc(c):
     if c == '"':
         return '\\"'
     elif c == '\\':
         return '\\\\'
+    elif ord(c) in range(32, 126):
+        return c
+    else:
+        return "\\%s" % ord(c)
+
+def reg_esc(c):
+    if c == '"':
+        return '\\"'
+    elif c == '#': # interpolation
+        return '\\#'
     elif ord(c) in range(32, 126):
         return c
     else:
@@ -134,23 +152,25 @@ def convert_state(all, name, toks):
 
 def convert_token(regexp, type, next = None):
     if next:
-        return "Regexp new(%s) is(%s) -> %s" % (rr(regexp), convert_type(type), convert_next(next))
+        return "r%s is(%s) -> %s" % (rr(regexp), convert_type(type), convert_next(next))
     else:
-        return "Regexp new(%s) is(%s)" % (rr(regexp), convert_type(type))
+        return "r%s is(%s)" % (rr(regexp), convert_type(type))
 
 def convert_type(t):
     if isinstance(t, tuple):
         return ".".join([x.lower() for x in list(t)])
     elif isinstance(t, str):
         return t.lower()
-    elif type(t) is types.FunctionType and isinstance(t.__closure__[0].cell_contents, tuple):
-        return "by-groups(" + ", ".join([convert_type(x) for x in t.__closure__[0].cell_contents if x]) + ")"
-    elif type(t) is types.FunctionType and len(t.__closure__) == 2:
-        return "using(self class)"
-    elif type(t) is types.FunctionType and len(t.__closure__) == 3:
-        # TODO
-        return "using(" + convert_modname(t.__closure__[2].cell_contents.__name__) + ")"
+    elif type(t) is types.FunctionType and t.__closure__:
+        if isinstance(t.__closure__[0].cell_contents, tuple):
+            return "by-groups(" + ", ".join([convert_type(x) for x in t.__closure__[0].cell_contents if x]) + ")"
+        elif len(t.__closure__) == 2:
+            return "using(self class)"
+        elif len(t.__closure__) == 3:
+            # TODO
+            return "using(" + convert_modname(t.__closure__[2].cell_contents.__name__) + ")"
     else:
+        #return "TODO"
         raise Exception("Could not convert: %s" % repr(t))
 
 def convert_next(n):

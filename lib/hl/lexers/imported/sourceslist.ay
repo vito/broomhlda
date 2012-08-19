@@ -10,27 +10,27 @@ start: .root
 flags: 0
 
 lex(distribution):
-  Regexp new("#.*?$") is(comment) -> pop
-  Regexp new("\\$\\(ARCH\\)") is(name.variable)
-  Regexp new("[^\\s$\\[]+") is(literal.string)
-  Regexp new("\\[") is(literal.string.other) -> go-to(escaped-distribution)
-  Regexp new("\\$") is(literal.string)
-  Regexp new("\\s+") is(text) -> go-to(components)
+  r"\#.*?$" is(comment) -> pop
+  r"\$\(ARCH\)" is(name.variable)
+  r"[^\s$\[]+" is(literal.string)
+  r"\[" is(literal.string.other) -> go-to(escaped-distribution)
+  r"\$" is(literal.string)
+  r"\s+" is(text) -> go-to(components)
 
 lex(root):
-  Regexp new("\\s+") is(text)
-  Regexp new("#.*?$") is(comment)
-  Regexp new("^(deb(?:-src)?)(\\s+)") is(by-groups(keyword, text)) -> go-to(distribution)
+  r"\s+" is(text)
+  r"\#.*?$" is(comment)
+  r"^(deb(?:-src)?)(\s+)" is(by-groups(keyword, text)) -> go-to(distribution)
 
 lex(escaped-distribution):
-  Regexp new("\\]") is(literal.string.other) -> pop
-  Regexp new("\\$\\(ARCH\\)") is(name.variable)
-  Regexp new("[^\\]$]+") is(literal.string.other)
-  Regexp new("\\$") is(literal.string.other)
+  r"\]" is(literal.string.other) -> pop
+  r"\$\(ARCH\)" is(name.variable)
+  r"[^\]$]+" is(literal.string.other)
+  r"\$" is(literal.string.other)
 
 lex(components):
-  Regexp new("#.*?$") is(comment) -> pop(2)
-  Regexp new("$") is(text) -> pop(2)
-  Regexp new("\\s+") is(text)
-  Regexp new("\\S+") is(keyword.pseudo)
+  r"\#.*?$" is(comment) -> pop(2)
+  r"$" is(text) -> pop(2)
+  r"\s+" is(text)
+  r"\S+" is(keyword.pseudo)
 

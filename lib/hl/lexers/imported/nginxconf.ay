@@ -10,31 +10,31 @@ start: .root
 flags: 0
 
 lex(base):
-  Regexp new("#.*\\n") is(comment.single)
-  Regexp new("on|off") is(name.constant)
-  Regexp new("\\$[^\\s;#()]+") is(name.variable)
-  Regexp new("([a-z0-9.-]+)(:)([0-9]+)") is(by-groups(name, punctuation, literal.number.integer))
-  Regexp new("[a-z-]+/[a-z-+]+") is(literal.string)
-  Regexp new("[0-9]+[km]?\\b") is(literal.number.integer)
-  Regexp new("(\126)(\\s*)([^\\s{]+)") is(by-groups(punctuation, text, literal.string.regex))
-  Regexp new("[:=\126]") is(punctuation)
-  Regexp new("[^\\s;#{}$]+") is(literal.string)
-  Regexp new("/[^\\s;#]*") is(name)
-  Regexp new("\\s+") is(text)
-  Regexp new("[$;]") is(text)
+  r"\#.*\n" is(comment.single)
+  r"on|off" is(name.constant)
+  r"\$[^\s;\#()]+" is(name.variable)
+  r"([a-z0-9.-]+)(:)([0-9]+)" is(by-groups(name, punctuation, literal.number.integer))
+  r"[a-z-]+/[a-z-+]+" is(literal.string)
+  r"[0-9]+[km]?\b" is(literal.number.integer)
+  r"(\126)(\s*)([^\s{]+)" is(by-groups(punctuation, text, literal.string.regex))
+  r"[:=\126]" is(punctuation)
+  r"[^\s;\#{}$]+" is(literal.string)
+  r"/[^\s;\#]*" is(name)
+  r"\s+" is(text)
+  r"[$;]" is(text)
 
 lex(root):
-  Regexp new("(include)(\\s+)([^\\s;]+)") is(by-groups(keyword, text, name))
-  Regexp new("[^\\s;#]+") is(keyword) -> go-to(stmt)
+  r"(include)(\s+)([^\s;]+)" is(by-groups(keyword, text, name))
+  r"[^\s;\#]+" is(keyword) -> go-to(stmt)
   any-of(base)
 
 lex(stmt):
-  Regexp new("{") is(punctuation) -> go-to(block)
-  Regexp new(";") is(punctuation) -> pop
+  r"{" is(punctuation) -> go-to(block)
+  r";" is(punctuation) -> pop
   any-of(base)
 
 lex(block):
-  Regexp new("}") is(punctuation) -> pop(2)
-  Regexp new("[^\\s;#]+") is(keyword.namespace) -> go-to(stmt)
+  r"}" is(punctuation) -> pop(2)
+  r"[^\s;\#]+" is(keyword.namespace) -> go-to(stmt)
   any-of(base)
 
