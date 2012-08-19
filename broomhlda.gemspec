@@ -14,9 +14,8 @@ Gem::Specification.new do |s|
   s.license = "BSD"
 
   s.has_rdoc = false
-  s.rubyforge_project = "atomy"
 
-  s.add_runtime_dependency "atomy", "~> 0.3"
+  s.add_runtime_dependency "atomy", "~> 0.4"
 
   s.add_development_dependency "rake"
 end
