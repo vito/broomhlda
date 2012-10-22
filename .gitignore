@@ -4,3 +4,5 @@
 hl.css
 out.html
 .rbx/
+.rbenv-gemsets
+.rbenv-version
