@@ -1,0 +1,61 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "DTD"
+aliases: ["dtd"]
+extensions: [".dtd"]
+mimetypes: ["application/xml-dtd"]
+start: .root
+flags: Regexp MULTILINE
+
+lex(comment):
+  r"[^-]+" is(comment)
+  r"-->" is(comment) -> pop
+  r"-" is(comment)
+
+lex(notation):
+  any-of(common)
+  r"SYSTEM|PUBLIC" is(keyword.constant)
+  r"[^>\s\|()?+*,]+" is(name.attribute)
+  r">" is(keyword) -> pop
+
+lex(entity):
+  any-of(common)
+  r"SYSTEM|PUBLIC|NDATA" is(keyword.constant)
+  r"[^>\s\|()?+*,]+" is(name.entity)
+  r">" is(keyword) -> pop
+
+lex(common):
+  r"\s+" is(text)
+  r"(%|&)[^;]*;" is(name.entity)
+  r"<!--" is(comment) -> go-to(comment)
+  r"[(|)*,?+]" is(operator)
+  r"\"[^\"]*\"" is(literal.string.double)
+  r"\'[^\']*\'" is(literal.string.single)
+
+lex(element):
+  any-of(common)
+  r"EMPTY|ANY|\#PCDATA" is(keyword.constant)
+  r"[^>\s\|()?+*,]+" is(name.tag)
+  r">" is(keyword) -> pop
+
+lex(root):
+  any-of(common)
+  r"(<!ELEMENT)(\s+)(\S+)" is(by-groups(keyword, text, name.tag)) -> go-to(element)
+  r"(<!ATTLIST)(\s+)(\S+)" is(by-groups(keyword, text, name.tag)) -> go-to(attlist)
+  r"(<!ENTITY)(\s+)(\S+)" is(by-groups(keyword, text, name.entity)) -> go-to(entity)
+  r"(<!NOTATION)(\s+)(\S+)" is(by-groups(keyword, text, name.tag)) -> go-to(notation)
+  r"(<!\[)([^\[\s]+)(\s*)(\[)" is(by-groups(keyword, name.entity, text, keyword))
+  r"(<!DOCTYPE)(\s+)([^>\s]+)" is(by-groups(keyword, text, name.tag))
+  r"PUBLIC|SYSTEM" is(keyword.constant)
+  r"[\[\]>]" is(keyword)
+
+lex(attlist):
+  any-of(common)
+  r"CDATA|IDREFS|IDREF|ID|NMTOKENS|NMTOKEN|ENTITIES|ENTITY|NOTATION" is(keyword.constant)
+  r"\#REQUIRED|\#IMPLIED|\#FIXED" is(keyword.constant)
+  r"xml:space|xml:lang" is(keyword.reserved)
+  r"[^>\s\|()?+*,]+" is(name.attribute)
+  r">" is(keyword) -> pop
+

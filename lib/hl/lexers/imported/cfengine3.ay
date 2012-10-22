@@ -1,0 +1,49 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "CFEngine3"
+aliases: ["cfengine3", "cf3"]
+extensions: [".cf"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(arglist):
+  r"\)" is(punctuation) -> pop
+  r"," is(punctuation)
+  r"\w+" is(name.variable)
+  r"\s+" is(text)
+
+lex(root):
+  r"\#.*?\n" is(comment)
+  r"(body)(\s+)(\S+)(\s+)(control)" is(by-groups(keyword, text, keyword, text, keyword))
+  r"(body|bundle)(\s+)(\S+)(\s+)(\w+)(\()" is(by-groups(keyword, text, keyword, text, name.function, punctuation)) -> go-to(arglist)
+  r"(body|bundle)(\s+)(\S+)(\s+)(\w+)" is(by-groups(keyword, text, keyword, text, name.function))
+  r"(\")([^\"]+)(\")(\s+)(string|slist|int|real)(\s*)(=>)(\s*)" is(by-groups(punctuation, name.variable, punctuation, text, keyword.type, text, operator, text))
+  r"(\S+)(\s*)(=>)(\s*)" is(by-groups(keyword.reserved, text, operator, text))
+  r"\"" is(literal.string) -> go-to(string)
+  r"(\w+)(\()" is(by-groups(name.function, punctuation))
+  r"([\w.!&|\(\)]+)(::)" is(by-groups(name.class, punctuation))
+  r"(\w+)(:)" is(by-groups(keyword.declaration, punctuation))
+  r"@[\{\(][^\)\}]+[\}\)]" is(name.variable)
+  r"[(){},;]" is(punctuation)
+  r"=>" is(operator)
+  r"->" is(operator)
+  r"\d+\.\d+" is(literal.number.float)
+  r"\d+" is(literal.number.integer)
+  r"\w+" is(name.function)
+  r"\s+" is(text)
+
+lex(string):
+  r"\$[\{\(]" is(literal.string.interpol) -> go-to(interpol)
+  r"\\." is(literal.string.escape)
+  r"\"" is(literal.string) -> pop
+  r"\n" is(literal.string)
+  r"." is(literal.string)
+
+lex(interpol):
+  r"\$[\{\(]" is(literal.string.interpol) -> push
+  r"[\}\)]" is(literal.string.interpol) -> pop
+  r"[^\$\{\(\)\}]+" is(literal.string.interpol)
+

@@ -1,0 +1,60 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "FSharp"
+aliases: ["fsharp"]
+extensions: [".fs", ".fsi"]
+mimetypes: ["text/x-fsharp"]
+start: .root
+flags: 0
+
+lex(comment):
+  r"[^(*)]+" is(comment)
+  r"\(\*" is(comment) -> push
+  r"\*\)" is(comment) -> pop
+  r"[(*)]" is(comment)
+
+lex(root):
+  r"\s+" is(text)
+  r"false|true|\(\)|\[\]" is(name.builtin.pseudo)
+  r"\b([A-Z][A-Za-z0-9_\']*)(?=\s*\.)" is(name.namespace) -> go-to(dotted)
+  r"\b([A-Z][A-Za-z0-9_\']*)" is(name.class)
+  r"//.*?\n" is(comment.single)
+  r"\(\*(?!\))" is(comment) -> go-to(comment)
+  r"\b(abstract|and|as|assert|base|begin|class|default|delegate|do|do!|done|downcast|downto|elif|else|end|exception|extern|false|finally|for|fun|function|global|if|in|inherit|inline|interface|internal|lazy|let|let!|match|member|module|mutable|namespace|new|null|of|open|or|override|private|public|rec|return|return!|sig|static|struct|then|to|true|try|type|upcast|use|use!|val|void|when|while|with|yield|yield!)\b" is(keyword)
+  r"(!=|\#|&&|&|\(|\)|\*|\+|,|-\.|->|-|\.\.|\.|::|:=|:>|:|;;|;|<-|<|>]|>|\?\?|\?|\[<|\[>|\[\||\[|]|_|`|{|\|\]|\||}|\126|<@|=|@>)" is(operator)
+  r"([=<>@^|&+\*/$%-]|[!?\126])?[!$%&*+\./:<=>?@^|\126-]" is(operator)
+  r"\b(and|asr|land|lor|lsl|lxor|mod|not|or)\b" is(operator.word)
+  r"\b(unit|int|float|bool|string|char|list|array|byte|sbyte|int16|uint16|uint32|int64|uint64nativeint|unativeint|decimal|void|float32|single|double)\b" is(keyword.type)
+  r"\#[ \t]*(if|endif|else|line|nowarn|light)\b.*?\n" is(comment.preproc)
+  r"[^\W\d][\w']*" is(name)
+  r"\d[\d_]*" is(literal.number.integer)
+  r"0[xX][\da-fA-F][\da-fA-F_]*" is(literal.number.hex)
+  r"0[oO][0-7][0-7_]*" is(literal.number.oct)
+  r"0[bB][01][01_]*" is(literal.number.binary)
+  r"-?\d[\d_]*(.[\d_]*)?([eE][+\-]?\d[\d_]*)" is(literal.number.float)
+  r"'(?:(\\[\\\\"'ntbr ])|(\\[0-9]{3})|(\\x[0-9a-fA-F]{2}))'" is(literal.string.char)
+  r"'.'" is(literal.string.char)
+  r"'" is(keyword)
+  r"\"" is(literal.string.double) -> go-to(string)
+  r"[\126?][a-z][\w\']*:" is(name.variable)
+
+lex(string):
+  r"[^\\\"]+" is(literal.string.double)
+  any-of(escape-sequence)
+  r"\\\n" is(literal.string.double)
+  r"\"" is(literal.string.double) -> pop
+
+lex(escape-sequence):
+  r"\\[\\\\"\'ntbr]" is(literal.string.escape)
+  r"\\[0-9]{3}" is(literal.string.escape)
+  r"\\x[0-9a-fA-F]{2}" is(literal.string.escape)
+
+lex(dotted):
+  r"\s+" is(text)
+  r"\." is(punctuation)
+  r"[A-Z][A-Za-z0-9_\']*(?=\s*\.)" is(name.namespace)
+  r"[A-Z][A-Za-z0-9_\']*" is(name.class) -> pop
+  r"[a-z_][A-Za-z0-9_\']*" is(name) -> pop
+

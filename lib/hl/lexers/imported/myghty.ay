@@ -1,0 +1,23 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Myghty"
+aliases: ["myghty"]
+extensions: [".myt", "autodelegate"]
+mimetypes: ["application/x-myghty"]
+start: .root
+flags: 0
+
+lex(root):
+  r"\s+" is(text)
+  r"(<%(?:def|method))(\s*)(.*?)(>)(.*?)(</%\2\s*>)(?s)" is(by-groups(name.tag, text, name.function, name.tag, using(self class), name.tag))
+  r"(<%\w+)(.*?)(>)(.*?)(</%\2\s*>)(?s)" is(by-groups(name.tag, name.function, name.tag, using(Python), name.tag))
+  r"(<&[^|])(.*?)(,.*?)?(&>)" is(by-groups(name.tag, name.function, using(Python), name.tag))
+  r"(<&\|)(.*?)(,.*?)?(&>)(?s)" is(by-groups(name.tag, name.function, using(Python), name.tag))
+  r"</&>" is(name.tag)
+  r"(<%!?)(.*?)(%>)(?s)" is(by-groups(name.tag, using(Python), name.tag))
+  r"(?<=^)\#[^\n]*(\n|\Z)" is(comment)
+  r"(?<=^)(%)([^\n]*)(\n|\Z)" is(by-groups(name.tag, using(Python), other))
+  r"(?sx)\10                 (.+?)               \# anything, followed by:\10                 (?:\10                  (?<=\n)(?=[%\#]) |  \# an eval or comment line\10                  (?=</?[%&]) |      \# a substitution or block or\10                                     \# call start or end\10                                     \# - don't consume\10                  (\\\n) |           \# an escaped newline\10                  \Z                 \# end of string\10                 )" is(by-groups(other, operator))
+

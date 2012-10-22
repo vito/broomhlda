@@ -1,0 +1,36 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Base Makefile"
+aliases: ["basemake"]
+extensions: []
+mimetypes: []
+start: .root
+flags: 0
+
+lex(export):
+  r"[a-zA-Z0-9_${}-]+" is(name.variable)
+  r"\n" is(text) -> pop
+  r"\s+" is(text)
+
+lex(root):
+  r"^(?:[\t ]+.*\n|\n)+" is(using(Bash))
+  r"\$\((?:.*\\\n|.*\n)+" is(using(Bash))
+  r"\s+" is(text)
+  r"\#.*?\n" is(comment)
+  r"(export)(\s+)(?=[a-zA-Z0-9_${}\t -]+\n)" is(by-groups(keyword, text)) -> go-to(export)
+  r"export\s+" is(keyword)
+  r"([a-zA-Z0-9_${}.-]+)(\s*)([!?:+]?=)([ \t]*)((?:.*\\\n|.*\n)+)" is(by-groups(name.variable, text, operator, text, using(Bash)))
+  r"(?s)\"(\\\\|\\.|[^\"\\])*\"" is(literal.string.double)
+  r"(?s)'(\\\\|\\.|[^'\\])*'" is(literal.string.single)
+  r"([^\n:]+)(:+)([ \t]*)" is(by-groups(name.function, operator, text)) -> go-to(block-header)
+
+lex(block-header):
+  r"[^,\\\n\#]+" is(literal.number)
+  r"," is(punctuation)
+  r"\#.*?\n" is(comment)
+  r"\\\n" is(text)
+  r"\\." is(text)
+  r"(?:[\t ]+.*\n|\n)+" is(using(Bash)) -> pop
+

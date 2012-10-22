@@ -1,0 +1,53 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Elixir"
+aliases: ["elixir", "ex", "exs"]
+extensions: [".ex", ".exs"]
+mimetypes: ["text/x-elixir"]
+start: .root
+flags: 0
+
+lex(interpoling-symbol):
+  r"\"" is(literal.string.symbol) -> pop
+  any-of(interpoling)
+  r"[^\#\"]+" is(literal.string.symbol)
+
+lex(interpoling-string):
+  r"}" is(literal.string.interpol) -> pop
+  any-of(root)
+
+lex(dqs):
+  r"\"" is(literal.string.double) -> pop
+  any-of(interpoling)
+  r"[^\#\"]+" is(literal.string.double)
+
+lex(interpoling):
+  r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
+
+lex(root):
+  r"\s+" is(text)
+  r"\#.*$" is(comment.single)
+  r"\b(case|end|bc|lc|if|unless|try|loop|receive|fn|defmodule|defp|def|defprotocol|defimpl|defrecord|defmacro|defdelegate|defexception|exit|raise|throw)\b(?![?!])|(?<!\.)\b(do|\-\>)\b\s*" is(keyword)
+  r"\b(import|require|use|recur|quote|unquote|super)\b(?![?!])" is(keyword.namespace)
+  r"(?<!\.)\b(and|not|or|when|xor|in)\b" is(operator.word)
+  r"%=|\*=|\*\*=|\+=|\-=|\^=|\|\|=|<=>|<(?!<|=)|>(?!<|=|>)|<=|>=|===|==|=\126|!=|!\126|(?=[ \t])\?|(?<=[ \t])!+|&&|\|\||\^|\*|\+|\-|/|\||\+\+|\-\-|\*\*|\/\/|\<\-|\<\>|<<|>>|=|\." is(operator)
+  r"(?<!:)(:)([a-zA-Z_]\w*([?!]|=(?![>=]))?|\<\>|===?|>=?|<=?|<=>|&&?|%\(\)|%\[\]|%\{\}|\+\+?|\-\-?|\|\|?|\!|//|[%&`/\|]|\*\*?|=?\126|<\-)|([a-zA-Z_]\w*([?!])?)(:)(?!:)" is(literal.string.symbol)
+  r":\"" is(literal.string.symbol) -> go-to(interpoling-symbol)
+  r"\b(nil|true|false)\b(?![?!])" is(name.constant)
+  r"\b[A-Z]\w*\b" is(name.constant)
+  r"\b(__(FILE|LINE|MODULE|STOP_ITERATOR|EXCEPTION|OP|REF|FUNCTION|BLOCK|KVBLOCK)__)\b(?![?!])" is(name.builtin.pseudo)
+  r"[a-zA-Z_!]\w*[!\?]?" is(name)
+  r"[(){};,/\|:\\\[\]]" is(punctuation)
+  r"@[a-zA-Z_]\w*|&\d" is(name.variable)
+  r"\b(0[xX][0-9A-Fa-f]+|\d(_?\d)*(\.(?![^\d\s])(_?\d)*)?([eE][-+]?\d(_?\d)*)?|0[bB][01]+)\b" is(literal.number)
+  any-of(strings)
+
+lex(strings):
+  r"\"\"\"(?:.|\n)*?\"\"\"" is(literal.string.doc)
+  r"'''(?:.|\n)*?'''" is(literal.string.doc)
+  r"\"" is(literal.string.double) -> go-to(dqs)
+  r"'.*'" is(literal.string.single)
+  r"(?<!\w)\?(\\(x\d{1,2}|\h{1,2}(?!\h)\b|0[0-7]{0,2}(?![0-7])\b|[^x0MC])|(\\[MC]-)+\w|[^\s\\])" is(literal.string.other)
+

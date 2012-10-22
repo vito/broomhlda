@@ -1,0 +1,53 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Fancy"
+aliases: ["fancy", "fy"]
+extensions: [".fy", ".fancypack"]
+mimetypes: ["text/x-fancysrc"]
+start: .root
+flags: 0
+
+lex(root):
+  r"\s+" is(text)
+  r"s{(\\\\|\\}|[^}])*}\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s<(\\\\|\\>|[^>])*>\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s\[(\\\\|\\\]|[^\]])*\]\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"s\((\\\\|\\\)|[^\)])*\)\s*" is(literal.string.regex) -> go-to(balanced-regex)
+  r"m?/(\\\\|\\/|[^/\n])*/[gcimosx]*" is(literal.string.regex)
+  r"m(?=[/!\\{<\[\(@%\$])" is(literal.string.regex) -> go-to(balanced-regex)
+  r"\#(.*?)\n" is(comment.single)
+  r"\'([^\'\s\[\]\(\)\{\}]+|\[\])" is(literal.string.symbol)
+  r"\"\"\"(\\\\|\\\"|[^\"])*\"\"\"" is(literal.string)
+  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
+  r"(def|class|try|catch|finally|retry|return|return_local|match|case|->|=>)\b" is(keyword)
+  r"(self|super|nil|false|true)\b" is(name.constant)
+  r"[(){};,/?\|:\\]" is(punctuation)
+  r"(Object|Array|Hash|Directory|File|Class|String|Number|Enumerable|FancyEnumerable|Block|TrueClass|NilClass|FalseClass|Tuple|Symbol|Stack|Set|FancySpec|Method|Package|Range)\b" is(name.builtin)
+  r"[a-zA-Z]([a-zA-Z0-9_]|[-+?!=*/^><%])*:" is(name.function)
+  r"[-+*/\126,<>=&!?%^\[\]\.$]+" is(operator)
+  r"[A-Z][a-zA-Z0-9_]*" is(name.constant)
+  r"@[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable.instance)
+  r"@@[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable.class)
+  r"@@?" is(operator)
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
+  r"(0[oO]?[0-7]+(?:_[0-7]+)*)(\s*)([/?])?" is(by-groups(literal.number.oct, text, operator))
+  r"(0[xX][0-9A-Fa-f]+(?:_[0-9A-Fa-f]+)*)(\s*)([/?])?" is(by-groups(literal.number.hex, text, operator))
+  r"(0[bB][01]+(?:_[01]+)*)(\s*)([/?])?" is(by-groups(literal.number.bin, text, operator))
+  r"([\d]+(?:_\d+)*)(\s*)([/?])?" is(by-groups(literal.number.integer, text, operator))
+  r"\d+([eE][+-]?[0-9]+)|\d+\.\d+([eE][+-]?[0-9]+)?" is(literal.number.float)
+  r"\d+" is(literal.number.integer)
+
+lex(balanced-regex):
+  r"/(\\\\|\\/|[^/])*/[egimosx]*" is(literal.string.regex) -> pop
+  r"!(\\\\|\\!|[^!])*![egimosx]*" is(literal.string.regex) -> pop
+  r"\\(\\\\|[^\\])*\\[egimosx]*" is(literal.string.regex) -> pop
+  r"{(\\\\|\\}|[^}])*}[egimosx]*" is(literal.string.regex) -> pop
+  r"<(\\\\|\\>|[^>])*>[egimosx]*" is(literal.string.regex) -> pop
+  r"\[(\\\\|\\\]|[^\]])*\][egimosx]*" is(literal.string.regex) -> pop
+  r"\((\\\\|\\\)|[^\)])*\)[egimosx]*" is(literal.string.regex) -> pop
+  r"@(\\\\|\\\@|[^\@])*@[egimosx]*" is(literal.string.regex) -> pop
+  r"%(\\\\|\\\%|[^\%])*%[egimosx]*" is(literal.string.regex) -> pop
+  r"\$(\\\\|\\\$|[^\$])*\$[egimosx]*" is(literal.string.regex) -> pop
+

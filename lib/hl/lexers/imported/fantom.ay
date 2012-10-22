@@ -1,0 +1,148 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Fantom"
+aliases: ["fan"]
+extensions: [".fan"]
+mimetypes: ["application/x-fantom"]
+start: .root
+flags: 0
+
+lex(inheritance):
+  r"\s+" is(text)
+  r":|," is(punctuation)
+  r"(?:(\w+)(::))?(\w+)" is(by-groups(name.namespace, punctuation, name.class))
+  r"{" is(punctuation) -> pop
+
+lex(facet):
+  r"\s+" is(text)
+  r"{" is(punctuation) -> go-to(facetFields)
+  r"" is(text) -> pop
+
+lex(insideUri):
+  r"\\\\" is(literal.string.escape)
+  r"\\\"" is(literal.string.escape)
+  r"\\`" is(literal.string.escape)
+  r"\$\w+" is(literal.string.interpol)
+  r"\${.*?}" is(literal.string.interpol)
+  r"`" is(punctuation) -> pop
+  r"." is(literal.string.backtick)
+
+lex(literals):
+  r"\b-?[\d_]+(ns|ms|sec|min|hr|day)" is(literal.number)
+  r"\b-?[\d_]*\.[\d_]+(ns|ms|sec|min|hr|day)" is(literal.number)
+  r"\b-?(\d+)?\.\d+(f|F|d|D)?" is(literal.number.float)
+  r"\b-?0x[0-9a-fA-F_]+" is(literal.number.hex)
+  r"\b-?[\d_]+" is(literal.number.integer)
+  r"'\\.'|'[^\\]'|'\\u[0-9a-f]{4}'" is(literal.string.char)
+  r"\"" is(punctuation) -> go-to(insideStr)
+  r"`" is(punctuation) -> go-to(insideUri)
+  r"\b(true|false|null)\b" is(keyword.constant)
+  r"(?:(\w+)(::))?(\w+)(<\|)(.*?)(\|>)" is(by-groups(name.namespace, punctuation, name.class, punctuation, literal.string, punctuation))
+  r"(?:(\w+)(::))?(\w+)?(\#)(\w+)?" is(by-groups(name.namespace, punctuation, name.class, punctuation, name.function))
+  r"\[,\]" is(literal)
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\[,\])" is(by-groups(using(self class), literal))
+  r"\[:\]" is(literal)
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\[:\])" is(by-groups(using(self class), literal))
+
+lex(methodKeywords):
+  r"\b(abstract|native|once|override|static|virtual|final)\b" is(keyword)
+
+lex(using):
+  r"[ \t]+" is(text)
+  r"(\[)(\w+)(\])" is(by-groups(punctuation, comment.special, punctuation))
+  r"(\\")?([\w\.]+)(\\")?" is(by-groups(punctuation, name.namespace, punctuation))
+  r"::" is(punctuation) -> go-to(usingClass)
+  r"" is(text) -> pop
+
+lex(protectionKeywords):
+  r"\b(public|protected|private|internal)\b" is(keyword)
+
+lex(insideStr):
+  r"\\\\" is(literal.string.escape)
+  r"\\\"" is(literal.string.escape)
+  r"\\`" is(literal.string.escape)
+  r"\$\w+" is(literal.string.interpol)
+  r"\${.*?}" is(literal.string.interpol)
+  r"\"" is(punctuation) -> pop
+  r"." is(literal.string)
+
+lex(operators):
+  r"\+\+|\-\-|\+|\-|\*|/|\|\||&&|<=>|<=|<|>=|>|=|!|\[|\]" is(operator)
+
+lex(inType):
+  r"[\[\]\|\->:\?]" is(punctuation)
+  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class)
+  r"" is(text) -> pop
+
+lex(facetFields):
+  any-of(comments)
+  any-of(literals)
+  any-of(operators)
+  r"\s+" is(text)
+  r"(\s*)(\w+)(\s*)(=)" is(by-groups(text, name, text, operator))
+  r"}" is(punctuation) -> pop
+  r"." is(text)
+
+lex(comments):
+  r"(?s)/\*.*?\*/" is(comment.multiline)
+  r"//.*?\n" is(comment.single)
+  r"\*\*.*?\n" is(comment.special)
+  r"\#.*\n" is(comment.single)
+
+lex(insideMethodDeclArgs):
+  r"\)" is(punctuation) -> pop
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\))" is(by-groups(using(self class), text, name.variable, text, punctuation)) -> pop
+  any-of(root)
+
+lex(usingClass):
+  r"[ \t]+" is(text)
+  r"(as)(\s+)(\w+)" is(by-groups(keyword.declaration, text, name.class)) -> pop(2)
+  r"[\w\$]+" is(name.class)
+  r"" is(text) -> pop(2)
+
+lex(typeKeywords):
+  r"\b(abstract|final|const|native|facet|enum)\b" is(keyword)
+
+lex(insideBrace):
+  r"\}" is(punctuation) -> pop
+  any-of(root)
+
+lex(otherKeywords):
+  r"\b(try|catch|throw|finally|for|if|else|while|as|is|isnot|switch|case|default|continue|break|do|return|get|set)\b" is(keyword)
+  r"\b(it|this|super)\b" is(name.builtin.pseudo)
+
+lex(fieldKeywords):
+  r"\b(abstract|const|final|native|override|static|virtual|readonly)\b" is(keyword)
+
+lex(insideParen):
+  r"\)" is(punctuation) -> pop
+  any-of(root)
+
+lex(root):
+  any-of(comments)
+  any-of(protectionKeywords)
+  any-of(typeKeywords)
+  any-of(methodKeywords)
+  any-of(fieldKeywords)
+  any-of(literals)
+  any-of(otherKeywords)
+  any-of(operators)
+  r"using\b" is(keyword.namespace) -> go-to(using)
+  r"@\w+" is(name.decorator) -> go-to(facet)
+  r"(class|mixin)(\s+)(\w+)" is(by-groups(keyword, text, name.class)) -> go-to(inheritance)
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)([ \t]+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(:=)" is(by-groups(using(self class), text, name.variable, text, operator))
+  r"([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(:=)" is(by-groups(name.variable, text, operator))
+  r"(\.|(?:\->))([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\()" is(by-groups(operator, name.function, text, punctuation)) -> go-to(insideParen)
+  r"(\.|(?:\->))([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(operator, name.function))
+  r"(new)(\s+)(make\w*)(\s*)(\()" is(by-groups(keyword, text, name.function, text, punctuation)) -> go-to(insideMethodDeclArgs)
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)([ \t]+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\()" is(by-groups(using(self class), text, name.function, text, punctuation)) -> go-to(insideMethodDeclArgs)
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(,)" is(by-groups(using(self class), text, name.variable, text, punctuation))
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\->)(\s*)((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\|)" is(by-groups(using(self class), text, name.variable, text, punctuation, text, using(self class), punctuation))
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)(\s+)([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\|)" is(by-groups(using(self class), text, name.variable, text, punctuation))
+  r"((?:\[|[a-zA-Z_]|\|)[:\w\[\]\|\->\?]*?)([ \t]+)([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(using(self class), text, name.variable))
+  r"\(" is(punctuation) -> go-to(insideParen)
+  r"\{" is(punctuation) -> go-to(insideBrace)
+  r"." is(text)
+
