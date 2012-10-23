@@ -44,7 +44,7 @@ try-all(matchers) = do:
         break
 
   unless(closest):
-    error(NoMatchFor new(@input))
+    condition error(NoMatchFor new(@input))
 
   skipped = closest pre-match
   @input = closest post-match
