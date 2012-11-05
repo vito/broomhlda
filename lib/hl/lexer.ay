@@ -1,11 +1,9 @@
 use("atomy")
 
-condition = require("condition")
-
 token = require(File expand-path("../token", _FILE))
 
 
-NoMatchFor = condition Error class:
+NoMatchFor = Error class:
   initialize(@input) := .ok
 
   message :=
@@ -44,7 +42,7 @@ try-all(matchers) = do:
         break
 
   unless(closest):
-    condition error(NoMatchFor new(@input))
+    /error(NoMatchFor new(@input))
 
   skipped = closest pre-match
   @input = closest post-match
