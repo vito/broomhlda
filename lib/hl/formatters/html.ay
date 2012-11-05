@@ -9,15 +9,15 @@ Formatter = class:
 
   format(builder = Nokogiri XML Builder new) := do:
     builder
-      div(#{ class: "highlight" }) [d]:
+      div(#{ .class: "highlight" }) [d]:
         d pre [p]:
           format-tokens(p)
       
-    builder doc children first serialize(#{ save-with: 0 })
+    builder doc children first serialize(#{ .save-with: 0 })
 
   format-tokens(to) := do:
     @tokens each [t]:
-      to span(#{ class: t type tag }) [s]:
+      to span(#{ .class: t type tag }) [s]:
         s text(t contents)
 
     to
