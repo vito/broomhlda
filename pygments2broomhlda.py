@@ -47,6 +47,9 @@ def rr(x):
 
         sane += c
 
+    # replace (?s) with (?m)
+    sane = re.sub(r"\(\?([a-z]*)s([a-z]*)\)", r"(?\1m\2)", sane)
+
     return rq(sane)
 
 def rq(x):
