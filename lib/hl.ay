@@ -5,7 +5,13 @@ here = File expand-path("../", _FILE)
 $path unshift(here)
 
 load(lexer) :=
-  require(
-    File expand-path(
-      "../hl/lexers/" + lexer downcase
-      _FILE)) Lexer
+  {
+    require(
+      File expand-path(
+        "../hl/lexers/" + lexer downcase
+        _FILE)) Lexer
+  } rescue:
+    LoadError: require(
+      File expand-path(
+        "../hl/lexers/imported/" + lexer downcase
+        _FILE)) Lexer
