@@ -3,6 +3,8 @@ import pygments.lexers
 import re
 import types
 
+from pygments.lexer import inherit
+
 def dq(x):
     if isinstance(x, str) or isinstance(x, unicode):
         return '"%s"' % "".join([esc(y) for y in x])
@@ -91,6 +93,10 @@ def convertible(states):
         for tok in toks:
             if isinstance(tok, str):
                 continue
+
+            if tok == inherit:
+                print("cannot handle inherit")
+                return False
 
             if not token_convertible(tok[1]):
                 print("token not convertible: %s" % tok[1])
