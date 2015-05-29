@@ -23,7 +23,8 @@ lex(root):
 
 lex(simplevalue):
   r"(true|false|null)\b" is(keyword.constant)
-  r"-?[0-9]+" is(literal.number.integer)
+  r"-?(0|[1-9]\d*)(\.\d+[eE](\+|-)?\d+|[eE](\+|-)?\d+|\.\d+)" is(literal.number.float)
+  r"-?(0|[1-9]\d*)" is(literal.number.integer)
   r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
 
 lex(value):

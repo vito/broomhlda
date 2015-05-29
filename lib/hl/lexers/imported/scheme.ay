@@ -4,7 +4,7 @@ use("hl/define")
 Lexer = lexer:
 name: "Scheme"
 aliases: ["scheme", "scm"]
-extensions: [".scm", ".ss", ".rkt"]
+extensions: [".scm", ".ss"]
 mimetypes: ["text/x-scheme", "application/x-scheme"]
 start: .root
 flags: 0
@@ -26,4 +26,5 @@ lex(root):
   r"(?<=\()[a-zA-Z0-9!$%&*+,/:<=>?@^_\126|-]+" is(name.function)
   r"[a-zA-Z0-9!$%&*+,/:<=>?@^_\126|-]+" is(name.variable)
   r"(\(|\))" is(punctuation)
+  r"(\[|\])" is(punctuation)
 

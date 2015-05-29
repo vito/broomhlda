@@ -4,30 +4,47 @@ use("hl/define")
 Lexer = lexer:
 name: "Dylan"
 aliases: ["dylan"]
-extensions: [".dylan", ".dyl"]
+extensions: [".dylan", ".dyl", ".intr"]
 mimetypes: ["text/x-dylan"]
 start: .root
-flags: Regexp MULTILINE
+flags: Regexp IGNORECASE
 
-lex(root):
-  r"\b(subclass|abstract|block|c(on(crete|stant)|lass)|domain|ex(c(eption|lude)|port)|f(unction(al)?)|generic|handler|i(n(herited|line|stance|terface)|mport)|library|m(acro|ethod)|open|primary|sealed|si(deways|ngleton)|slot|v(ariable|irtual))\b" is(name.builtin)
-  r"<\w+>" is(keyword.type)
+lex(comment):
+  r"[^*/]" is(comment.multiline)
+  r"/\*" is(comment.multiline) -> push
+  r"\*/" is(comment.multiline) -> pop
+  r"[*/]" is(comment.multiline)
+
+lex(code):
+  r"\s+" is(text)
   r"//.*?\n" is(comment.single)
-  r"/\*[\w\W]*?\*/" is(comment.multiline)
+  r"/\*" is(comment.multiline) -> go-to(comment)
   r"\"" is(literal.string) -> go-to(string)
   r"'(\\.|\\[0-7]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\'\n])'" is(literal.string.char)
-  r"=>|\b(a(bove|fterwards)|b(e(gin|low)|y)|c(ase|leanup|reate)|define|else(if)?|end|f(inally|or|rom)|i[fn]|l(et|ocal)|otherwise|rename|s(elect|ignal)|t(hen|o)|u(n(less|til)|se)|wh(en|ile))\b" is(keyword)
-  r"([ \t])([!\$%&\*\/:<=>\?\126_^a-zA-Z0-9.+\-]*:)" is(by-groups(text, name.variable))
-  r"([ \t]*)(\S+[^:])([ \t]*)(\()([ \t]*)" is(by-groups(text, name.function, text, punctuation, text))
-  r"-?[0-9.]+" is(literal.number)
-  r"[(),;]" is(punctuation)
-  r"\$[a-zA-Z0-9-]+" is(name.constant)
-  r"[!$%&*/:<>=?\126^.+\[\]{}-]+" is(operator)
-  r"\s+" is(text)
-  r"\#\"[a-zA-Z0-9-]+\"" is(keyword)
+  r"\#[bB][01]+" is(literal.number)
+  r"\#[oO][0-7]+" is(literal.number.oct)
+  r"[-+]?(\d*\.\d+(e[-+]?\d+)?|\d+(\.\d*)?e[-+]?\d+)" is(literal.number.float)
+  r"[-+]?\d+" is(literal.number.integer)
+  r"\#[xX][0-9a-fA-F]+" is(literal.number.hex)
+  r"(\?\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+)(:)(token|name|variable|expression|body|case-body|\*)" is(by-groups(name.tag, operator, name.builtin))
+  r"(\?)(:)(token|name|variable|expression|body|case-body|\*)" is(by-groups(name.tag, operator, name.builtin))
+  r"\?\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+" is(name.tag)
+  r"(=>|::|\#\(|\#\[|\#\#|\?|\?\?|\?=|[(){}\[\],\.;])" is(punctuation)
+  r":=" is(operator)
+  r"\#[tf]" is(literal)
+  r"\#\"" is(literal.string.symbol) -> go-to(keyword)
   r"\#[a-zA-Z0-9-]+" is(keyword)
-  r"\#(\(|\[)" is(punctuation)
-  r"[a-zA-Z0-9-_]+" is(name.variable)
+  r"\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+:" is(keyword)
+  r"<\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+>" is(name.class)
+  r"\*\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+\*" is(name.variable.global)
+  r"\$\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+" is(name.constant)
+  r"\\?[a-zA-Z0-9\!\&\*\<\>\|\^\$\%\@\_\-\+\\126\?\/\=]+" is(name)
+
+lex(root):
+  r"\s+" is(text)
+  r"//.*?\n" is(comment.single)
+  r"([A-Za-z0-9-]+)(:)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, operator, text, literal.string))
+  r"" is(text) -> go-to(code)
 
 lex(string):
   r"\"" is(literal.string) -> pop
@@ -35,4 +52,8 @@ lex(string):
   r"[^\\\"\n]+" is(literal.string)
   r"\\\n" is(literal.string)
   r"\\" is(literal.string)
+
+lex(keyword):
+  r"\"" is(literal.string.symbol) -> pop
+  r"[^\\\"]+" is(literal.string.symbol)
 

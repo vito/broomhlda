@@ -1,0 +1,24 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "reg"
+aliases: ["registry"]
+extensions: [".reg"]
+mimetypes: ["text/x-windows-registry"]
+start: .root
+flags: 0
+
+lex(root):
+  r"Windows Registry Editor.*" is(text)
+  r"\s+" is(text)
+  r"[;\#].*" is(comment.single)
+  r"(\[)(-?)(HKEY_[A-Z_]+)(.*?\])$" is(by-groups(keyword, operator, name.builtin, keyword))
+  r"(\"(?:\\\"|\\\\|[^\"])+\")([ \t]*)(=)([ \t]*)" is(by-groups(name.attribute, text, operator, text)) -> go-to(value)
+  r"(.*?)([ \t]*)(=)([ \t]*)" is(by-groups(name.attribute, text, operator, text)) -> go-to(value)
+
+lex(value):
+  r"-" is(operator) -> pop
+  r"(dword|hex(?:\([0-9a-fA-F]\))?)(:)([0-9a-fA-F,]+)" is(by-groups(name.variable, punctuation, literal.number)) -> pop
+  r".*" is(literal.string) -> pop
+

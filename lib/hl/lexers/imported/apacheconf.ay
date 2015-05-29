@@ -13,7 +13,7 @@ lex(root):
   r"\s+" is(text)
   r"(\#.*?)$" is(comment)
   r"(<[^\s>]+)(?:(\s+)(.*?))?(>)" is(by-groups(name.tag, text, literal.string, name.tag))
-  r"([a-zA-Z][a-zA-Z0-9]*)(\s+)" is(by-groups(name.builtin, text)) -> go-to(value)
+  r"([a-zA-Z][a-zA-Z0-9_]*)(\s+)" is(by-groups(name.builtin, text)) -> go-to(value)
   r"\.+" is(text)
 
 lex(value):

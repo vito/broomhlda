@@ -24,7 +24,7 @@ lex(html-content):
   r"</" is(literal.string.single) -> do-all(pop, go-to(html-end-tag))
   r"<" is(literal.string.single) -> go-to(html-open-tag)
   r"{" is(operator) -> go-to(root)
-  r".|\s+" is(literal.string.single)
+  r"[^<{]+" is(literal.string.single)
 
 lex(string):
   r"[^\\\"{]+" is(literal.string.double)
@@ -37,6 +37,7 @@ lex(html-attr-value):
   r"\"" is(literal.string.single) -> do-all(pop, go-to(string))
   r"\#(([a-zA-Z_]\w*)|(`[^`]*`))" is(literal.string.single) -> pop
   r"\#(?={)" is(literal.string.single) -> do-all(pop, go-to(root))
+  r"[^\"\'{`=<>]+" is(literal.string.single) -> pop
   r"{" is(operator) -> do-all(pop, go-to(root))
 
 lex(type-tuple):

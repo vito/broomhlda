@@ -52,15 +52,15 @@ lex(escape):
 
 lex(root):
   r"\s+" is(text)
-  r"--(?![!\#$%&*+./<=>?@\^|_\126]).*?$" is(comment.single)
+  r"--(?![!\#$%&*+./<=>?@\^|_\126:\\]).*?$" is(comment.single)
   r"{-" is(comment.multiline) -> go-to(comment)
   r"\bimport\b" is(keyword.reserved) -> go-to(import)
   r"\bmodule\b" is(keyword.reserved) -> go-to(module)
   r"\berror\b" is(name.exception)
   r"\b(case|class|data|default|deriving|do|else|if|in|infix[lr]?|instance|let|newtype|of|then|type|where|_)(?!\')\b" is(keyword.reserved)
   r"^[_a-z][\w\']*" is(name.function)
-  r"[_a-z][\w\']*" is(name)
-  r"[A-Z][\w\']*" is(keyword.type)
+  r"'?[_a-z][\w']*" is(name)
+  r"('')?[A-Z][\w\']*" is(keyword.type)
   r"\\(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(name.function)
   r"(<-|::|->|=>|=)(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(operator.word)
   r":[:!\#$%&*+.\\/<=>?@^|\126-]*" is(keyword.type)

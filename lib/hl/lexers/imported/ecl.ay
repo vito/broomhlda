@@ -32,7 +32,7 @@ lex(statements):
 lex(whitespace):
   r"\s+" is(text)
   r"\/\/.*" is(comment.single)
-  r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
+  r"/(\\\n)?\*(.|\n)*?\*(\\\n)?/" is(comment.multiline)
 
 lex(keywords):
   r"(APPLY|ASSERT|BUILD|BUILDINDEX|EVALUATE|FAIL|KEYDIFF|KEYPATCH|LOADXML|NOTHOR|NOTIFY|OUTPUT|PARALLEL|SEQUENTIAL|SOAPCALL|WAITCHECKPOINT|DEPRECATED|FAILCODE|FAILMESSAGE|FAILURE|GLOBAL|INDEPENDENT|ONWARNING|PERSIST|PRIORITY|RECOVERY|STORED|SUCCESS|WAIT|WHEN)\b" is(keyword.reserved)

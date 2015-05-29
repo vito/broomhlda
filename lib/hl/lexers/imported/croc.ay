@@ -1,0 +1,36 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Croc"
+aliases: ["croc"]
+extensions: [".croc"]
+mimetypes: ["text/x-crocsrc"]
+start: .root
+flags: 0
+
+lex(nestedcomment):
+  r"[^*/]+" is(comment.multiline)
+  r"/\*" is(comment.multiline) -> push
+  r"\*/" is(comment.multiline) -> pop
+  r"[*/]" is(comment.multiline)
+
+lex(root):
+  r"\n" is(text)
+  r"\s+" is(text)
+  r"//(.*?)\n" is(comment.single)
+  r"/\*" is(comment.multiline) -> go-to(nestedcomment)
+  r"(as|assert|break|case|catch|class|continue|default|do|else|finally|for|foreach|function|global|namespace|if|import|in|is|local|module|return|scope|super|switch|this|throw|try|vararg|while|with|yield)\b" is(keyword)
+  r"(false|true|null)\b" is(keyword.constant)
+  r"([0-9][0-9_]*)(?=[.eE])(\.[0-9][0-9_]*)?([eE][+\-]?[0-9_]+)?" is(literal.number.float)
+  r"0[bB][01][01_]*" is(literal.number)
+  r"0[xX][0-9a-fA-F][0-9a-fA-F_]*" is(literal.number.hex)
+  r"([0-9][0-9_]*)(?![.eE])" is(literal.number.integer)
+  r"'(\\['\"\\nrt]|\\x[0-9a-fA-F]{2}|\\[0-9]{1,3}|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|.)'" is(literal.string.char)
+  r"@\"(\"\"|[^\"])*\"" is(literal.string)
+  r"@`(``|[^`])*`" is(literal.string)
+  r"@'(''|[^'])*'" is(literal.string)
+  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
+  r"(\126=|\^=|%=|\*=|==|!=|>>>=|>>>|>>=|>>|>=|<=>|\?=|-\>|<<=|<<|<=|\+\+|\+=|--|-=|\|\||\|=|&&|&=|\.\.|/=)|[-/.&$@|\+<>!()\[\]{}?,;:=*%^\126\#\\]" is(punctuation)
+  r"[a-zA-Z_]\w*" is(name)
+

@@ -20,7 +20,7 @@ lex(body):
   r";.*$" is(comment.single)
   r"\#\|" is(comment.multiline) -> go-to(multiline-comment)
   r"\#\d*Y.*$" is(comment.special)
-  r"\"(\\.|[^\"\\])*\"" is(literal.string)
+  r"\"(\\.|\\\n|[^\"\\])*\"" is(literal.string)
   r":(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
   r"'(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
   r"'" is(operator)

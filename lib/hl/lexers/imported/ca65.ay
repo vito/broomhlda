@@ -1,0 +1,25 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "ca65"
+aliases: ["ca65"]
+extensions: [".s"]
+mimetypes: []
+start: .root
+flags: Regexp IGNORECASE
+
+lex(root):
+  r";.*" is(comment.single)
+  r"\s+" is(text)
+  r"[a-z_.@$][\w.@$]*:" is(name.label)
+  r"((ld|st)[axy]|(in|de)[cxy]|asl|lsr|ro[lr]|adc|sbc|cmp|cp[xy]|cl[cvdi]|se[cdi]|jmp|jsr|bne|beq|bpl|bmi|bvc|bvs|bcc|bcs|p[lh][ap]|rt[is]|brk|nop|ta[xy]|t[xy]a|txs|tsx|and|ora|eor|bit)\b" is(keyword)
+  r"\.[a-z0-9_]+" is(keyword.pseudo)
+  r"[-+\126*/^&|!<>=]" is(operator)
+  r"\"[^\"\n]*." is(literal.string)
+  r"'[^'\n]*." is(literal.string.char)
+  r"\$[0-9a-f]+|[0-9a-f]+h\b" is(literal.number.hex)
+  r"\d+|%[01]+" is(literal.number.integer)
+  r"[\#,.:()=]" is(punctuation)
+  r"[a-z_.@$][\w.@$]*" is(name)
+

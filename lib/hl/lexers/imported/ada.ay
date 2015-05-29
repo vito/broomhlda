@@ -42,7 +42,12 @@ lex(type-def):
   r"\(" is(punctuation) -> go-to(formal-part)
   r"with|and|use" is(keyword.reserved)
   r"array\b" is(keyword.reserved) -> do-all(pop, go-to(array-def))
-  r"record\b" is(keyword.reserved) -> go-to(formal-part)
+  r"record\b" is(keyword.reserved) -> go-to(record-def)
+  r"(null record)(;)" is(by-groups(keyword.reserved, punctuation)) -> pop
+  any-of(root)
+
+lex(record-def):
+  r"end record" is(keyword.reserved) -> pop
   any-of(root)
 
 lex(end):
@@ -80,7 +85,7 @@ lex(root):
   r"(end)(\s+)" is(by-groups(keyword.reserved, text)) -> go-to(end)
   r"(pragma)(\s+)([a-zA-Z0-9_]+)" is(by-groups(keyword.reserved, text, comment.preproc))
   r"(true|false|null)\b" is(keyword.constant)
-  r"(Byte|Character|Float|Integer|Long_Float|Long_Integer|Long_Long_Float|Long_Long_Integer|Natural|Positive|Short_Float|Short_Integer|Short_Short_Float|Short_Short_Integer|String|Wide_String|Duration)\b" is(keyword.type)
+  r"(Address|Byte|Boolean|Character|Controlled|Count|Cursor|Duration|File_Mode|File_Type|Float|Generator|Integer|Long_Float|Long_Integer|Long_Long_Float|Long_Long_Integer|Natural|Positive|Reference_Type|Short_Float|Short_Integer|Short_Short_Float|Short_Short_Integer|String|Wide_Character|Wide_String)\b" is(keyword.type)
   r"(and(\s+then)?|in|mod|not|or(\s+else)|rem)\b" is(operator.word)
   r"generic|private" is(keyword.declaration)
   r"package" is(keyword.declaration) -> go-to(package)

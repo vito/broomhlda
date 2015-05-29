@@ -86,7 +86,7 @@ lex(facetFields):
   r"." is(text)
 
 lex(comments):
-  r"/\*.*?\*/"(m) is(comment.multiline)
+  r"(?m)/\*.*?\*/" is(comment.multiline)
   r"//.*?\n" is(comment.single)
   r"\*\*.*?\n" is(comment.special)
   r"\#.*\n" is(comment.single)

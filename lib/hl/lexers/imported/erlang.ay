@@ -21,7 +21,7 @@ lex(root):
   r"<<" is(name.label)
   r">>" is(name.label)
   r"((?:[a-z][a-zA-Z0-9_]*|'[^\n']*[^\\]'))(:)" is(by-groups(name.namespace, punctuation))
-  r"^((?:[a-z][a-zA-Z0-9_]*|'[^\n']*[^\\]'))(\s*)(\()" is(by-groups(name.function, text, punctuation))
+  r"(?:^|(?<=:))((?:[a-z][a-zA-Z0-9_]*|'[^\n']*[^\\]'))(\s*)(\()" is(by-groups(name.function, text, punctuation))
   r"[+-]?(?:[2-9]|[12][0-9]|3[0-6])\#[0-9a-zA-Z]+" is(literal.number.integer)
   r"[+-]?\d+" is(literal.number.integer)
   r"[+-]?\d+.\d+" is(literal.number.float)

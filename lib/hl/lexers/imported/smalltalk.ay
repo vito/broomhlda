@@ -15,7 +15,7 @@ lex(objects):
   r"\b(self|super|true|false|nil|thisContext)\b" is(name.builtin.pseudo) -> go-to(afterobject)
   r"\b[A-Z]\w*(?!:)\b" is(name.class) -> go-to(afterobject)
   r"\b[a-z]\w*(?!:)\b" is(name.variable) -> go-to(afterobject)
-  r"\#(\"[^\"]*\"|[-+*/\\\126<>=|&!?,@%]+|[\w:]+)" is(literal.string.symbol) -> go-to(afterobject)
+  r"\#(\"(\"\"|[^\"])*\"|[-+*/\\\126<>=|&!?,@%]+|[\w:]+)" is(literal.string.symbol) -> go-to(afterobject)
   any-of(literals)
 
 lex(blockvariables):
@@ -28,7 +28,7 @@ lex(_parenth-helper):
   any-of(whitespaces)
   r"(\d+r)?-?\d+(\.\d+)?(e-?\d+)?" is(literal.number)
   r"[-+*/\\\126<>=|&\#!?,@%\w:]+" is(literal.string.symbol)
-  r"\'[^\']*\'" is(literal.string)
+  r"'(''|[^'])*'" is(literal.string)
   r"\$." is(literal.string.char)
   r"\#*\(" is(literal.string.symbol) -> go-to(inner-parenth)
 
@@ -47,7 +47,7 @@ lex(afterobject):
   r"[\[({]" is(text) -> pop
 
 lex(literals):
-  r"\'[^\']*\'" is(literal.string) -> go-to(afterobject)
+  r"'(''|[^'])*'" is(literal.string) -> go-to(afterobject)
   r"\$." is(literal.string.char) -> go-to(afterobject)
   r"\#\(" is(literal.string.symbol) -> go-to(parenth)
   r"\)" is(text) -> go-to(afterobject)
@@ -68,13 +68,13 @@ lex(inner-parenth):
 
 lex(whitespaces):
   r"\s+" is(text)
-  r"\"[^\"]*\"" is(comment)
+  r"\"(\"\"|[^\"])*\"" is(comment)
 
 lex(squeak-fileout):
-  r"^\"[^\"]*\"!" is(keyword)
-  r"^'[^']*'!" is(keyword)
+  r"^\"(\"\"|[^\"])*\"!" is(keyword)
+  r"^'(''|[^'])*'!" is(keyword)
   r"^(!)(\w+)( commentStamp: )(.*?)( prior: .*?!\n)(.*?)(!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword, text, keyword))
-  r"^(!)(\w+(?: class)?)( methodsFor: )(\'[^\']*\')(.*?!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword))
+  r"^(!)(\w+(?: class)?)( methodsFor: )('(?:''|[^'])*')(.*?!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword))
   r"^(\w+)( subclass: )(\#\w+)(\s+instanceVariableNames: )(.*?)(\s+classVariableNames: )(.*?)(\s+poolDictionaries: )(.*?)(\s+category: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string.symbol, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword))
   r"^(\w+(?: class)?)(\s+instanceVariableNames: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string, keyword))
   r"(!\n)(\].*)(! !)$" is(by-groups(keyword, text, keyword))

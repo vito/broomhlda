@@ -1,0 +1,30 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "BUGS"
+aliases: ["bugs", "winbugs", "openbugs"]
+extensions: [".bug"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  any-of(comments)
+  any-of(whitespace)
+  r"(model)(\s+)({)" is(by-groups(keyword.namespace, text, punctuation))
+  r"(for|in)(?![0-9a-zA-Z\._])" is(keyword.reserved)
+  r"(abs|arccos|arccosh|arcsin|arcsinh|arctan|arctanh|cloglog|cos|cosh|cumulative|cut|density|deviance|equals|expr|gammap|ilogit|icloglog|integral|log|logfact|loggam|logit|max|min|phi|post.p.value|pow|prior.p.value|probit|replicate.post|replicate.prior|round|sin|sinh|solution|sqrt|step|tan|tanh|trunc|inprod|interp.lin|inverse|logdet|mean|eigen.vals|ode|prod|p.valueM|rank|ranked|replicate.postM|sd|sort|sum|D|I|F|T|C|dbern|dbin|dcat|dnegbin|dpois|dhyper|dbeta|dchisqr|ddexp|dexp|dflat|dgamma|dgev|df|dggamma|dgpar|dloglik|dlnorm|dlogis|dnorm|dpar|dt|dunif|dweib|dmulti|ddirch|dmnorm|dmt|dwish)(?=\s*\()" is(name.builtin)
+  r"[A-Za-z][A-Za-z0-9_.]*" is(name)
+  r"[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" is(literal.number)
+  r"\[|\]|\(|\)|:|,|;" is(punctuation)
+  r"<-|\126" is(operator)
+  r"\+|-|\*|/" is(operator)
+  r"[{}]" is(punctuation)
+
+lex(whitespace):
+  r"\s+" is(text)
+
+lex(comments):
+  r"\#.*$" is(comment.single)
+

@@ -25,7 +25,7 @@ lex(root):
   r"(add|alarm|break|case|const|continue|delete|do|else|enum|event|export|for|function|if|global|local|module|next|of|print|redef|return|schedule|type|when|while)\b" is(keyword)
   r"(addr|any|bool|count|counter|double|file|int|interval|net|pattern|port|record|set|string|subnet|table|time|timer|vector)\b" is(keyword.type)
   r"(T|F)\b" is(keyword.constant)
-  r"(&)((?:add|delete|expire)_func|attr|(create|read|write)_expire|default|disable_print_hook|raw_output|encrypt|group|log|mergeable|optional|persistent|priority|redef|rotate_(?:interval|size)|synchronized)\b" is(by-groups(punctuation, keyword))
+  r"(&)((?:add|delete|expire)_func|attr|(?:create|read|write)_expire|default|disable_print_hook|raw_output|encrypt|group|log|mergeable|optional|persistent|priority|redef|rotate_(?:interval|size)|synchronized)\b" is(by-groups(punctuation, keyword))
   r"\s+module\b" is(keyword.namespace)
   r"\d+/(tcp|udp|icmp|unknown)\b" is(literal.number)
   r"(\d+\.){3}\d+" is(literal.number)

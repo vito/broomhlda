@@ -1,0 +1,34 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Mscgen"
+aliases: ["mscgen", "msc"]
+extensions: [".msc"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  r"msc\b" is(keyword.type)
+  r"(hscale|HSCALE|width|WIDTH|wordwraparcs|WORDWRAPARCS|arcgradient|ARCGRADIENT)\b" is(name.property)
+  r"(abox|ABOX|rbox|RBOX|box|BOX|note|NOTE)\b" is(operator.word)
+  r"(\.|-|\|){3}" is(keyword)
+  r"(?:-|=|\.|:){2}|<<=>>|<->|<=>|<<>>|<:>|->|=>>|>>|=>|:>|-x|-X|<-|<<=|<<|<=|<:|x-|X-|=" is(operator)
+  r"\*" is(name.builtin)
+  r"([a-zA-Z0-9_]+|\"(?:\\\"|[^\"])*\")" is(name.variable)
+  r"\[" is(punctuation) -> go-to(attrs)
+  r"\{|\}|,|;" is(punctuation)
+  any-of(comments)
+
+lex(attrs):
+  r"\]" is(punctuation) -> pop
+  r"([a-zA-Z0-9_]+|\"(?:\\\"|[^\"])*\")(\s*)(=)(\s*)([a-zA-Z0-9_]+|\"(?:\\\"|[^\"])*\")" is(by-groups(name.attribute, text.whitespace, operator, text.whitespace, literal.string))
+  r"," is(punctuation)
+  any-of(comments)
+
+lex(comments):
+  r"(?://|\#).*?\n" is(comment.single)
+  r"/\*(?:.|\n)*?\*/" is(comment.multiline)
+  r"[ \t\r\n]+" is(text.whitespace)
+

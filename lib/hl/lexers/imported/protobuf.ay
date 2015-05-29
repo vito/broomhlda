@@ -19,7 +19,7 @@ lex(root):
   r"[ \t]+" is(text)
   r"[,;{}\[\]\(\)]" is(punctuation)
   r"/(\\\n)?/(\n|(.|\n)*?[^\\]\n)" is(comment.single)
-  r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
+  r"/(\\\n)?\*(.|\n)*?\*(\\\n)?/" is(comment.multiline)
   r"\b(import|option|optional|required|repeated|default|packed|ctype|extensions|to|max|rpc|returns)\b" is(keyword)
   r"(int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|float|double|bool|string|bytes)\b" is(keyword.type)
   r"(true|false)\b" is(keyword.constant)

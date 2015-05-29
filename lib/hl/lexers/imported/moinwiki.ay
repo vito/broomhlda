@@ -16,7 +16,7 @@ lex(root):
   r"({{{)(\n\#!.+)?" is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
   r"(\'\'\'?|\|\||`|__|\126\126|\^|,,|::)" is(comment)
   r"^( +)([.*-])( )" is(by-groups(text, name.builtin, text))
-  r"^( +)([a-zivx]{1,5}\.)( )" is(by-groups(text, name.builtin, text))
+  r"^( +)([a-z]{1,5}\.)( )" is(by-groups(text, name.builtin, text))
   r"\[\[\w+.*?\]\]" is(keyword)
   r"(\[[^\s\]]+)(\s+[^\]]+?)?(\])" is(by-groups(keyword, literal.string, keyword))
   r"^----+$" is(keyword)

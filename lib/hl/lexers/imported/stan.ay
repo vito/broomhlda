@@ -1,0 +1,37 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Stan"
+aliases: ["stan"]
+extensions: [".stan"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  r"\"[^\"]*\"" is(literal.string)
+  any-of(comments)
+  any-of(whitespace)
+  r"(data|transformed\s+?data|parameters|transformed\s+parameters|model|generated\s+quantities)(\s*)({)" is(by-groups(keyword.namespace, text, punctuation))
+  r"(for|in|while|repeat|until|if|then|else|true|false|T|lower|upper|print)\b" is(keyword.reserved)
+  r"(int|real|vector|simplex|ordered|row_vector|matrix|corr_matrix|cov_matrix|positive_ordered)\b" is(keyword.type)
+  r"[;:,\[\]()<>]" is(punctuation)
+  r"(Phi|abs|acos|acosh|asin|asinh|atan|atan2|atanh|bernoulli_log|beta_binomial_log|beta_log|binary_log_loss|binomial_coefficient_log|categorical_log|cauchy_log|cbrt|ceil|chi_square_log|cholesky_decompose|col|cols|cos|cosh|determinant|diag_matrix|diagonal|dirichlet_log|dot_product|dot_self|double_exponential_log|eigenvalues|eigenvalues_sym|erf|erfc|exp|exp2|expm1|exponential_cdf|exponential_log|fabs|fdim|floor|fma|fmax|fmin|fmod|gamma_log|hypergeometric_log|hypot|if_else|int_step|inv_chi_square_log|inv_cloglog|inv_gamma_log|inv_logit|inv_wishart_log|inverse|lbeta|lgamma|lkj_corr_cholesky_log|lkj_corr_log|lkj_cov_log|lmgamma|log|log10|log1m|log1p|log1p_exp|log2|log_sum_exp|logistic_log|logit|lognormal_cdf|lognormal_log|max|mean|min|multi_normal_cholesky_log|multi_normal_log|multi_student_t_log|multinomial_log|multiply_log|multiply_lower_tri_self_transpose|neg_binomial_log|normal_cdf|normal_log|ordered_logistic_log|pareto_log|poisson_log|pow|prod|round|row|rows|scaled_inv_chi_square_log|sd|sin|singular_values|sinh|softmax|sqrt|square|step|student_t_log|sum|tan|tanh|tgamma|trace|trunc|uniform_log|variance|weibull_cdf|weibull_log|wishart_log|bernoulli|beta|beta_binomial|categorical|cauchy|chi_square|dirichlet|double_exponential|exponential|gamma|hypergeometric|inv_chi_square|inv_gamma|inv_wishart|lkj_corr|lkj_corr_cholesky|lkj_cov|logistic|lognormal|multi_normal|multi_normal_cholesky|multi_student_t|multinomial|neg_binomial|normal|ordered_logistic|pareto|poisson|scaled_inv_chi_square|student_t|uniform|weibull|wishart)(?=\s*\()" is(name.builtin)
+  r"(e|epsilon|log10|log2|negative_epsilon|negative_infinity|not_a_number|pi|positive_infinity|sqrt2)(?=\s*\()" is(keyword.constant)
+  r"[A-Za-z][A-Za-z0-9_]*__\b" is(name.builtin.pseudo)
+  r"[A-Za-z][A-Za-z0-9_]*\b" is(name)
+  r"-?[0-9]+(\.[0-9]+)?[eE]-?[0-9]+" is(literal.number.float)
+  r"-?[0-9]*\.[0-9]*" is(literal.number.float)
+  r"-?[0-9]+" is(literal.number.integer)
+  r"<-|\126" is(operator)
+  r"\+|-|\.?\*|\.?/|\\|'|=" is(operator)
+  r"[{}]" is(punctuation)
+
+lex(whitespace):
+  r"\s+" is(text)
+
+lex(comments):
+  r"(?m)/\*.*?\*/" is(comment.multiline)
+  r"(//|\#).*$" is(comment.single)
+

@@ -22,6 +22,7 @@ lex(root):
   r"(&lt;|<)\#" is(comment.multiline) -> go-to(multline)
   r"@\"\n.*?\n\"@" is(literal.string.heredoc)
   r"@'\n.*?\n'@" is(literal.string.heredoc)
+  r"`[\'\"$@-]" is(punctuation)
   r"\"" is(literal.string.double) -> go-to(string)
   r"'([^']|'')*'" is(literal.string.single)
   r"(\$|@@|@)((global|script|private|env):)?[a-z0-9_]+" is(name.variable)

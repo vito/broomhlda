@@ -3,7 +3,7 @@ use("hl/define")
 
 Lexer = lexer:
 name: "verilog"
-aliases: ["v"]
+aliases: ["verilog", "v"]
 extensions: [".v"]
 mimetypes: ["text/x-verilog"]
 start: .root

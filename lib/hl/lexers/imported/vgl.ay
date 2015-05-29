@@ -1,0 +1,24 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "VGL"
+aliases: ["vgl"]
+extensions: [".rpf"]
+mimetypes: []
+start: .root
+flags: Regexp IGNORECASE | Regexp MULTILINE
+
+lex(root):
+  r"\{[^\}]*\}" is(comment.multiline)
+  r"declare" is(keyword.constant)
+  r"(if|then|else|endif|while|do|endwhile|and|or|prompt|object|create|on|line|with|global|routine|value|endroutine|constant|global|set|join|library|compile_option|file|exists|create|copy|delete|enable|windows|name|notprotected)(?! *[=<>.,()])" is(keyword)
+  r"(true|false|null|empty|error|locked)" is(keyword.constant)
+  r"[\126\^\*\\#!%&\[\]\(\)<>\|+=:;,./?-]" is(operator)
+  r"\"[^\"]*\"" is(literal.string)
+  r"(\.)([a-z_\$][a-z0-9_\$]*)" is(by-groups(operator, name.attribute))
+  r"[0-9][0-9]*(\.[0-9]+(e[+\-]?[0-9]+)?)?" is(literal.number)
+  r"[a-z_\$][a-z0-9_\$]*" is(name)
+  r"[\r\n]+" is(text)
+  r"\s+" is(text)
+

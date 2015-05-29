@@ -44,7 +44,7 @@ lex(instruction-args):
   r"[0-9]+\.e?[0-9]+" is(literal.number.float)
   r"[0-9]+" is(literal.number.integer)
   any-of(punctuation)
-  r"[a-d][lh]|e?[a-d]x|e?[sb]p|e?[sd]i|[c-gs]s|st[0-7]|mm[0-7]|cr[0-4]|dr[0-367]|tr[3-7]" is(name.builtin)
+  r"r[0-9][0-5]?[bwd]|[a-d][lh]|[er]?[a-d]x|[er]?[sb]p|[er]?[sd]i|[c-gs]s|st[0-7]|mm[0-7]|cr[0-4]|dr[0-367]|tr[3-7]" is(name.builtin)
   r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*" is(name.variable)
   r"[\r\n]+" is(text) -> pop
   any-of(whitespace)

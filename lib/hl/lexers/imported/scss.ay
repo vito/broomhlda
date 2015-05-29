@@ -98,7 +98,7 @@ lex(root):
   r"(@include)( [\w-]+)" is(by-groups(keyword, name.decorator)) -> go-to(value)
   r"@extend" is(keyword) -> go-to(selector)
   r"@[a-z0-9_-]+" is(keyword) -> go-to(selector)
-  r"(\$[\w-]\w*)([ \t]*:)" is(by-groups(name.variable, operator)) -> go-to(value)
+  r"(\$[\w-]*\w)([ \t]*:)" is(by-groups(name.variable, operator)) -> go-to(value)
   r"(?=[^;{}][;}])" is(name.attribute) -> go-to(attr)
   r"(?=[^;{}:]+:[^a-z])" is(name.attribute) -> go-to(attr)
   r"" is(text) -> go-to(selector)

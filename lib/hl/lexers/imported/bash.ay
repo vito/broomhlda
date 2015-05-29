@@ -36,6 +36,7 @@ lex(basic):
   r"\\[\w\W]" is(literal.string.escape)
   r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
   r"[\[\]{}()=]" is(operator)
+  r"<<<" is(operator)
   r"<<-?\s*(\'?)\\?(\w+)[\w\W]+?\2" is(literal.string)
   r"&&|\|\|" is(operator)
 
@@ -44,8 +45,8 @@ lex(paren):
   any-of(root)
 
 lex(data):
-  r"\$?\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\""(m) is(literal.string.double)
-  r"\$?'(\\\\|\\[0-7]+|\\.|[^'\\])*'"(m) is(literal.string.single)
+  r"(?m)\$?\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
+  r"(?m)\$?'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
   r";" is(text)
   r"\s+" is(text)
   r"[^=\s\[\]{}()$\"\'`\\<]+" is(text)
@@ -58,3 +59,4 @@ lex(math):
   r"[-+*/%^|&]|\*\*|\|\|" is(operator)
   r"\d+" is(literal.number)
   any-of(root)
+

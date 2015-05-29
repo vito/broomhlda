@@ -59,7 +59,7 @@ lex(numbers):
   r"\d+j?" is(literal.number.integer)
 
 lex(keywords):
-  r"(assert|break|continue|del|elif|else|except|exec|finally|for|global|if|lambda|pass|print|raise|return|try|while|yield|as|with)\b" is(keyword)
+  r"(assert|break|continue|del|elif|else|except|exec|finally|for|global|if|lambda|pass|print|raise|return|try|while|yield(\s+from)?|as|with)\b" is(keyword)
 
 lex(import):
   r"(?:[ \t]|\\\n)+" is(text)
@@ -109,5 +109,7 @@ lex(strings):
 lex(fromimport):
   r"(?:[ \t]|\\\n)+" is(text)
   r"import\b" is(keyword.namespace) -> pop
+  r"None\b" is(name.builtin.pseudo) -> pop
   r"[a-zA-Z_.][a-zA-Z0-9_.]*" is(name.namespace)
+  r"" is(text) -> pop
 

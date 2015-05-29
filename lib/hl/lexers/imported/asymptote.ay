@@ -38,7 +38,7 @@ lex(whitespace):
   r"\s+" is(text)
   r"\\\n" is(text)
   r"//(\n|(.|\n)*?[^\\]\n)" is(comment)
-  r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment)
+  r"/(\\\n)?\*(.|\n)*?\*(\\\n)?/" is(comment)
 
 lex(statement):
   any-of(whitespace)
@@ -48,8 +48,8 @@ lex(statement):
 
 lex(root):
   any-of(whitespace)
-  r"((?:[a-zA-Z0-9_*\s])+?(?:\s|[*]))([a-zA-Z_][a-zA-Z0-9_]*)(\s*\([^;]*?\))((?:\s|//.*?\n|/[*].*?[*]/)+)({)" is(by-groups(using(self class), name.function, using(self class), using(self class), punctuation)) -> go-to(function)
-  r"((?:[a-zA-Z0-9_*\s])+?(?:\s|[*]))([a-zA-Z_][a-zA-Z0-9_]*)(\s*\([^;]*?\))((?:\s|//.*?\n|/[*].*?[*]/)+)(;)" is(by-groups(using(self class), name.function, using(self class), using(self class), punctuation))
+  r"((?:[a-zA-Z0-9_*\s])+?(?:\s|\*))([a-zA-Z_][a-zA-Z0-9_]*)(\s*\([^;]*?\))((?:\s|//.*?\n|/\*.*?\*/)+)({)" is(by-groups(using(self class), name.function, using(self class), using(self class), punctuation)) -> go-to(function)
+  r"((?:[a-zA-Z0-9_*\s])+?(?:\s|\*))([a-zA-Z_][a-zA-Z0-9_]*)(\s*\([^;]*?\))((?:\s|//.*?\n|/\*.*?\*/)+)(;)" is(by-groups(using(self class), name.function, using(self class), using(self class), punctuation))
   r"" is(text) -> go-to(statement)
 
 lex(string):

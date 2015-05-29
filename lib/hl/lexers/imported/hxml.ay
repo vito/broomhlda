@@ -1,0 +1,21 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Hxml"
+aliases: ["haxeml", "hxml"]
+extensions: [".hxml"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  r"(--)(next)" is(by-groups(punctuation, generic.heading))
+  r"(-)(prompt|debug|v)" is(by-groups(punctuation, keyword.keyword))
+  r"(--)(neko-source|flash-strict|flash-use-stage|no-opt|no-traces|no-inline|times|no-output)" is(by-groups(punctuation, keyword))
+  r"(-)(cpp|js|neko|x|as3|swf9?|swf-lib|php|xml|main|lib|D|resource|cp|cmd)( +)(.+)" is(by-groups(punctuation, keyword, text.whitespace, literal.string))
+  r"(-)(swf-version)( +)(\d+)" is(by-groups(punctuation, keyword, literal.number.integer))
+  r"(-)(swf-header)( +)(\d+)(:)(\d+)(:)(\d+)(:)([A-Fa-f0-9]{6})" is(by-groups(punctuation, keyword, text.whitespace, literal.number.integer, punctuation, literal.number.integer, punctuation, literal.number.integer, punctuation, literal.number.hex))
+  r"(--)(js-namespace|php-front|php-lib|remap|gen-hx-classes)( +)(.+)" is(by-groups(punctuation, keyword, text.whitespace, literal.string))
+  r"\#.*" is(comment.single)
+

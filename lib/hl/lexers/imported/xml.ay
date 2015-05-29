@@ -16,7 +16,7 @@ lex(comment):
 
 lex(tag):
   r"\s+" is(text)
-  r"[a-zA-Z0-9_.:-]+\s*=" is(name.attribute) -> go-to(attr)
+  r"[\w.:-]+\s*=" is(name.attribute) -> go-to(attr)
   r"/?\s*>" is(name.tag) -> pop
 
 lex(root):
@@ -26,8 +26,8 @@ lex(root):
   r"<!--" is(comment) -> go-to(comment)
   r"<\?.*?\?>" is(comment.preproc)
   r"<![^>]*>" is(comment.preproc)
-  r"<\s*[a-zA-Z0-9:._-]+" is(name.tag) -> go-to(tag)
-  r"<\s*/\s*[a-zA-Z0-9:._-]+\s*>" is(name.tag)
+  r"<\s*[\w:.-]+" is(name.tag) -> go-to(tag)
+  r"<\s*/\s*[\w:.-]+\s*>" is(name.tag)
 
 lex(attr):
   r"\s+" is(text)

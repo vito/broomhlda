@@ -20,7 +20,7 @@ lex(args):
   r"\(" is(punctuation) -> push
   r"\)" is(punctuation) -> pop
   r"(\${)(.+?)(})" is(by-groups(operator, name.variable, operator))
-  r"\".*?\""(m) is(literal.string.double)
+  r"(?m)\".*?\"" is(literal.string.double)
   r"\\\S+" is(literal.string)
   r"[^\)$\"\# \t\n]+" is(literal.string)
   r"\n" is(text)

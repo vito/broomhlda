@@ -24,7 +24,7 @@ lex(base):
   r"\d+" is(literal.number.integer)
   r"\n" is(text)
   r"[^\S\n]+" is(text)
-  r"\[(=*)\[.*?\]\1\]"(m) is(literal.string)
+  r"(?m)\[(=*)\[.*?\]\1\]" is(literal.string)
   r"(->|=>)" is(name.function)
   r":[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable)
   r"(==|!=|\126=|<=|>=|\.\.\.|\.\.|[=+\-*/%^<>\#!.\\:])" is(operator)

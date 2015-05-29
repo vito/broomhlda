@@ -4,14 +4,15 @@ use("hl/define")
 Lexer = lexer:
 name: "S"
 aliases: ["splus", "s", "r"]
-extensions: [".S", ".R"]
-mimetypes: ["text/S-plus", "text/S", "text/R"]
+extensions: [".S", ".R", ".Rhistory", ".Rprofile"]
+mimetypes: ["text/S-plus", "text/S", "text/x-r-source", "text/x-r", "text/x-R", "text/x-r-history", "text/x-r-profile"]
 start: .root
 flags: 0
 
 lex(statements):
   any-of(comments)
   r"\s+" is(text)
+  r"`.*?`" is(literal.string.backtick)
   r"\'" is(literal.string) -> go-to(string-squote)
   r"\\"" is(literal.string) -> go-to(string-dquote)
   any-of(builtin-symbols)
@@ -22,30 +23,29 @@ lex(statements):
   any-of(valid-name)
 
 lex(string-dquote):
-  r"[^\\"]*\\"" is(literal.string) -> pop
+  r"([^\"\\]|\\.)*\"" is(literal.string) -> pop
 
 lex(operators):
-  r"<-|-|==|<=|>=|<|>|&&|&|!=|\|\|?" is(operator)
-  r"\*|\+|\^|/|%%|%/%|=" is(operator)
-  r"%in%|%*%" is(operator)
+  r"<<?-|->>?|-|==|<=|>=|<|>|&&?|!=|\|\|?|\?" is(operator)
+  r"\*|\+|\^|/|!|%[^%]*%|=|\126|\$|@|:{1,3}" is(operator)
 
 lex(keywords):
-  r"for(?=\s*\()|while(?=\s*\()|if(?=\s*\()|(?<=\s)else|(?<=\s)break(?=;|$)|return(?=\s*\()|function(?=\s*\()" is(keyword.reserved)
+  r"(if|else|for|while|repeat|in|next|break|return|switch|function)(?![0-9a-zA-Z\._])" is(keyword.reserved)
 
 lex(numbers):
-  r"(?<![0-9a-zA-Z\)\}\]`\\"])(?=\s*)[-\+]?[0-9]+(\.[0-9]*)?(E[0-9][-\+]?(\.[0-9]*)?)?" is(literal.number)
-  r"\.[0-9]*(E[0-9][-\+]?(\.[0-9]*)?)?" is(literal.number)
+  r"0[xX][a-fA-F0-9]+([pP][0-9]+)?[Li]?" is(literal.number.hex)
+  r"[+-]?([0-9]+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?[Li]?" is(literal.number)
 
 lex(valid-name):
-  r"[a-zA-Z][0-9a-zA-Z\._]+" is(text)
-  r"`.+`" is(literal.string.backtick)
+  r"[a-zA-Z][0-9a-zA-Z\._]*" is(text)
+  r"\.[a-zA-Z_][0-9a-zA-Z\._]*" is(text)
 
 lex(builtin-symbols):
-  r"(NULL|NA|TRUE|FALSE|NaN)\b" is(keyword.constant)
+  r"(NULL|NA(_(integer|real|complex|character)_)?|Inf|TRUE|FALSE|NaN|\.\.(\.|[0-9]+))(?![0-9a-zA-Z\._])" is(keyword.constant)
   r"(T|F)\b" is(keyword.variable)
 
 lex(punctuation):
-  r"\[|\]|\[\[|\]\]|\$|\(|\)|@|:::?|;|," is(punctuation)
+  r"\[{1,2}|\]{1,2}|\(|\)|;|," is(punctuation)
 
 lex(comments):
   r"\#.*$" is(comment.single)
@@ -56,5 +56,5 @@ lex(root):
   r"." is(text)
 
 lex(string-squote):
-  r"[^\']*\'" is(literal.string) -> pop
+  r"([^\'\\]|\\.)*\'" is(literal.string) -> pop
 

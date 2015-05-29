@@ -1,0 +1,35 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "JAGS"
+aliases: ["jags"]
+extensions: [".jag", ".bug"]
+mimetypes: []
+start: .root
+flags: 0
+
+lex(root):
+  any-of(comments)
+  any-of(whitespace)
+  r"(model|data)(\s+)({)" is(by-groups(keyword.namespace, text, punctuation))
+  r"var(?![0-9a-zA-Z\._])" is(keyword.declaration)
+  r"(for|in)(?![0-9a-zA-Z\._])" is(keyword.reserved)
+  r"(abs|arccos|arccosh|arcsin|arcsinh|arctan|arctanh|cos|cosh|cloglog|equals|exp|icloglog|ifelse|ilogit|log|logfact|loggam|logit|phi|pow|probit|round|sin|sinh|sqrt|step|tan|tanh|trunc|inprod|interp.lin|logdet|max|mean|min|prod|sum|sd|inverse|rank|sort|t|acos|acosh|asin|asinh|atan|T|I|[dpq]bern|[dpq]beta|[dpq]dchiqsqr|[dpq]ddexp|[dpq]dexp|[dpq]df|[dpq]gamma|[dpq]gen.gamma|[dpq]logis|[dpq]lnorm|[dpq]negbin|[dpq]nchisqr|[dpq]norm|[dpq]par|[dpq]pois|[dpq]weib|dt|dunif|dbetabin|dbern|dbin|dcat|dhyper|ddirch|dmnorm|dwish|dmt|dmulti|dbinom|dchisq|dnbinom|dweibull|ddirich)(?=\s*\()" is(name.builtin)
+  any-of(names)
+  r"[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" is(literal.number)
+  r"\[|\]|\(|\)|:|,|;" is(punctuation)
+  r"<-|\126" is(operator)
+  r"\+|-|\*|\/|\|\|[&]{2}|[<>=]=?|\^|%.*?%" is(operator)
+  r"[{}]" is(punctuation)
+
+lex(whitespace):
+  r"\s+" is(text)
+
+lex(comments):
+  r"(?m)/\*.*?\*/" is(comment.multiline)
+  r"\#.*$" is(comment.single)
+
+lex(names):
+  r"[a-zA-Z][a-zA-Z0-9_.]*\b" is(name)
+

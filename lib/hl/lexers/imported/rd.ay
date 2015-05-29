@@ -1,0 +1,21 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Rd"
+aliases: ["rd"]
+extensions: [".Rd"]
+mimetypes: ["text/x-r-doc"]
+start: .root
+flags: 0
+
+lex(root):
+  r"\\[\\{}%]" is(literal.string.escape)
+  r"%.*$" is(comment)
+  r"\\(?:cr|l?dots|R|tab)\b" is(keyword.constant)
+  r"\\[a-zA-Z]+\b" is(keyword)
+  r"^\s*\#(?:ifn?def|endif).*\b" is(comment.preproc)
+  r"[{}]" is(name.builtin)
+  r"[^\\%\n{}]+" is(text)
+  r"." is(text)
+

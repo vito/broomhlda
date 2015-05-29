@@ -15,12 +15,12 @@ lex(comment):
 
 lex(string-square):
   r"\[" is(literal.string.double) -> go-to(string-square)
-  r"(\\\\|\\[0-7]+|\\.|\\\n|[^\]\\])"(m) is(literal.string.double)
+  r"(?m)(\\\\|\\[0-7]+|\\.|\\\n|[^\]\\])" is(literal.string.double)
   r"\]" is(literal.string.double) -> pop
 
 lex(string):
   r"\[" is(literal.string.double) -> go-to(string-square)
-  r"(\\\\|\\[0-7]+|\\.|[^\"\\])"(m) is(literal.string.double)
+  r"(?m)(\\\\|\\[0-7]+|\\.|[^\"\\])" is(literal.string.double)
   r"\"" is(literal.string.double) -> pop
 
 lex(command-in-paren):

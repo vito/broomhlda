@@ -1,0 +1,83 @@
+use("atomy")
+use("hl/define")
+
+Lexer = lexer:
+name: "Monkey"
+aliases: ["monkey"]
+extensions: [".monkey"]
+mimetypes: ["text/x-monkey"]
+start: .root
+flags: 0
+
+lex(comment):
+  r"(?i)^\#rem.*?" is(comment.multiline) -> push
+  r"(?i)^\#end.*?" is(comment.multiline) -> pop
+  r"\n" is(comment.multiline)
+  r".+" is(comment.multiline)
+
+lex(string):
+  r"[^\"\126]+" is(literal.string.double)
+  r"\126q|\126n|\126r|\126t|\126z|\126\126" is(literal.string.escape)
+  r"\"" is(literal.string.double) -> pop
+
+lex(variables):
+  r"[A-Z_][A-Z0-9_]*\b" is(name.constant)
+  r"[a-z_][a-zA-Z0-9_]*\b" is(name.variable)
+  r"[?%\#$]" is(keyword.type)
+  r"\s+" is(text)
+  r":" is(punctuation) -> go-to(classname)
+  r"," is(punctuation) -> push
+  r"" is(text) -> pop
+
+lex(funcname):
+  r"(?i)[A-Z][a-zA-Z0-9_]*\b" is(name.function)
+  r":" is(punctuation) -> go-to(classname)
+  r"\s+" is(text)
+  r"\(" is(punctuation) -> go-to(variables)
+  r"\)" is(punctuation) -> pop
+
+lex(classname):
+  r"[a-z0-9_]*\." is(name.namespace)
+  r"(?:Int|Float|String|Bool|Object|Array|Void)\b" is(keyword.type)
+  r"[A-Z][a-zA-Z0-9_]*\b" is(name.class)
+  r"(\[)(\s*)(\d*)(\s*)(\])" is(by-groups(punctuation, text, literal.number.integer, text, punctuation))
+  r"\s+(?!<)" is(text) -> pop
+  r"<" is(punctuation) -> push
+  r">" is(punctuation) -> pop
+  r"\n" is(text) -> pop
+  r"" is(text) -> pop
+
+lex(root):
+  r"\s+" is(text)
+  r"'.*" is(comment)
+  r"(?i)^\#rem\b" is(comment.multiline) -> go-to(comment)
+  r"(?i)^(?:\#If|\#ElseIf|\#Else|\#EndIf|\#End|\#Print|\#Error)\b" is(comment.preproc)
+  r"^\#" is(comment.preproc) -> go-to(variables)
+  r"\"" is(literal.string.double) -> go-to(string)
+  r"[0-9]+\.[0-9]*(?!\.)" is(literal.number.float)
+  r"\.[0-9]+(?!\.)" is(literal.number.float)
+  r"[0-9]+" is(literal.number.integer)
+  r"\$[0-9a-fA-Z]+" is(literal.number.hex)
+  r"\%[10]+" is(literal.number)
+  r"\b(?:Int|Float|String|Bool|Object|Array|Void)\b" is(keyword.type)
+  r"(?i)\b(?:Try|Catch|Throw)\b" is(keyword.reserved)
+  r"Throwable" is(name.exception)
+  r"(?i)\b(?:Null|True|False)\b" is(name.builtin)
+  r"(?i)\b(?:Self|Super)\b" is(name.builtin.pseudo)
+  r"\b(?:HOST|LANG|TARGET|CONFIG)\b" is(name.constant)
+  r"(?i)^(Import)(\s+)(.*)(\n)" is(by-groups(keyword.namespace, text, name.namespace, text))
+  r"(?i)^Strict\b.*\n" is(keyword.reserved)
+  r"(?i)(Const|Local|Global|Field)(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(variables)
+  r"(?i)(New|Class|Interface|Extends|Implements)(\s+)" is(by-groups(keyword.reserved, text)) -> go-to(classname)
+  r"(?i)(Function|Method)(\s+)" is(by-groups(keyword.reserved, text)) -> go-to(funcname)
+  r"(?i)(?:End|Return|Public|Private|Extern|Property|Final|Abstract)\b" is(keyword.reserved)
+  r"(?i)(?:If|Then|Else|ElseIf|EndIf|Select|Case|Default|While|Wend|Repeat|Until|Forever|For|To|Until|Step|EachIn|Next|Exit|Continue)\s+" is(keyword.reserved)
+  r"(?i)\b(?:Module|Inline)\b" is(keyword.reserved)
+  r"[\[\]]" is(punctuation)
+  r"<=|>=|<>|\*=|/=|\+=|-=|&=|\126=|\|=|[-&*/^+=<>|\126]" is(operator)
+  r"(?i)(?:Not|Mod|Shl|Shr|And|Or)" is(operator.word)
+  r"[\(\){}!\#,.:]" is(punctuation)
+  r"[A-Z_][A-Z0-9_]*\b" is(name.constant)
+  r"[A-Z][a-zA-Z0-9_]*\b" is(name.function)
+  r"[a-z_][a-zA-Z0-9_]*\b" is(name.variable)
+
