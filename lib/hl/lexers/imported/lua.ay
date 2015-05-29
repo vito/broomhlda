@@ -29,7 +29,7 @@ lex(stringescape):
   r"\\([abfnrtv\\\"']|\d{1,3})" is(literal.string.escape)
 
 lex(base):
-  r"(?s)--\[(=*)\[.*?\]\1\]" is(comment.multiline)
+  r"--\[(=*)\[.*?\]\1\]"(m) is(comment.multiline)
   r"--.*$" is(comment.single)
   r"(?i)(\d*\.\d+|\d+\.\d*)(e[+-]?\d+)?" is(literal.number.float)
   r"(?i)\d+e[+-]?\d+" is(literal.number.float)
@@ -37,7 +37,7 @@ lex(base):
   r"\d+" is(literal.number.integer)
   r"\n" is(text)
   r"[^\S\n]" is(text)
-  r"(?s)\[(=*)\[.*?\]\1\]" is(literal.string)
+  r"\[(=*)\[.*?\]\1\]"(m) is(literal.string)
   r"(==|\126=|<=|>=|\.\.\.|\.\.|[=+\-*/%^<>\#])" is(operator)
   r"[\[\]\{\}\(\)\.,:;]" is(punctuation)
   r"(and|or|not)\b" is(operator.word)

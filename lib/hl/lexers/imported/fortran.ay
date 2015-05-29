@@ -28,8 +28,8 @@ lex(root):
   r"[\s]+" is(text)
 
 lex(strings):
-  r"(?s)\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
-  r"(?s)'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
+  r"\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\""(m) is(literal.string.double)
+  r"'(\\\\|\\[0-7]+|\\.|[^'\\])*'"(m) is(literal.string.single)
 
 lex(nums):
   r"\d+(?![.Ee])" is(literal.number.integer)

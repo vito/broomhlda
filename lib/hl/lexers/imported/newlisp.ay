@@ -15,7 +15,7 @@ lex(bracestring):
   r"[^{}]+" is(literal.string)
 
 lex(tagstring):
-  r"(?s)(.*?)(\[/text\])" is(literal.string) -> pop
+  r"(.*?)(\[/text\])"(m) is(literal.string) -> pop
 
 lex(root):
   r"\#!(.*?)$" is(comment.preproc)

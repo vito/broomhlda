@@ -22,8 +22,8 @@ lex(root):
   r"(export)(\s+)(?=[a-zA-Z0-9_${}\t -]+\n)" is(by-groups(keyword, text)) -> go-to(export)
   r"export\s+" is(keyword)
   r"([a-zA-Z0-9_${}.-]+)(\s*)([!?:+]?=)([ \t]*)((?:.*\\\n|.*\n)+)" is(by-groups(name.variable, text, operator, text, using(Bash)))
-  r"(?s)\"(\\\\|\\.|[^\"\\])*\"" is(literal.string.double)
-  r"(?s)'(\\\\|\\.|[^'\\])*'" is(literal.string.single)
+  r"\"(\\\\|\\.|[^\"\\])*\""(m) is(literal.string.double)
+  r"'(\\\\|\\.|[^'\\])*'"(m) is(literal.string.single)
   r"([^\n:]+)(:+)([ \t]*)" is(by-groups(name.function, operator, text)) -> go-to(block-header)
 
 lex(block-header):

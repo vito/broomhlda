@@ -42,8 +42,8 @@ lex(paren):
   any-of(root)
 
 lex(data):
-  r"(?s)\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
-  r"(?s)'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
+  r"\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\""(m) is(literal.string.double)
+  r"'(\\\\|\\[0-7]+|\\.|[^'\\])*'"(m) is(literal.string.single)
   r"\s+" is(text)
   r"[^=\s\[\]{}()$\"\'`\\]+" is(text)
   r"\d+(?= |\Z)" is(literal.number)
