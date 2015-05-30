@@ -6,10 +6,10 @@ Gem::Specification.new do |s|
   s.homepage = "http://atomy-lang.org"
   s.summary  = "broomhlda syntax highlighter and tokenizer"
 
-  s.files         = %w{COPYING} + Dir["lib/**/*"]
+  s.files         = %w{LICENSE.md} + Dir["lib/**/*"]
   s.require_paths = ["lib"]
 
-  s.license = "BSD"
+  s.license = "Apache-2.0"
 
   s.has_rdoc = false
 
