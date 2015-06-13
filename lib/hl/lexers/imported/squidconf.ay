@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "SquidConf"
 aliases: ["squidconf", "squid.conf", "squid"]
 extensions: ["squid.conf"]
@@ -26,3 +26,4 @@ lex(root):
   r"(?:\b\d+\b(?:-\b\d+|%)?)" is(literal.number)
   r"\S+" is(text)
 
+const-set(.Lexer, lexer)

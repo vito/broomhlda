@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MOOCode"
 aliases: ["moocode"]
 extensions: [".moo"]
@@ -23,3 +23,4 @@ lex(root):
   r"([a-z_A-Z0-9]+)(\()" is(by-groups(name.function, operator))
   r"([a-zA-Z_0-9]+)" is(text)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CoffeeScript"
 aliases: ["coffee-script", "coffeescript"]
 extensions: [".coffee"]
@@ -76,3 +76,4 @@ lex(tsqs):
 lex(strings):
   r"[^\#\\\'\"]+" is(literal.string)
 
+const-set(.Lexer, lexer)

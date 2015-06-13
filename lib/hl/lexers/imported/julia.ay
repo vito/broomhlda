@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Julia"
 aliases: ["julia", "jl"]
 extensions: [".jl"]
@@ -57,3 +57,4 @@ lex(funcname):
   r"\([^\s\w{]{1,2}\)" is(operator) -> pop
   r"[^\s\w{]{1,2}" is(operator) -> pop
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "GoodData-CL"
 aliases: ["gooddata-cl"]
 extensions: [".gdc"]
@@ -30,3 +30,4 @@ lex(string-literal):
   r"\"" is(literal.string) -> pop
   r"[^\\\"]+" is(literal.string)
 
+const-set(.Lexer, lexer)

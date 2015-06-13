@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Debian Control file"
 aliases: ["control"]
 extensions: ["control"]
@@ -48,3 +48,4 @@ lex(depend-vers):
   r"\)[^,]" is(text) -> pop(2)
   r"([><=]+)(\s*)([^\)]+)" is(by-groups(operator, text, literal.number))
 
+const-set(.Lexer, lexer)

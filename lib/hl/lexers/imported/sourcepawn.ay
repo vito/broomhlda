@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "SourcePawn"
 aliases: ["sp"]
 extensions: [".sp"]
@@ -55,3 +55,4 @@ lex(if0):
   r"^\s*\#endif.*?(?<!\\)\n" is(comment.preproc) -> pop
   r".*?\n" is(comment)
 
+const-set(.Lexer, lexer)

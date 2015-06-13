@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Prolog"
 aliases: ["prolog"]
 extensions: [".prolog", ".pro", ".pl"]
@@ -36,3 +36,4 @@ lex(root):
   r"[A-Z_][A-Za-z0-9_]*" is(name.variable)
   r"\s+|[\8192-\8207\65520-\65534\65519]" is(text)
 
+const-set(.Lexer, lexer)

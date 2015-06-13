@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Coq"
 aliases: ["coq"]
 extensions: [".v"]
@@ -56,3 +56,4 @@ lex(dotted):
   r"[a-z][a-z0-9_\']*" is(name) -> pop
   r"" is(text) -> pop
 
+const-set(.Lexer, lexer)

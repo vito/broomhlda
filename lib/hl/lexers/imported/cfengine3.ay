@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CFEngine3"
 aliases: ["cfengine3", "cf3"]
 extensions: [".cf"]
@@ -47,3 +47,4 @@ lex(interpol):
   r"[\}\)]" is(literal.string.interpol) -> pop
   r"[^\$\{\(\)\}]+" is(literal.string.interpol)
 
+const-set(.Lexer, lexer)

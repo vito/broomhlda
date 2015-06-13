@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Clojure"
 aliases: ["clojure", "clj"]
 extensions: [".clj"]
@@ -29,3 +29,4 @@ lex(root):
   r"(\{|\})" is(punctuation)
   r"(\(|\))" is(punctuation)
 
+const-set(.Lexer, lexer)

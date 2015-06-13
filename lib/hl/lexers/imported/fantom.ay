@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Fantom"
 aliases: ["fan"]
 extensions: [".fan"]
@@ -146,3 +146,4 @@ lex(root):
   r"\{" is(punctuation) -> go-to(insideBrace)
   r"." is(text)
 
+const-set(.Lexer, lexer)

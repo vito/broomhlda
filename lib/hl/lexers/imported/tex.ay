@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "TeX"
 aliases: ["tex", "latex"]
 extensions: [".tex", ".aux", ".toc"]
@@ -46,3 +46,4 @@ lex(math):
   r"[-=!+*/()\[\]]" is(operator)
   r"[^=!+*/()\[\]\\$%&_^{}0-9-]+" is(name.builtin)
 
+const-set(.Lexer, lexer)

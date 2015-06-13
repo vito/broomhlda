@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Debian Sourcelist"
 aliases: ["sourceslist", "sources.list"]
 extensions: ["sources.list"]
@@ -34,3 +34,4 @@ lex(components):
   r"\s+" is(text)
   r"\S+" is(keyword.pseudo)
 
+const-set(.Lexer, lexer)

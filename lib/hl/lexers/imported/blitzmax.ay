@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "BlitzMax"
 aliases: ["blitzmax", "bmax"]
 extensions: [".bmx"]
@@ -41,3 +41,4 @@ lex(string):
   r"\"C?" is(literal.string.double) -> pop
   r"[^\"]+" is(literal.string.double)
 
+const-set(.Lexer, lexer)

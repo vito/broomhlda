@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "haXe"
 aliases: ["hx", "haXe"]
 extensions: [".hx"]
@@ -183,3 +183,4 @@ lex(funargdecl):
   r"\?" is(punctuation)
   r"\)" is(punctuation) -> pop
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "COBOL"
 aliases: ["cobol"]
 extensions: [".cob", ".COB", ".cpy", ".CPY"]
@@ -41,3 +41,4 @@ lex(nums):
   r"[+-]?\d*\.\d+([eE][-+]?\d+)?" is(literal.number.float)
   r"[+-]?\d+\.\d*([eE][-+]?\d+)?" is(literal.number.float)
 
+const-set(.Lexer, lexer)

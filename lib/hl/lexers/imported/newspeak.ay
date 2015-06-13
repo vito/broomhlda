@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Newspeak"
 aliases: ["newspeak"]
 extensions: [".ns2"]
@@ -46,3 +46,4 @@ lex(expressionstat):
   any-of(whitespace)
   any-of(literals)
 
+const-set(.Lexer, lexer)

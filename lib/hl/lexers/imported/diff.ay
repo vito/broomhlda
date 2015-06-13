@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Diff"
 aliases: ["diff", "udiff"]
 extensions: [".diff", ".patch"]
@@ -19,3 +19,4 @@ lex(root):
   r"=.*\n" is(generic.heading)
   r".*\n" is(text)
 
+const-set(.Lexer, lexer)

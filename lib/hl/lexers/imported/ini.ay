@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "INI"
 aliases: ["ini", "cfg"]
 extensions: [".ini", ".cfg"]
@@ -15,3 +15,4 @@ lex(root):
   r"\[.*?\]$" is(keyword)
   r"(.*?)([ \t]*)(=)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Properties"
 aliases: ["properties"]
 extensions: [".properties"]
@@ -14,3 +14,4 @@ lex(root):
   r"(?:[;\#]|//).*$" is(comment)
   r"(.*?)([ \t]*)([=:])([ \t]*)(.*(?:(?<=\\)\n.*)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
 
+const-set(.Lexer, lexer)

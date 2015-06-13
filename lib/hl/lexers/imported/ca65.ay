@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "ca65"
 aliases: ["ca65"]
 extensions: [".s"]
@@ -23,3 +23,4 @@ lex(root):
   r"[\#,.:()=]" is(punctuation)
   r"[a-z_.@$][\w.@$]*" is(name)
 
+const-set(.Lexer, lexer)

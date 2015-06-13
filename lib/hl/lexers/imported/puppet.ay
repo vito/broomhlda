@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Puppet"
 aliases: ["puppet"]
 extensions: [".pp"]
@@ -47,3 +47,4 @@ lex(numbers):
   r"\d+L" is(literal.number.integer.long)
   r"\d+j?" is(literal.number.integer)
 
+const-set(.Lexer, lexer)

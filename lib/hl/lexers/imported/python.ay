@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Python"
 aliases: ["python", "py", "sage"]
 extensions: [".py", ".pyw", ".sc", "SConstruct", "SConscript", ".tac", ".sage"]
@@ -113,3 +113,4 @@ lex(fromimport):
   r"[a-zA-Z_.][a-zA-Z0-9_.]*" is(name.namespace)
   r"" is(text) -> pop
 
+const-set(.Lexer, lexer)

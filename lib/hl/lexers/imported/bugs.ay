@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "BUGS"
 aliases: ["bugs", "winbugs", "openbugs"]
 extensions: [".bug"]
@@ -28,3 +28,4 @@ lex(whitespace):
 lex(comments):
   r"\#.*$" is(comment.single)
 
+const-set(.Lexer, lexer)

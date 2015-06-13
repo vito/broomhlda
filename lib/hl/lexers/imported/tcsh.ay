@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Tcsh"
 aliases: ["tcsh", "csh"]
 extensions: [".tcsh", ".csh"]
@@ -49,3 +49,4 @@ lex(data):
   r"\d+(?= |\Z)" is(literal.number)
   r"\$\#?(\w+|.)" is(name.variable)
 
+const-set(.Lexer, lexer)

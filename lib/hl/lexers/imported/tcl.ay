@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Tcl"
 aliases: ["tcl"]
 extensions: [".tcl"]
@@ -107,3 +107,4 @@ lex(command-in-brace):
   r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-brace)
   r"\#" is(comment) -> go-to(comment)
 
+const-set(.Lexer, lexer)

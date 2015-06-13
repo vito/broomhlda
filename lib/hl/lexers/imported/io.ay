@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Io"
 aliases: ["io"]
 extensions: [".io"]
@@ -31,3 +31,4 @@ lex(root):
   r"(\d+\.?\d*|\d*\.\d+)([eE][+-]?[0-9]+)?" is(literal.number.float)
   r"\d+" is(literal.number.integer)
 
+const-set(.Lexer, lexer)

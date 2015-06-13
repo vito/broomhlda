@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "ApacheConf"
 aliases: ["apacheconf", "aconf", "apache"]
 extensions: [".htaccess", "apache.conf", "apache2.conf"]
@@ -26,3 +26,4 @@ lex(value):
   r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
   r"[^\s\"]+" is(text)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "ECL"
 aliases: ["ecl"]
 extensions: [".ecl"]
@@ -54,3 +54,4 @@ lex(string):
   r"\'" is(literal.string) -> pop
   r"[^\"\']+" is(literal.string)
 
+const-set(.Lexer, lexer)

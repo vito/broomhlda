@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CMake"
 aliases: ["cmake"]
 extensions: [".cmake", "CMakeLists.txt"]
@@ -35,3 +35,4 @@ lex(root):
 lex(string):
   
 
+const-set(.Lexer, lexer)

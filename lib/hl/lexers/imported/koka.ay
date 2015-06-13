@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Koka"
 aliases: ["koka"]
 extensions: [".kk", ".kki"]
@@ -101,3 +101,4 @@ lex(type):
   r"[\(\[<]" is(keyword.type) -> go-to(type-nested)
   any-of(type-content)
 
+const-set(.Lexer, lexer)

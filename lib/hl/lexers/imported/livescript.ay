@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "LiveScript"
 aliases: ["live-script", "livescript"]
 extensions: [".ls"]
@@ -79,3 +79,4 @@ lex(tsqs):
 lex(strings):
   r"[^\#\\\'\"]+" is(literal.string)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Felix"
 aliases: ["felix", "flx"]
 extensions: [".flx", ".flxh"]
@@ -137,3 +137,4 @@ lex(tvarlist):
   r"(with|where)\b" is(keyword)
   r"[a-zA-Z_]\w*" is(name)
 
+const-set(.Lexer, lexer)

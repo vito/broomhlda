@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "cfstatement"
 aliases: ["cfs"]
 extensions: []
@@ -33,3 +33,4 @@ lex(string):
   r"\#" is(literal.string.double)
   r"\"" is(literal.string.double) -> pop
 
+const-set(.Lexer, lexer)

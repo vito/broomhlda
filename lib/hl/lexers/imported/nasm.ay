@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "NASM"
 aliases: ["nasm"]
 extensions: [".asm", ".ASM"]
@@ -49,3 +49,4 @@ lex(instruction-args):
   r"[\r\n]+" is(text) -> pop
   any-of(whitespace)
 
+const-set(.Lexer, lexer)

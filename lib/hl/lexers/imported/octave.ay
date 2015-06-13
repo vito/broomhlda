@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Octave"
 aliases: ["octave"]
 extensions: [".m"]
@@ -36,3 +36,4 @@ lex(root):
 lex(string):
   r"[^']*'" is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

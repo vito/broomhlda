@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "D"
 aliases: ["d"]
 extensions: [".d", ".di"]
@@ -99,3 +99,4 @@ lex(nested-comment):
   r"\+/" is(comment.multiline) -> pop
   r"[+/]" is(comment.multiline)
 
+const-set(.Lexer, lexer)

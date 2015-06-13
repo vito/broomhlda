@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Modula-2"
 aliases: ["modula2", "m2"]
 extensions: [".def", ".mod"]
@@ -60,3 +60,4 @@ lex(comments):
   r"/\*(.*?)\*/" is(comment.multiline)
   r"\(\*([^\$].*?)\*\)" is(comment.multiline)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Stan"
 aliases: ["stan"]
 extensions: [".stan"]
@@ -35,3 +35,4 @@ lex(comments):
   r"(?m)/\*.*?\*/" is(comment.multiline)
   r"(//|\#).*$" is(comment.single)
 
+const-set(.Lexer, lexer)

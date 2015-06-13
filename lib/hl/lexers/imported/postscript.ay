@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "PostScript"
 aliases: ["postscript"]
 extensions: [".ps", ".eps"]
@@ -36,3 +36,4 @@ lex(stringliteral):
 lex(escape):
   r"([0-8]{3}|n|r|t|b|f|\\|\(|\))?" is(literal.string.escape) -> pop
 
+const-set(.Lexer, lexer)

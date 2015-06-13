@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "VB.net"
 aliases: ["vb.net", "vbnet"]
 extensions: [".vb", ".bas"]
@@ -59,3 +59,4 @@ lex(root):
   r"&O[0-7]+([SILDFR]|US|UI|UL)?" is(literal.number.integer)
   r"_\n" is(text)
 
+const-set(.Lexer, lexer)

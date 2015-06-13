@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Gosu"
 aliases: ["gosu"]
 extensions: [".gs", ".gsx", ".gsp", ".vark"]
@@ -55,3 +55,4 @@ lex(templateText):
   r"\$\{" is(operator) -> go-to(stringTemplateShorthand)
   r"." is(literal.string)
 
+const-set(.Lexer, lexer)

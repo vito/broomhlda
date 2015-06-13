@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Darcs Patch"
 aliases: ["dpatch"]
 extensions: [".dpatch", ".darcspatch"]
@@ -42,3 +42,4 @@ lex(specialText):
   r"\n" is(text) -> pop
   r"\[_[^_]*_]" is(operator)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "DTD"
 aliases: ["dtd"]
 extensions: [".dtd"]
@@ -59,3 +59,4 @@ lex(attlist):
   r"[^>\s\|()?+*,]+" is(name.attribute)
   r">" is(keyword) -> pop
 
+const-set(.Lexer, lexer)

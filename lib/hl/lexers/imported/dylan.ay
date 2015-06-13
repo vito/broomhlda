@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Dylan"
 aliases: ["dylan"]
 extensions: [".dylan", ".dyl", ".intr"]
@@ -57,3 +57,4 @@ lex(keyword):
   r"\"" is(literal.string.symbol) -> pop
   r"[^\\\"]+" is(literal.string.symbol)
 
+const-set(.Lexer, lexer)

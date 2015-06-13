@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Lighttpd configuration file"
 aliases: ["lighty", "lighttpd"]
 extensions: []
@@ -21,3 +21,4 @@ lex(root):
   r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
   r"\s+" is(text)
 
+const-set(.Lexer, lexer)

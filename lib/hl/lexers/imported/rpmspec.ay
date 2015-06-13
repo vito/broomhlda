@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "RPMSpec"
 aliases: ["spec"]
 extensions: [".spec"]
@@ -54,3 +54,4 @@ lex(string):
   any-of(interpol)
   r"." is(literal.string.double)
 
+const-set(.Lexer, lexer)

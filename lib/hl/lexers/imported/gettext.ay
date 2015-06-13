@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Gettext Catalog"
 aliases: ["pot", "po"]
 extensions: [".pot", ".po"]
@@ -18,3 +18,4 @@ lex(root):
   r"^(msgid|msgid_plural|msgstr)(\s+)(\".*\")$" is(by-groups(name.variable, text, literal.string))
   r"^(msgstr\[)(\d)(\])(\s+)(\".*\")$" is(by-groups(name.variable, literal.number.integer, name.variable, text, literal.string))
 
+const-set(.Lexer, lexer)

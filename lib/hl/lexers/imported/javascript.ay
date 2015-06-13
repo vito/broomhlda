@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "JavaScript"
 aliases: ["js", "javascript"]
 extensions: [".js"]
@@ -42,3 +42,4 @@ lex(slashstartsregex):
 lex(badregex):
   r"\n" is(text) -> pop
 
+const-set(.Lexer, lexer)

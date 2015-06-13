@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "OCaml"
 aliases: ["ocaml"]
 extensions: [".ml", ".mli", ".mll", ".mly"]
@@ -56,3 +56,4 @@ lex(dotted):
   r"[A-Z][A-Za-z0-9_\']*" is(name.class) -> pop
   r"[a-z_][A-Za-z0-9_\']*" is(name) -> pop
 
+const-set(.Lexer, lexer)

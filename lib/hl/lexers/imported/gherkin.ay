@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Gherkin"
 aliases: ["Cucumber", "cucumber", "Gherkin", "gherkin"]
 extensions: [".feature"]
@@ -94,3 +94,4 @@ lex(step-content-stack):
   r"$" is(keyword) -> pop(2)
   any-of(step-content)
 
+const-set(.Lexer, lexer)

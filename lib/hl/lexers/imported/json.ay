@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "JSON"
 aliases: ["json"]
 extensions: [".json"]
@@ -44,3 +44,4 @@ lex(objectvalue):
   r"\"(\\\\|\\\"|[^\"])*\"" is(name.tag) -> go-to(objectattribute)
   r"}" is(punctuation) -> pop
 
+const-set(.Lexer, lexer)

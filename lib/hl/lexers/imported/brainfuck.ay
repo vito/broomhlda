@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Brainfuck"
 aliases: ["brainfuck", "bf"]
 extensions: [".bf", ".b"]
@@ -25,3 +25,4 @@ lex(loop):
   r"\]" is(keyword) -> pop
   any-of(common)
 
+const-set(.Lexer, lexer)

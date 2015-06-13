@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Velocity"
 aliases: ["velocity"]
 extensions: [".vm", ".fhtml"]
@@ -47,3 +47,4 @@ lex(directiveparams):
   r"\b[a-zA-Z_][a-zA-Z0-9_]*\b" is(name.function)
   any-of(funcparams)
 
+const-set(.Lexer, lexer)

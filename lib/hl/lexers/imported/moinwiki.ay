@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MoinMoin/Trac Wiki markup"
 aliases: ["trac-wiki", "moin"]
 extensions: []
@@ -30,3 +30,4 @@ lex(codeblock):
   r"[^{}]+" is(comment.preproc)
   r"." is(comment.preproc)
 
+const-set(.Lexer, lexer)

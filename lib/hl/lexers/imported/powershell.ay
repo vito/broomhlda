@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "PowerShell"
 aliases: ["powershell", "posh", "ps1"]
 extensions: [".ps1"]
@@ -46,3 +46,4 @@ lex(interpol):
   r"\$\(" is(literal.string.interpol) -> push
   r"\)" is(literal.string.interpol) -> pop
 
+const-set(.Lexer, lexer)

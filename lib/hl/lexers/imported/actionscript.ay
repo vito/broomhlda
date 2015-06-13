@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "ActionScript"
 aliases: ["as", "actionscript"]
 extensions: [".as"]
@@ -28,3 +28,4 @@ lex(root):
   r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
   r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "verilog"
 aliases: ["verilog", "v"]
 extensions: [".v"]
@@ -58,3 +58,4 @@ lex(string):
 lex(import):
   r"[a-zA-Z0-9_:]+\*?" is(name.namespace) -> pop
 
+const-set(.Lexer, lexer)

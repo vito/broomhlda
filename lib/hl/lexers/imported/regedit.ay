@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "reg"
 aliases: ["registry"]
 extensions: [".reg"]
@@ -22,3 +22,4 @@ lex(value):
   r"(dword|hex(?:\([0-9a-fA-F]\))?)(:)([0-9a-fA-F,]+)" is(by-groups(name.variable, punctuation, literal.number)) -> pop
   r".*" is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

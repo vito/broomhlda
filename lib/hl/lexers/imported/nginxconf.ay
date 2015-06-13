@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Nginx configuration file"
 aliases: ["nginx"]
 extensions: []
@@ -38,3 +38,4 @@ lex(block):
   r"[^\s;\#]+" is(keyword.namespace) -> go-to(stmt)
   any-of(base)
 
+const-set(.Lexer, lexer)

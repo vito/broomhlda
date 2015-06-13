@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Fortran"
 aliases: ["fortran"]
 extensions: [".f", ".f90", ".F", ".F90"]
@@ -36,3 +36,4 @@ lex(nums):
   r"[+-]?\d*\.\d+([eE][-+]?\d+)?" is(literal.number.float)
   r"[+-]?\d+\.\d*([eE][-+]?\d+)?" is(literal.number.float)
 
+const-set(.Lexer, lexer)

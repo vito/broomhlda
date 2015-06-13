@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Smali"
 aliases: ["smali"]
 extensions: [".smali"]
@@ -68,3 +68,4 @@ lex(method):
   r"<(?:cl)?init>" is(name.function)
   r"(\$?\b)([A-Za-z0-9_$]*)(\()" is(by-groups(punctuation, name.function, punctuation))
 
+const-set(.Lexer, lexer)

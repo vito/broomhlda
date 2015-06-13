@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Erlang"
 aliases: ["erlang"]
 extensions: [".erl", ".hrl", ".es", ".escript"]
@@ -44,3 +44,4 @@ lex(directive):
   r"(record)(\s*)(\()((?:(?:[A-Z_][a-zA-Z0-9_]*)|(?:[a-z][a-zA-Z0-9_]*|'[^\n']*[^\\]')))" is(by-groups(name.entity, text, punctuation, name.label)) -> pop
   r"(?:[a-z][a-zA-Z0-9_]*|'[^\n']*[^\\]')" is(name.entity) -> pop
 
+const-set(.Lexer, lexer)

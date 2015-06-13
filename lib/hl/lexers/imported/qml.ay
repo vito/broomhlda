@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "QML"
 aliases: ["qml", "Qt Meta Language", "Qt modeling Language"]
 extensions: [".qml"]
@@ -44,3 +44,4 @@ lex(slashstartsregex):
 lex(badregex):
   r"\n" is(text) -> pop
 
+const-set(.Lexer, lexer)

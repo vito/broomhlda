@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "NewLisp"
 aliases: ["newlisp"]
 extensions: [".lsp", ".nl"]
@@ -31,3 +31,4 @@ lex(root):
   r"([a-zA-Z0-9!$%&*+.,/<=>?@^_\126|-])+|(\[.*?\])+" is(literal.string.symbol)
   r"(\(|\))" is(punctuation)
 
+const-set(.Lexer, lexer)

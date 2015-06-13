@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Scilab"
 aliases: ["scilab"]
 extensions: [".sci", ".sce", ".tst"]
@@ -34,3 +34,4 @@ lex(string):
   r"[^']*'" is(literal.string) -> pop
   r"." is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CBM BASIC V2"
 aliases: ["cbmbas"]
 extensions: [".bas"]
@@ -22,3 +22,4 @@ lex(root):
   r"[\(\),:;]" is(punctuation)
   r"\w+[$%]?" is(name)
 
+const-set(.Lexer, lexer)

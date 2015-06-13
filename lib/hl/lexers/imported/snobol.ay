@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Snobol"
 aliases: ["snobol"]
 extensions: [".snobol"]
@@ -39,3 +39,4 @@ lex(statement):
 lex(heredoc):
   r".*\n" is(literal.string.heredoc)
 
+const-set(.Lexer, lexer)

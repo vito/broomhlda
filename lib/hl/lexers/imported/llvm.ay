@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "LLVM"
 aliases: ["llvm"]
 extensions: [".ll"]
@@ -33,3 +33,4 @@ lex(keyword):
   r"void|float|double|x86_fp80|fp128|ppc_fp128|label|metadata" is(keyword.type)
   r"i[1-9]\d*" is(keyword)
 
+const-set(.Lexer, lexer)

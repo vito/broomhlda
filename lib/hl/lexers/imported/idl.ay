@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "IDL"
 aliases: ["idl"]
 extensions: [".pro"]
@@ -20,3 +20,4 @@ lex(root):
   r"\b[0-9](L|B|S|UL|ULL|LL)?\b" is(literal.number)
   r"." is(text)
 
+const-set(.Lexer, lexer)

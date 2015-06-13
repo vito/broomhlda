@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "S"
 aliases: ["splus", "s", "r"]
 extensions: [".S", ".R", ".Rhistory", ".Rprofile"]
@@ -58,3 +58,4 @@ lex(root):
 lex(string-squote):
   r"([^\'\\]|\\.)*\'" is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

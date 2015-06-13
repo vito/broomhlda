@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "vhdl"
 aliases: ["vhdl"]
 extensions: [".vhdl", ".vhd"]
@@ -51,3 +51,4 @@ lex(numbers):
   r"O\"[0-7_]+\"" is(literal.number.oct)
   r"B\"[0-1_]+\"" is(literal.number.oct)
 
+const-set(.Lexer, lexer)

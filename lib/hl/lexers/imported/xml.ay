@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "XML"
 aliases: ["xml"]
 extensions: [".xml", ".xsl", ".rss", ".xslt", ".xsd", ".wsdl"]
@@ -35,3 +35,4 @@ lex(attr):
   r"'.*?'" is(literal.string) -> pop
   r"[^\s>]+" is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

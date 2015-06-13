@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Elixir"
 aliases: ["elixir", "ex", "exs"]
 extensions: [".ex", ".exs"]
@@ -90,3 +90,4 @@ lex(strings):
 lex(ltno-intp):
   r".*\>[a-z]*" is(literal.string.double) -> pop
 
+const-set(.Lexer, lexer)

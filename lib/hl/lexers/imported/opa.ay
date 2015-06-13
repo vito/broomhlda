@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Opa"
 aliases: ["opa"]
 extensions: [".opa"]
@@ -150,3 +150,4 @@ lex(single-string):
   r"{" is(operator) -> go-to(root)
   any-of(escape-sequence)
 
+const-set(.Lexer, lexer)

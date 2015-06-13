@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MoonScript"
 aliases: ["moon", "moonscript"]
 extensions: [".moon"]
@@ -49,3 +49,4 @@ lex(dqs):
   r"\"" is(literal.string.double) -> pop
   r"." is(literal.string)
 
+const-set(.Lexer, lexer)

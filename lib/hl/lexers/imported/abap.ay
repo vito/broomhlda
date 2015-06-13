@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "ABAP"
 aliases: ["abap"]
 extensions: [".abap"]
@@ -40,3 +40,4 @@ lex(common):
   r"^\*.*$" is(comment.single)
   r"\\".*?\n" is(comment.single)
 
+const-set(.Lexer, lexer)

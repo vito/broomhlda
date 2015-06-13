@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Rust"
 aliases: ["rust"]
 extensions: [".rs", ".rc"]
@@ -53,3 +53,4 @@ lex(root):
 lex(number-lit):
   r"(([ui](8|16|32|64)?)|(f(32|64)?))?" is(keyword) -> pop
 
+const-set(.Lexer, lexer)

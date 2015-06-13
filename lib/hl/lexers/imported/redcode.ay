@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Redcode"
 aliases: ["redcode"]
 extensions: [".cw"]
@@ -20,3 +20,4 @@ lex(root):
   r"[.,]" is(punctuation)
   r"[-+]?\d+" is(literal.number.integer)
 
+const-set(.Lexer, lexer)

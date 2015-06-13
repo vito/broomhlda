@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "GLSL"
 aliases: ["glsl"]
 extensions: [".vert", ".frag", ".geo"]
@@ -28,3 +28,4 @@ lex(root):
   r"\." is(punctuation)
   r"\s+" is(text)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Boo"
 aliases: ["boo"]
 extensions: [".boo"]
@@ -52,3 +52,4 @@ lex(root):
 lex(funcname):
   r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.function) -> pop
 
+const-set(.Lexer, lexer)

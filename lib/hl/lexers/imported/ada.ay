@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Ada"
 aliases: ["ada", "ada95ada2005"]
 extensions: [".adb", ".ads", ".ada"]
@@ -104,3 +104,4 @@ lex(root):
   r"[*<>+=/&-]" is(operator)
   r"\n+" is(text)
 
+const-set(.Lexer, lexer)

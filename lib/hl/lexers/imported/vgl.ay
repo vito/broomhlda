@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "VGL"
 aliases: ["vgl"]
 extensions: [".rpf"]
@@ -22,3 +22,4 @@ lex(root):
   r"[\r\n]+" is(text)
   r"\s+" is(text)
 
+const-set(.Lexer, lexer)

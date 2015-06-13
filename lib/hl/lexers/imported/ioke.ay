@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Ioke"
 aliases: ["ioke", "ik"]
 extensions: [".ik"]
@@ -85,3 +85,4 @@ lex(root):
   r"[A-Z][a-zA-Z0-9_!:?]*" is(name.class)
   r"[a-z_][a-zA-Z0-9_!:?]*" is(name)
 
+const-set(.Lexer, lexer)

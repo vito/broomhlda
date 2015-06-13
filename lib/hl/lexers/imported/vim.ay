@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "VimL"
 aliases: ["vim"]
 extensions: [".vim", ".vimrc", ".exrc", ".gvimrc", "_vimrc", "_exrc", "_gvimrc", "vimrc", "gvimrc"]
@@ -25,3 +25,4 @@ lex(root):
   r"\b\w+\b" is(name.other)
   r"." is(text)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Gnuplot"
 aliases: ["gnuplot"]
 extensions: [".plot", ".plt"]
@@ -108,3 +108,4 @@ lex(root):
   r"@[a-zA-Z_][a-zA-Z0-9_]*" is(name.constant)
   r";" is(keyword)
 
+const-set(.Lexer, lexer)

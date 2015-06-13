@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Bash"
 aliases: ["bash", "sh", "ksh"]
 extensions: [".sh", ".ksh", ".bash", ".ebuild", ".eclass", ".bashrc", "bashrc", ".bash_", "bash_"]
@@ -60,3 +60,4 @@ lex(math):
   r"\d+" is(literal.number)
   any-of(root)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "GAS"
 aliases: ["gas"]
 extensions: [".s", ".S"]
@@ -48,3 +48,4 @@ lex(instruction-args):
   any-of(punctuation)
   any-of(whitespace)
 
+const-set(.Lexer, lexer)

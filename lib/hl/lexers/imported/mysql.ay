@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MySQL"
 aliases: ["mysql"]
 extensions: []
@@ -34,3 +34,4 @@ lex(root):
   r"@[A-Za-z0-9]*[._]*[A-Za-z0-9]*" is(name.variable)
   r"[;:()\[\],\.]" is(punctuation)
 
+const-set(.Lexer, lexer)

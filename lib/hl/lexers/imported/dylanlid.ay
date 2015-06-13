@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "DylanLID"
 aliases: ["dylan-lid", "lid"]
 extensions: [".lid", ".hdp"]
@@ -14,3 +14,4 @@ lex(root):
   r"//.*?\n" is(comment.single)
   r"(.*?)(:)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, operator, text, literal.string))
 
+const-set(.Lexer, lexer)

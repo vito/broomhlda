@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Batchfile"
 aliases: ["bat"]
 extensions: [".bat", ".cmd"]
@@ -42,3 +42,4 @@ lex(echo):
   any-of(basic)
   r"[^\'\"^]+" is(text)
 
+const-set(.Lexer, lexer)

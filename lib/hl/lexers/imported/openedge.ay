@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "OpenEdge ABL"
 aliases: ["openedge", "abl", "progress"]
 extensions: [".p", ".cls"]
@@ -37,3 +37,4 @@ lex(preprocessor):
   r"{" is(comment.preproc) -> push
   r"}" is(comment.preproc) -> pop
 
+const-set(.Lexer, lexer)

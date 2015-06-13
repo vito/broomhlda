@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MuPAD"
 aliases: ["mupad"]
 extensions: [".mu"]
@@ -33,3 +33,4 @@ lex(root):
   r"\.[0-9]+(?:e[0-9]+)?" is(literal.number)
   r"." is(text)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CUDA"
 aliases: ["cuda", "cu"]
 extensions: [".cu", ".cuh"]
@@ -81,3 +81,4 @@ lex(string):
   r"\\\n" is(literal.string)
   r"\\" is(literal.string)
 
+const-set(.Lexer, lexer)

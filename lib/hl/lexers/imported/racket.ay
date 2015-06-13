@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Racket"
 aliases: ["racket", "rkt"]
 extensions: [".rkt", ".rktl"]
@@ -59,3 +59,4 @@ lex(root):
   r"[a-zA-Z0-9!$%&*+,/:<=>?@^_\126|-]+" is(name.variable)
   r"(\(|\)|\[|\]|\{|\})" is(punctuation)
 
+const-set(.Lexer, lexer)

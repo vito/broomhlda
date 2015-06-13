@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "dg"
 aliases: ["dg"]
 extensions: [".dg"]
@@ -58,3 +58,4 @@ lex(stringescape):
 lex(tdqs):
   r"\"\"\"" is(literal.string) -> pop
 
+const-set(.Lexer, lexer)

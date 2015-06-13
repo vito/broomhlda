@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Scheme"
 aliases: ["scheme", "scm"]
 extensions: [".scm", ".ss"]
@@ -28,3 +28,4 @@ lex(root):
   r"(\(|\))" is(punctuation)
   r"(\[|\])" is(punctuation)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "CSS"
 aliases: ["css"]
 extensions: [".css"]
@@ -52,3 +52,4 @@ lex(atrule):
   r";" is(punctuation) -> pop
   any-of(basics)
 
+const-set(.Lexer, lexer)

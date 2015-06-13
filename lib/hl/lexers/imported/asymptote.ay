@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Asymptote"
 aliases: ["asy", "asymptote"]
 extensions: [".asy"]
@@ -61,3 +61,4 @@ lex(string):
   r"\\n" is(literal.string)
   r"\\" is(literal.string)
 
+const-set(.Lexer, lexer)

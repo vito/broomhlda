@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "POVRay"
 aliases: ["pov"]
 extensions: [".pov", ".inc"]
@@ -25,3 +25,4 @@ lex(root):
   r"[0-9]+" is(literal.number.integer)
   r"\s+" is(text)
 
+const-set(.Lexer, lexer)

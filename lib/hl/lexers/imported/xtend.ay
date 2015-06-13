@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Xtend"
 aliases: ["xtend"]
 extensions: [".xtend"]
@@ -45,3 +45,4 @@ lex(template):
   r"\171" is(literal.string) -> pop
   r"." is(literal.string)
 
+const-set(.Lexer, lexer)

@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Befunge"
 aliases: ["befunge"]
 extensions: [".befunge"]
@@ -23,3 +23,4 @@ lex(root):
   r"[()A-Z]" is(comment)
   r"\s+" is(text)
 
+const-set(.Lexer, lexer)

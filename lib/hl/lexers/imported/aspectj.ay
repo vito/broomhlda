@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "AspectJ"
 aliases: ["aspectj"]
 extensions: [".aj"]
@@ -39,3 +39,4 @@ lex(root):
 lex(class):
   r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
 
+const-set(.Lexer, lexer)

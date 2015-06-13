@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Lua"
 aliases: ["lua"]
 extensions: [".lua", ".wlua"]
@@ -53,3 +53,4 @@ lex(root):
   r"\#!(.*?)$" is(comment.preproc)
   r"" is(text) -> go-to(base)
 
+const-set(.Lexer, lexer)

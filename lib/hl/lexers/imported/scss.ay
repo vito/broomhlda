@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "SCSS"
 aliases: ["scss"]
 extensions: [".scss"]
@@ -112,3 +112,4 @@ lex(interpolation):
   r"\}" is(literal.string.interpol) -> pop
   any-of(value)
 
+const-set(.Lexer, lexer)

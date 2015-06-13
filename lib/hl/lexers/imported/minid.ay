@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "MiniD"
 aliases: ["minid"]
 extensions: [".md"]
@@ -34,3 +34,4 @@ lex(root):
   r"(\126=|\^=|%=|\*=|==|!=|>>>=|>>>|>>=|>>|>=|<=>|\?=|-\>|<<=|<<|<=|\+\+|\+=|--|-=|\|\||\|=|&&|&=|\.\.|/=)|[-/.&$@|\+<>!()\[\]{}?,;:=*%^\126\#\\]" is(punctuation)
   r"[a-zA-Z_]\w*" is(name)
 
+const-set(.Lexer, lexer)

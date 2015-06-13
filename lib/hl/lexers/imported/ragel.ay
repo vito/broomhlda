@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Ragel"
 aliases: ["ragel"]
 extensions: []
@@ -67,3 +67,4 @@ lex(numbers):
   r"0x[0-9A-Fa-f]+" is(literal.number.hex)
   r"[+-]?[0-9]+" is(literal.number.integer)
 
+const-set(.Lexer, lexer)

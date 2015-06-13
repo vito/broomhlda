@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Kconfig"
 aliases: ["kconfig", "menuconfig", "linux-config", "kernel-config"]
 extensions: ["Kconfig", "Config.in", "external.in", "standard-modules.in"]
@@ -68,3 +68,4 @@ lex(indent4):
   r"\s*\n" is(text)
   r"" is(generic) -> pop(2)
 
+const-set(.Lexer, lexer)

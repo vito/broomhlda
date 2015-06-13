@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Fancy"
 aliases: ["fancy", "fy"]
 extensions: [".fy", ".fancypack"]
@@ -51,3 +51,4 @@ lex(balanced-regex):
   r"%(\\\\|\\\%|[^\%])*%[egimosx]*" is(literal.string.regex) -> pop
   r"\$(\\\\|\\\$|[^\$])*\$[egimosx]*" is(literal.string.regex) -> pop
 
+const-set(.Lexer, lexer)

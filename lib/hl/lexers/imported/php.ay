@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "PHP"
 aliases: ["php", "php3", "php4", "php5"]
 extensions: [".php", ".php[345]", ".inc"]
@@ -60,3 +60,4 @@ lex(string):
   r"(\$\{)(\S+)(\})" is(by-groups(literal.string.interpol, name.variable, literal.string.interpol))
   r"[${\\]+" is(literal.string.double)
 
+const-set(.Lexer, lexer)

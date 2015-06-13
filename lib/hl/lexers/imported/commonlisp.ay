@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Common Lisp"
 aliases: ["common-lisp", "cl"]
 extensions: [".cl", ".lisp", ".el"]
@@ -62,3 +62,4 @@ lex(commented-form):
   r"\)" is(comment.preproc) -> pop
   r"[^()]+" is(comment.preproc)
 
+const-set(.Lexer, lexer)

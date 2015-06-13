@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Groff"
 aliases: ["groff", "nroff", "man"]
 extensions: [".[1234567]", ".man"]
@@ -35,3 +35,4 @@ lex(textline):
   r"[^\\\n]+" is(text)
   r"\n" is(text) -> pop
 
+const-set(.Lexer, lexer)

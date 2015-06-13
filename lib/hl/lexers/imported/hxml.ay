@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "Hxml"
 aliases: ["haxeml", "hxml"]
 extensions: [".hxml"]
@@ -19,3 +19,4 @@ lex(root):
   r"(--)(js-namespace|php-front|php-lib|remap|gen-hx-classes)( +)(.+)" is(by-groups(punctuation, keyword, text.whitespace, literal.string))
   r"\#.*" is(comment.single)
 
+const-set(.Lexer, lexer)

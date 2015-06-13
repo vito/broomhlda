@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: "FoxPro"
 aliases: ["Clipper", "XBase"]
 extensions: [".PRG", ".prg"]
@@ -34,3 +34,4 @@ lex(root):
   r"\s+" is(text)
   r"." is(text)
 
+const-set(.Lexer, lexer)
