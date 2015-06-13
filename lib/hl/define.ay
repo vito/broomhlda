@@ -66,12 +66,12 @@ def(state-from('pop)): '(State Pop new)
 def(state-from(`(pop(~n)))): `(State PopNum new(~n))
 def(state-from('push)): '(State Push new)
 def(state-from(`(do-all(~*args)))):
-  `(State DoAll new(~(args collect [a]: state-from(a))))
+  `(State DoAll new([~*(args collect [a]: state-from(a))]))
 def(state-from(`(combined(~*args)))):
   all = args reverse collect [a]:
     `(@matchers fetch(.~a))
 
-  `(State Combined new(~all))
+  `(State Combined new([~*all]))
 def(state-from(`(go-to(~n)))):
   `(State GoTo new(@matchers, .~n))
 def(state-from(x)):

@@ -14,7 +14,7 @@ data(Matcher(@regexp, @type, @next))
 
 -- TODO: Using
 fn(tokens(data, gs & token ByGroups)):
-  gs types zip(data to-a drop(1)) [[t, d]]:
+  gs types zip(data to-a drop(1)) [t, d]:
     when(t nil? || d nil?):
       return(nil)
 
