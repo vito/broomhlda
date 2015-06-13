@@ -2,31 +2,31 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "MAQL"
-aliases: ["maql"]
-extensions: [".maql"]
-mimetypes: ["text/x-gooddata-maql", "application/x-gooddata-maql"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "MAQL"
+  aliases: ["maql"]
+  extensions: [".maql"]
+  mimetypes: ["text/x-gooddata-maql", "application/x-gooddata-maql"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"IDENTIFIER\b" is(name.builtin)
-  r"\{[^}]+\}" is(name.variable)
-  r"[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]{1,3})?" is(literal.number)
-  r"\"" is(literal.string) -> go-to(string-literal)
-  r"\<\>|\!\=" is(operator)
-  r"\=|\>\=|\>|\<\=|\<" is(operator)
-  r"\:\=" is(operator)
-  r"\[[^]]+\]" is(name.variable.class)
-  r"(DIMENSIONS?|BOTTOM|METRIC|COUNT|OTHER|FACT|WITH|TOP|OR|ATTRIBUTE|CREATE|PARENT|FALSE|ROWS?|FROM|ALL|AS|PF|COLUMNS?|DEFINE|REPORT|LIMIT|TABLE|LIKE|AND|BY|BETWEEN|EXCEPT|SELECT|MATCH|WHERE|TRUE|FOR|IN|WITHOUT|FILTER|ALIAS|ORDER|FACT|WHEN|NOT|ON|KEYS|KEY|FULLSET|PRIMARY|LABELS|LABEL|VISUAL|TITLE|DESCRIPTION|FOLDER|ALTER|DROP|ADD|DATASET|DATATYPE|INT|BIGINT|DOUBLE|DATE|VARCHAR|DECIMAL|SYNCHRONIZE|TYPE|DEFAULT|ORDER|ASC|DESC|HYPERLINK|INCLUDE|TEMPLATE|MODIFY)\b" is(keyword)
-  r"[a-zA-Z]\w*\b" is(name.function)
-  r"\#.*" is(comment.single)
-  r"[,;\(\)]" is(punctuation)
-  r"\s+" is(text)
+  lex(root):
+    r"IDENTIFIER\b" is(name.builtin)
+    r"\{[^}]+\}" is(name.variable)
+    r"[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]{1,3})?" is(literal.number)
+    r"\"" is(literal.string) -> go-to(string-literal)
+    r"\<\>|\!\=" is(operator)
+    r"\=|\>\=|\>|\<\=|\<" is(operator)
+    r"\:\=" is(operator)
+    r"\[[^]]+\]" is(name.variable.class)
+    r"(DIMENSIONS?|BOTTOM|METRIC|COUNT|OTHER|FACT|WITH|TOP|OR|ATTRIBUTE|CREATE|PARENT|FALSE|ROWS?|FROM|ALL|AS|PF|COLUMNS?|DEFINE|REPORT|LIMIT|TABLE|LIKE|AND|BY|BETWEEN|EXCEPT|SELECT|MATCH|WHERE|TRUE|FOR|IN|WITHOUT|FILTER|ALIAS|ORDER|FACT|WHEN|NOT|ON|KEYS|KEY|FULLSET|PRIMARY|LABELS|LABEL|VISUAL|TITLE|DESCRIPTION|FOLDER|ALTER|DROP|ADD|DATASET|DATATYPE|INT|BIGINT|DOUBLE|DATE|VARCHAR|DECIMAL|SYNCHRONIZE|TYPE|DEFAULT|ORDER|ASC|DESC|HYPERLINK|INCLUDE|TEMPLATE|MODIFY)\b" is(keyword)
+    r"[a-zA-Z]\w*\b" is(name.function)
+    r"\#.*" is(comment.single)
+    r"[,;\(\)]" is(punctuation)
+    r"\s+" is(text)
 
-lex(string-literal):
-  r"\\[tnrfbae\"\\]" is(literal.string.escape)
-  r"\"" is(literal.string) -> pop
-  r"[^\\\"]+" is(literal.string)
+  lex(string-literal):
+    r"\\[tnrfbae\"\\]" is(literal.string.escape)
+    r"\"" is(literal.string) -> pop
+    r"[^\\\"]+" is(literal.string)
 
 const-set(.Lexer, lexer)

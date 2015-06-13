@@ -2,92 +2,92 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Elixir"
-aliases: ["elixir", "ex", "exs"]
-extensions: [".ex", ".exs"]
-mimetypes: ["text/x-elixir"]
-start: .root
-flags: 0
+  name: "Elixir"
+  aliases: ["elixir", "ex", "exs"]
+  extensions: [".ex", ".exs"]
+  mimetypes: ["text/x-elixir"]
+  start: .root
+  flags: 0
 
-lex(enddoublestr):
-  any-of(interpoling)
-  r"[^\#\"]+" is(literal.string.double)
+  lex(enddoublestr):
+    any-of(interpoling)
+    r"[^\#\"]+" is(literal.string.double)
 
-lex(interpoling-symbol):
-  r"\"" is(literal.string.symbol) -> pop
-  any-of(interpoling)
-  r"[^\#\"]+" is(literal.string.symbol)
+  lex(interpoling-symbol):
+    r"\"" is(literal.string.symbol) -> pop
+    any-of(interpoling)
+    r"[^\#\"]+" is(literal.string.symbol)
 
-lex(sbno-intp):
-  r".*\][a-z]*" is(literal.string.double) -> pop
+  lex(sbno-intp):
+    r".*\][a-z]*" is(literal.string.double) -> pop
 
-lex(sbintp):
-  r"\][a-z]*" is(literal.string.double) -> pop
-  any-of(enddoublestr)
+  lex(sbintp):
+    r"\][a-z]*" is(literal.string.double) -> pop
+    any-of(enddoublestr)
 
-lex(interpoling-string):
-  r"}" is(literal.string.interpol) -> pop
-  any-of(root)
+  lex(interpoling-string):
+    r"}" is(literal.string.interpol) -> pop
+    any-of(root)
 
-lex(dqs):
-  r"\"" is(literal.string.double) -> pop
-  any-of(enddoublestr)
+  lex(dqs):
+    r"\"" is(literal.string.double) -> pop
+    any-of(enddoublestr)
 
-lex(paintp):
-  r"\)[a-z]*" is(literal.string.double) -> pop
-  any-of(enddoublestr)
+  lex(paintp):
+    r"\)[a-z]*" is(literal.string.double) -> pop
+    any-of(enddoublestr)
 
-lex(ltintp):
-  r"\>[a-z]*" is(literal.string.double) -> pop
-  any-of(enddoublestr)
+  lex(ltintp):
+    r"\>[a-z]*" is(literal.string.double) -> pop
+    any-of(enddoublestr)
 
-lex(cbintp):
-  r"\}[a-z]*" is(literal.string.double) -> pop
-  any-of(enddoublestr)
+  lex(cbintp):
+    r"\}[a-z]*" is(literal.string.double) -> pop
+    any-of(enddoublestr)
 
-lex(pano-intp):
-  r".*\)[a-z]*" is(literal.string.double) -> pop
+  lex(pano-intp):
+    r".*\)[a-z]*" is(literal.string.double) -> pop
 
-lex(interpoling):
-  r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
+  lex(interpoling):
+    r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
 
-lex(cbno-intp):
-  r".*\}[a-z]*" is(literal.string.double) -> pop
+  lex(cbno-intp):
+    r".*\}[a-z]*" is(literal.string.double) -> pop
 
-lex(root):
-  r"\s+" is(text)
-  r"\#.*$" is(comment.single)
-  r"\b(case|cond|end|bc|lc|if|unless|try|loop|receive|fn|defmodule|defp?|defprotocol|defimpl|defrecord|defmacrop?|defdelegate|defexception|exit|raise|throw|unless|after|rescue|catch|else)\b(?![?!])|(?<!\.)\b(do|\-\>)\b\s*" is(keyword)
-  r"\b(import|require|use|recur|quote|unquote|super|refer)\b(?![?!])" is(keyword.namespace)
-  r"(?<!\.)\b(and|not|or|when|xor|in)\b" is(operator.word)
-  r"%=|\*=|\*\*=|\+=|\-=|\^=|\|\|=|<=>|<(?!<|=)|>(?!<|=|>)|<=|>=|===|==|=\126|!=|!\126|(?=[ \t])\?|(?<=[ \t])!+|&&|\|\||\^|\*|\+|\-|/|\||\+\+|\-\-|\*\*|\/\/|\<\-|\<\>|<<|>>|=|\." is(operator)
-  r"(?<!:)(:)([a-zA-Z_]\w*([?!]|=(?![>=]))?|\<\>|===?|>=?|<=?|<=>|&&?|%\(\)|%\[\]|%\{\}|\+\+?|\-\-?|\|\|?|\!|//|[%&`/\|]|\*\*?|=?\126|<\-)|([a-zA-Z_]\w*([?!])?)(:)(?!:)" is(literal.string.symbol)
-  r":\"" is(literal.string.symbol) -> go-to(interpoling-symbol)
-  r"\b(nil|true|false)\b(?![?!])|\b[A-Z]\w*\b" is(name.constant)
-  r"\b(__(FILE|LINE|MODULE|MAIN|FUNCTION)__)\b(?![?!])" is(name.builtin.pseudo)
-  r"[a-zA-Z_!][\w_]*[!\?]?" is(name)
-  r"[(){};,/\|:\\\[\]]" is(punctuation)
-  r"@[a-zA-Z_]\w*|&\d" is(name.variable)
-  r"\b(0[xX][0-9A-Fa-f]+|\d(_?\d)*(\.(?![^\d\s])(_?\d)*)?([eE][-+]?\d(_?\d)*)?|0[bB][01]+)\b" is(literal.number)
-  r"%r\/.*\/" is(literal.string.regex)
-  any-of(strings)
+  lex(root):
+    r"\s+" is(text)
+    r"\#.*$" is(comment.single)
+    r"\b(case|cond|end|bc|lc|if|unless|try|loop|receive|fn|defmodule|defp?|defprotocol|defimpl|defrecord|defmacrop?|defdelegate|defexception|exit|raise|throw|unless|after|rescue|catch|else)\b(?![?!])|(?<!\.)\b(do|\-\>)\b\s*" is(keyword)
+    r"\b(import|require|use|recur|quote|unquote|super|refer)\b(?![?!])" is(keyword.namespace)
+    r"(?<!\.)\b(and|not|or|when|xor|in)\b" is(operator.word)
+    r"%=|\*=|\*\*=|\+=|\-=|\^=|\|\|=|<=>|<(?!<|=)|>(?!<|=|>)|<=|>=|===|==|=\126|!=|!\126|(?=[ \t])\?|(?<=[ \t])!+|&&|\|\||\^|\*|\+|\-|/|\||\+\+|\-\-|\*\*|\/\/|\<\-|\<\>|<<|>>|=|\." is(operator)
+    r"(?<!:)(:)([a-zA-Z_]\w*([?!]|=(?![>=]))?|\<\>|===?|>=?|<=?|<=>|&&?|%\(\)|%\[\]|%\{\}|\+\+?|\-\-?|\|\|?|\!|//|[%&`/\|]|\*\*?|=?\126|<\-)|([a-zA-Z_]\w*([?!])?)(:)(?!:)" is(literal.string.symbol)
+    r":\"" is(literal.string.symbol) -> go-to(interpoling-symbol)
+    r"\b(nil|true|false)\b(?![?!])|\b[A-Z]\w*\b" is(name.constant)
+    r"\b(__(FILE|LINE|MODULE|MAIN|FUNCTION)__)\b(?![?!])" is(name.builtin.pseudo)
+    r"[a-zA-Z_!][\w_]*[!\?]?" is(name)
+    r"[(){};,/\|:\\\[\]]" is(punctuation)
+    r"@[a-zA-Z_]\w*|&\d" is(name.variable)
+    r"\b(0[xX][0-9A-Fa-f]+|\d(_?\d)*(\.(?![^\d\s])(_?\d)*)?([eE][-+]?\d(_?\d)*)?|0[bB][01]+)\b" is(literal.number)
+    r"%r\/.*\/" is(literal.string.regex)
+    any-of(strings)
 
-lex(strings):
-  r"(%[A-Ba-z])?\"\"\"(?:.|\n)*?\"\"\"" is(literal.string.doc)
-  r"'''(?:.|\n)*?'''" is(literal.string.doc)
-  r"\"" is(literal.string.double) -> go-to(dqs)
-  r"'.*'" is(literal.string.single)
-  r"(?<!\w)\?(\\(x\d{1,2}|\h{1,2}(?!\h)\b|0[0-7]{0,2}(?![0-7])\b|[^x0MC])|(\\[MC]-)+\w|[^\s\\])" is(literal.string.other)
-  r"%[a-z]\{" is(literal.string.double) -> go-to(cbintp)
-  r"%[A-Z]\{" is(literal.string.double) -> go-to(cbno-intp)
-  r"%[a-z]\[" is(literal.string.double) -> go-to(sbintp)
-  r"%[A-Z]\[" is(literal.string.double) -> go-to(sbno-intp)
-  r"%[a-z]\(" is(literal.string.double) -> go-to(paintp)
-  r"%[A-Z]\(" is(literal.string.double) -> go-to(pano-intp)
-  r"%[a-z]\<" is(literal.string.double) -> go-to(ltintp)
-  r"%[A-Z]\<" is(literal.string.double) -> go-to(ltno-intp)
+  lex(strings):
+    r"(%[A-Ba-z])?\"\"\"(?:.|\n)*?\"\"\"" is(literal.string.doc)
+    r"'''(?:.|\n)*?'''" is(literal.string.doc)
+    r"\"" is(literal.string.double) -> go-to(dqs)
+    r"'.*'" is(literal.string.single)
+    r"(?<!\w)\?(\\(x\d{1,2}|\h{1,2}(?!\h)\b|0[0-7]{0,2}(?![0-7])\b|[^x0MC])|(\\[MC]-)+\w|[^\s\\])" is(literal.string.other)
+    r"%[a-z]\{" is(literal.string.double) -> go-to(cbintp)
+    r"%[A-Z]\{" is(literal.string.double) -> go-to(cbno-intp)
+    r"%[a-z]\[" is(literal.string.double) -> go-to(sbintp)
+    r"%[A-Z]\[" is(literal.string.double) -> go-to(sbno-intp)
+    r"%[a-z]\(" is(literal.string.double) -> go-to(paintp)
+    r"%[A-Z]\(" is(literal.string.double) -> go-to(pano-intp)
+    r"%[a-z]\<" is(literal.string.double) -> go-to(ltintp)
+    r"%[A-Z]\<" is(literal.string.double) -> go-to(ltno-intp)
 
-lex(ltno-intp):
-  r".*\>[a-z]*" is(literal.string.double) -> pop
+  lex(ltno-intp):
+    r".*\>[a-z]*" is(literal.string.double) -> pop
 
 const-set(.Lexer, lexer)

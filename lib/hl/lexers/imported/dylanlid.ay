@@ -2,16 +2,16 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "DylanLID"
-aliases: ["dylan-lid", "lid"]
-extensions: [".lid", ".hdp"]
-mimetypes: ["text/x-dylan-lid"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "DylanLID"
+  aliases: ["dylan-lid", "lid"]
+  extensions: [".lid", ".hdp"]
+  mimetypes: ["text/x-dylan-lid"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"\s+" is(text)
-  r"//.*?\n" is(comment.single)
-  r"(.*?)(:)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, operator, text, literal.string))
+  lex(root):
+    r"\s+" is(text)
+    r"//.*?\n" is(comment.single)
+    r"(.*?)(:)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, operator, text, literal.string))
 
 const-set(.Lexer, lexer)

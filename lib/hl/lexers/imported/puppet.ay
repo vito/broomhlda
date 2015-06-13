@@ -2,49 +2,49 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Puppet"
-aliases: ["puppet"]
-extensions: [".pp"]
-mimetypes: []
-start: .root
-flags: 0
+  name: "Puppet"
+  aliases: ["puppet"]
+  extensions: [".pp"]
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(operators):
-  r"(=>|\?|<|>|=|\+|-|/|\*|\126|!|\|)" is(operator)
-  r"(in|and|or|not)\b" is(operator.word)
+  lex(operators):
+    r"(=>|\?|<|>|=|\+|-|/|\*|\126|!|\|)" is(operator)
+    r"(in|and|or|not)\b" is(operator.word)
 
-lex(comments):
-  r"\s*\#.*$" is(comment)
-  r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
+  lex(comments):
+    r"\s*\#.*$" is(comment)
+    r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
 
-lex(names):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.attribute)
-  r"(\$\S+)(\[)(\S+)(\])" is(by-groups(name.variable, punctuation, literal.string, punctuation))
-  r"\$\S+" is(name.variable)
+  lex(names):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.attribute)
+    r"(\$\S+)(\[)(\S+)(\])" is(by-groups(name.variable, punctuation, literal.string, punctuation))
+    r"\$\S+" is(name.variable)
 
-lex(keywords):
-  r"(?i)(absent|alert|alias|audit|augeas|before|case|check|class|computer|configured|contained|create_resources|crit|cron|debug|default|define|defined|directory|else|elsif|emerg|err|exec|extlookup|fail|false|file|filebucket|fqdn_rand|generate|host|if|import|include|info|inherits|inline_template|installed|interface|k5login|latest|link|loglevel|macauthorization|mailalias|maillist|mcx|md5|mount|mounted|nagios_command|nagios_contact|nagios_contactgroup|nagios_host|nagios_hostdependency|nagios_hostescalation|nagios_hostextinfo|nagios_hostgroup|nagios_service|nagios_servicedependency|nagios_serviceescalation|nagios_serviceextinfo|nagios_servicegroup|nagios_timeperiod|node|noop|notice|notify|package|present|purged|realize|regsubst|resources|role|router|running|schedule|scheduled_task|search|selboolean|selmodule|service|sha1|shellquote|split|sprintf|ssh_authorized_key|sshkey|stage|stopped|subscribe|tag|tagged|template|tidy|true|undef|unmounted|user|versioncmp|vlan|warning|yumrepo|zfs|zone|zpool)\b" is(keyword)
+  lex(keywords):
+    r"(?i)(absent|alert|alias|audit|augeas|before|case|check|class|computer|configured|contained|create_resources|crit|cron|debug|default|define|defined|directory|else|elsif|emerg|err|exec|extlookup|fail|false|file|filebucket|fqdn_rand|generate|host|if|import|include|info|inherits|inline_template|installed|interface|k5login|latest|link|loglevel|macauthorization|mailalias|maillist|mcx|md5|mount|mounted|nagios_command|nagios_contact|nagios_contactgroup|nagios_host|nagios_hostdependency|nagios_hostescalation|nagios_hostextinfo|nagios_hostgroup|nagios_service|nagios_servicedependency|nagios_serviceescalation|nagios_serviceextinfo|nagios_servicegroup|nagios_timeperiod|node|noop|notice|notify|package|present|purged|realize|regsubst|resources|role|router|running|schedule|scheduled_task|search|selboolean|selmodule|service|sha1|shellquote|split|sprintf|ssh_authorized_key|sshkey|stage|stopped|subscribe|tag|tagged|template|tidy|true|undef|unmounted|user|versioncmp|vlan|warning|yumrepo|zfs|zone|zpool)\b" is(keyword)
 
-lex(root):
-  any-of(comments)
-  any-of(keywords)
-  any-of(names)
-  any-of(numbers)
-  any-of(operators)
-  any-of(strings)
-  r"[\]{}:(),;\[]" is(punctuation)
-  r"[^\S\n]+" is(text)
+  lex(root):
+    any-of(comments)
+    any-of(keywords)
+    any-of(names)
+    any-of(numbers)
+    any-of(operators)
+    any-of(strings)
+    r"[\]{}:(),;\[]" is(punctuation)
+    r"[^\S\n]+" is(text)
 
-lex(strings):
-  r"\"([^\"])*\"" is(literal.string)
-  r"\'([^\'])*\'" is(literal.string)
+  lex(strings):
+    r"\"([^\"])*\"" is(literal.string)
+    r"\'([^\'])*\'" is(literal.string)
 
-lex(numbers):
-  r"(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?j?" is(literal.number.float)
-  r"\d+[eE][+-]?[0-9]+j?" is(literal.number.float)
-  r"0[0-7]+j?" is(literal.number.oct)
-  r"0[xX][a-fA-F0-9]+" is(literal.number.hex)
-  r"\d+L" is(literal.number.integer.long)
-  r"\d+j?" is(literal.number.integer)
+  lex(numbers):
+    r"(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?j?" is(literal.number.float)
+    r"\d+[eE][+-]?[0-9]+j?" is(literal.number.float)
+    r"0[0-7]+j?" is(literal.number.oct)
+    r"0[xX][a-fA-F0-9]+" is(literal.number.hex)
+    r"\d+L" is(literal.number.integer.long)
+    r"\d+j?" is(literal.number.integer)
 
 const-set(.Lexer, lexer)

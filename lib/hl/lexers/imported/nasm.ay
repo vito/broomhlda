@@ -2,51 +2,51 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "NASM"
-aliases: ["nasm"]
-extensions: [".asm", ".ASM"]
-mimetypes: ["text/x-nasm"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "NASM"
+  aliases: ["nasm"]
+  extensions: [".asm", ".ASM"]
+  mimetypes: ["text/x-nasm"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(preproc):
-  r"[^;\n]+" is(comment.preproc)
-  r";.*?\n" is(comment.single) -> pop
-  r"\n" is(comment.preproc) -> pop
+  lex(preproc):
+    r"[^;\n]+" is(comment.preproc)
+    r";.*?\n" is(comment.single) -> pop
+    r"\n" is(comment.preproc) -> pop
 
-lex(punctuation):
-  r"[,():\[\]]+" is(punctuation)
-  r"[&|^<>+*/%\126-]+" is(operator)
-  r"[$]+" is(keyword.constant)
-  r"seg|wrt|strict" is(operator.word)
-  r"byte|[dq]?word" is(keyword.type)
+  lex(punctuation):
+    r"[,():\[\]]+" is(punctuation)
+    r"[&|^<>+*/%\126-]+" is(operator)
+    r"[$]+" is(keyword.constant)
+    r"seg|wrt|strict" is(operator.word)
+    r"byte|[dq]?word" is(keyword.type)
 
-lex(root):
-  any-of(whitespace)
-  r"^\s*%" is(comment.preproc) -> go-to(preproc)
-  r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*:" is(name.label)
-  r"([a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*)(\s+)(equ)" is(by-groups(name.constant, keyword.declaration, keyword.declaration)) -> go-to(instruction-args)
-  r"BITS|USE16|USE32|SECTION|SEGMENT|ABSOLUTE|EXTERN|GLOBAL|ORG|ALIGN|STRUC|ENDSTRUC|COMMON|CPU|GROUP|UPPERCASE|IMPORT|EXPORT|LIBRARY|MODULE" is(keyword) -> go-to(instruction-args)
-  r"(?:res|d)[bwdqt]|times" is(keyword.declaration) -> go-to(instruction-args)
-  r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*" is(name.function) -> go-to(instruction-args)
-  r"[\r\n]+" is(text)
+  lex(root):
+    any-of(whitespace)
+    r"^\s*%" is(comment.preproc) -> go-to(preproc)
+    r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*:" is(name.label)
+    r"([a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*)(\s+)(equ)" is(by-groups(name.constant, keyword.declaration, keyword.declaration)) -> go-to(instruction-args)
+    r"BITS|USE16|USE32|SECTION|SEGMENT|ABSOLUTE|EXTERN|GLOBAL|ORG|ALIGN|STRUC|ENDSTRUC|COMMON|CPU|GROUP|UPPERCASE|IMPORT|EXPORT|LIBRARY|MODULE" is(keyword) -> go-to(instruction-args)
+    r"(?:res|d)[bwdqt]|times" is(keyword.declaration) -> go-to(instruction-args)
+    r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*" is(name.function) -> go-to(instruction-args)
+    r"[\r\n]+" is(text)
 
-lex(whitespace):
-  r"\n" is(text)
-  r"[ \t]+" is(text)
-  r";.*" is(comment.single)
+  lex(whitespace):
+    r"\n" is(text)
+    r"[ \t]+" is(text)
+    r";.*" is(comment.single)
 
-lex(instruction-args):
-  r"\"(\\\"|[^\"\n])*\"|'(\\'|[^'\n])*'|`(\\`|[^`\n])*`" is(literal.string)
-  r"(?:0[xX][0-9a-fA-F]+|$0[0-9a-fA-F]*|[0-9]+[0-9a-fA-F]*h)" is(literal.number.hex)
-  r"[0-7]+q" is(literal.number.oct)
-  r"[01]+b" is(literal.number)
-  r"[0-9]+\.e?[0-9]+" is(literal.number.float)
-  r"[0-9]+" is(literal.number.integer)
-  any-of(punctuation)
-  r"r[0-9][0-5]?[bwd]|[a-d][lh]|[er]?[a-d]x|[er]?[sb]p|[er]?[sd]i|[c-gs]s|st[0-7]|mm[0-7]|cr[0-4]|dr[0-367]|tr[3-7]" is(name.builtin)
-  r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*" is(name.variable)
-  r"[\r\n]+" is(text) -> pop
-  any-of(whitespace)
+  lex(instruction-args):
+    r"\"(\\\"|[^\"\n])*\"|'(\\'|[^'\n])*'|`(\\`|[^`\n])*`" is(literal.string)
+    r"(?:0[xX][0-9a-fA-F]+|$0[0-9a-fA-F]*|[0-9]+[0-9a-fA-F]*h)" is(literal.number.hex)
+    r"[0-7]+q" is(literal.number.oct)
+    r"[01]+b" is(literal.number)
+    r"[0-9]+\.e?[0-9]+" is(literal.number.float)
+    r"[0-9]+" is(literal.number.integer)
+    any-of(punctuation)
+    r"r[0-9][0-5]?[bwd]|[a-d][lh]|[er]?[a-d]x|[er]?[sb]p|[er]?[sd]i|[c-gs]s|st[0-7]|mm[0-7]|cr[0-4]|dr[0-367]|tr[3-7]" is(name.builtin)
+    r"[a-zA-Z$._?][a-zA-Z0-9$._?\#@\126]*" is(name.variable)
+    r"[\r\n]+" is(text) -> pop
+    any-of(whitespace)
 
 const-set(.Lexer, lexer)

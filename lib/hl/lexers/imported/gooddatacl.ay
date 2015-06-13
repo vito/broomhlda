@@ -2,32 +2,32 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "GoodData-CL"
-aliases: ["gooddata-cl"]
-extensions: [".gdc"]
-mimetypes: ["text/x-gooddata-cl"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "GoodData-CL"
+  aliases: ["gooddata-cl"]
+  extensions: [".gdc"]
+  mimetypes: ["text/x-gooddata-cl"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(args-list):
-  r"\)" is(punctuation) -> pop
-  r"," is(punctuation)
-  r"[a-zA-Z]\w*" is(name.variable)
-  r"=" is(operator)
-  r"\"" is(literal.string) -> go-to(string-literal)
-  r"[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]{1,3})?" is(literal.number)
-  r"\s" is(text)
+  lex(args-list):
+    r"\)" is(punctuation) -> pop
+    r"," is(punctuation)
+    r"[a-zA-Z]\w*" is(name.variable)
+    r"=" is(operator)
+    r"\"" is(literal.string) -> go-to(string-literal)
+    r"[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]{1,3})?" is(literal.number)
+    r"\s" is(text)
 
-lex(root):
-  r"\#.*" is(comment.single)
-  r"[a-zA-Z]\w*" is(name.function)
-  r"\(" is(punctuation) -> go-to(args-list)
-  r";" is(punctuation)
-  r"\s+" is(text)
+  lex(root):
+    r"\#.*" is(comment.single)
+    r"[a-zA-Z]\w*" is(name.function)
+    r"\(" is(punctuation) -> go-to(args-list)
+    r";" is(punctuation)
+    r"\s+" is(text)
 
-lex(string-literal):
-  r"\\[tnrfbae\"\\]" is(literal.string.escape)
-  r"\"" is(literal.string) -> pop
-  r"[^\\\"]+" is(literal.string)
+  lex(string-literal):
+    r"\\[tnrfbae\"\\]" is(literal.string.escape)
+    r"\"" is(literal.string) -> pop
+    r"[^\\\"]+" is(literal.string)
 
 const-set(.Lexer, lexer)

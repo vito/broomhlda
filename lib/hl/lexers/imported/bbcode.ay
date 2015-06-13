@@ -2,22 +2,22 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "BBCode"
-aliases: ["bbcode"]
-extensions: []
-mimetypes: ["text/x-bbcode"]
-start: .root
-flags: 0
+  name: "BBCode"
+  aliases: ["bbcode"]
+  extensions: []
+  mimetypes: ["text/x-bbcode"]
+  start: .root
+  flags: 0
 
-lex(tag):
-  r"\s+" is(text)
-  r"(\w+)(=)(\"?[^\s\"\]]+\"?)" is(by-groups(name.attribute, operator, literal.string))
-  r"(=)(\"?[^\s\"\]]+\"?)" is(by-groups(operator, literal.string))
-  r"\]" is(keyword) -> pop
+  lex(tag):
+    r"\s+" is(text)
+    r"(\w+)(=)(\"?[^\s\"\]]+\"?)" is(by-groups(name.attribute, operator, literal.string))
+    r"(=)(\"?[^\s\"\]]+\"?)" is(by-groups(operator, literal.string))
+    r"\]" is(keyword) -> pop
 
-lex(root):
-  r"[^\[]+" is(text)
-  r"\[/?\w+" is(keyword) -> go-to(tag)
-  r"\[" is(text)
+  lex(root):
+    r"[^\[]+" is(text)
+    r"\[/?\w+" is(keyword) -> go-to(tag)
+    r"\[" is(text)
 
 const-set(.Lexer, lexer)

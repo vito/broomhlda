@@ -2,16 +2,16 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Properties"
-aliases: ["properties"]
-extensions: [".properties"]
-mimetypes: ["text/x-java-properties"]
-start: .root
-flags: 0
+  name: "Properties"
+  aliases: ["properties"]
+  extensions: [".properties"]
+  mimetypes: ["text/x-java-properties"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\s+" is(text)
-  r"(?:[;\#]|//).*$" is(comment)
-  r"(.*?)([ \t]*)([=:])([ \t]*)(.*(?:(?<=\\)\n.*)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
+  lex(root):
+    r"\s+" is(text)
+    r"(?:[;\#]|//).*$" is(comment)
+    r"(.*?)([ \t]*)([=:])([ \t]*)(.*(?:(?<=\\)\n.*)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
 
 const-set(.Lexer, lexer)

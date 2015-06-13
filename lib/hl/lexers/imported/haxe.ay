@@ -2,185 +2,185 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "haXe"
-aliases: ["hx", "haXe"]
-extensions: [".hx"]
-mimetypes: ["text/haxe"]
-start: .root
-flags: Regexp MULTILINE
+  name: "haXe"
+  aliases: ["hx", "haXe"]
+  extensions: [".hx"]
+  mimetypes: ["text/haxe"]
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(anonfundef):
-  r"\bfunction\b" is(keyword.declaration) -> go-to(fundecl)
+  lex(anonfundef):
+    r"\bfunction\b" is(keyword.declaration) -> go-to(fundecl)
 
-lex(instancefundef):
-  r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
-  r"\b(function)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.function)) -> go-to(fundecl)
+  lex(instancefundef):
+    r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
+    r"\b(function)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.function)) -> go-to(fundecl)
 
-lex(typedecl):
-  any-of(whitespace)
-  r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
-  r"<" is(punctuation) -> go-to(generictypedecl)
-  r"(?=[{}()=,a-z])" is(text) -> pop
+  lex(typedecl):
+    any-of(whitespace)
+    r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
+    r"<" is(punctuation) -> go-to(generictypedecl)
+    r"(?=[{}()=,a-z])" is(text) -> pop
 
-lex(typedefbody):
-  any-of(whitespace)
-  any-of(instancevardef)
-  any-of(instancefundef)
-  r">" is(punctuation) -> go-to(typedecl)
-  r"," is(punctuation)
-  r"}" is(punctuation) -> pop
+  lex(typedefbody):
+    any-of(whitespace)
+    any-of(instancevardef)
+    any-of(instancefundef)
+    r">" is(punctuation) -> go-to(typedecl)
+    r"," is(punctuation)
+    r"}" is(punctuation) -> pop
 
-lex(classdefbody):
-  any-of(whitespace)
-  any-of(instancevardef)
-  any-of(instancefundef)
-  r"}" is(punctuation) -> pop
-  any-of(codeblock)
+  lex(classdefbody):
+    any-of(whitespace)
+    any-of(instancevardef)
+    any-of(instancefundef)
+    r"}" is(punctuation) -> pop
+    any-of(codeblock)
 
-lex(fundecl):
-  any-of(whitespace)
-  any-of(typelabel)
-  any-of(generictypedecl)
-  r"\(" is(punctuation) -> go-to(funargdecl)
-  r"(?=[a-zA-Z0-9_])" is(text) -> pop
-  r"{" is(punctuation) -> do-all(pop, go-to(codeblock))
-  r";" is(punctuation) -> pop
+  lex(fundecl):
+    any-of(whitespace)
+    any-of(typelabel)
+    any-of(generictypedecl)
+    r"\(" is(punctuation) -> go-to(funargdecl)
+    r"(?=[a-zA-Z0-9_])" is(text) -> pop
+    r"{" is(punctuation) -> do-all(pop, go-to(codeblock))
+    r";" is(punctuation) -> pop
 
-lex(interfacedef):
-  r"interface" is(keyword.declaration) -> do-all(go-to(interfacedefprebody), go-to(typedecl))
+  lex(interfacedef):
+    r"interface" is(keyword.declaration) -> do-all(go-to(interfacedefprebody), go-to(typedecl))
 
-lex(codekeywords):
-  r"\b(if|else|while|do|for|in|break|continue|return|switch|case|try|catch|throw|null|trace|new|this|super|untyped|cast|callback|here)\b" is(keyword.reserved)
+  lex(codekeywords):
+    r"\b(if|else|while|do|for|in|break|continue|return|switch|case|try|catch|throw|null|trace|new|this|super|untyped|cast|callback|here)\b" is(keyword.reserved)
 
-lex(enumdefbody):
-  any-of(whitespace)
-  r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name.variable.instance)
-  r"\(" is(punctuation) -> go-to(funargdecl)
-  r";" is(punctuation)
-  r"}" is(punctuation) -> pop
+  lex(enumdefbody):
+    any-of(whitespace)
+    r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name.variable.instance)
+    r"\(" is(punctuation) -> go-to(funargdecl)
+    r";" is(punctuation)
+    r"}" is(punctuation) -> pop
 
-lex(typedefprebody):
-  any-of(whitespace)
-  r"(=)(\s*)({)" is(by-groups(punctuation, text, punctuation)) -> do-all(pop, go-to(typedefbody))
+  lex(typedefprebody):
+    any-of(whitespace)
+    r"(=)(\s*)({)" is(by-groups(punctuation, text, punctuation)) -> do-all(pop, go-to(typedefbody))
 
-lex(classdef):
-  r"class" is(keyword.declaration) -> do-all(go-to(classdefprebody), go-to(typedecl))
+  lex(classdef):
+    r"class" is(keyword.declaration) -> do-all(go-to(classdefprebody), go-to(typedecl))
 
-lex(generictypedecl):
-  any-of(whitespace)
-  r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
-  r"<" is(punctuation) -> push
-  r">" is(punctuation) -> pop
-  r"," is(punctuation)
+  lex(generictypedecl):
+    any-of(whitespace)
+    r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
+    r"<" is(punctuation) -> push
+    r">" is(punctuation) -> pop
+    r"," is(punctuation)
 
-lex(instancevardecl):
-  any-of(vardecl)
-  any-of(propertydef)
+  lex(instancevardecl):
+    any-of(vardecl)
+    any-of(propertydef)
 
-lex(classdefprebody):
-  any-of(whitespace)
-  r"(extends|implements)" is(keyword.declaration) -> go-to(typedecl)
-  r"{" is(punctuation) -> do-all(pop, go-to(classdefbody))
+  lex(classdefprebody):
+    any-of(whitespace)
+    r"(extends|implements)" is(keyword.declaration) -> go-to(typedecl)
+    r"{" is(punctuation) -> do-all(pop, go-to(classdefbody))
 
-lex(vardef):
-  r"\b(var)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.variable)) -> go-to(vardecl)
+  lex(vardef):
+    r"\b(var)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.variable)) -> go-to(vardecl)
 
-lex(propertydef):
-  r"(\()((?:default|null|never))(,)((?:default|null|never))(\))" is(by-groups(punctuation, keyword.reserved, punctuation, keyword.reserved, punctuation))
+  lex(propertydef):
+    r"(\()((?:default|null|never))(,)((?:default|null|never))(\))" is(by-groups(punctuation, keyword.reserved, punctuation, keyword.reserved, punctuation))
 
-lex(codeblock):
-  any-of(whitespace)
-  any-of(new)
-  any-of(case)
-  any-of(anonfundef)
-  any-of(literals)
-  any-of(vardef)
-  any-of(codekeywords)
-  r"[();,\[\]]" is(punctuation)
-  r"(?:=|\+=|-=|\*=|/=|%=|&=|\|=|\^=|<<=|>>=|>>>=|\|\||&&|\.\.\.|==|!=|>|<|>=|<=|\||&|\^|<<|>>>|>>|\+|\-|\*|/|%|!|\+\+|\-\-|\126|\.|\?|\:)" is(operator)
-  r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name)
-  r"}" is(punctuation) -> pop
-  r"{" is(punctuation) -> push
+  lex(codeblock):
+    any-of(whitespace)
+    any-of(new)
+    any-of(case)
+    any-of(anonfundef)
+    any-of(literals)
+    any-of(vardef)
+    any-of(codekeywords)
+    r"[();,\[\]]" is(punctuation)
+    r"(?:=|\+=|-=|\*=|/=|%=|&=|\|=|\^=|<<=|>>=|>>>=|\|\||&&|\.\.\.|==|!=|>|<|>=|<=|\||&|\^|<<|>>>|>>|\+|\-|\*|/|%|!|\+\+|\-\-|\126|\.|\?|\:)" is(operator)
+    r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name)
+    r"}" is(punctuation) -> pop
+    r"{" is(punctuation) -> push
 
-lex(case):
-  r"\b(case)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))(\s*)(\()" is(by-groups(keyword.reserved, text, name, text, punctuation)) -> go-to(funargdecl)
+  lex(case):
+    r"\b(case)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))(\s*)(\()" is(by-groups(keyword.reserved, text, name, text, punctuation)) -> go-to(funargdecl)
 
-lex(enumdefprebody):
-  any-of(whitespace)
-  r"{" is(punctuation) -> do-all(pop, go-to(enumdefbody))
+  lex(enumdefprebody):
+    any-of(whitespace)
+    r"{" is(punctuation) -> do-all(pop, go-to(enumdefbody))
 
-lex(typedef):
-  r"typedef" is(keyword.declaration) -> do-all(go-to(typedefprebody), go-to(typedecl))
+  lex(typedef):
+    r"typedef" is(keyword.declaration) -> do-all(go-to(typedefprebody), go-to(typedecl))
 
-lex(instancevardef):
-  r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
-  r"\b(var)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.variable.instance)) -> go-to(instancevardecl)
+  lex(instancevardef):
+    r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
+    r"\b(var)(\s+)((?:[a-zA-Z_][a-zA-Z0-9_]*))" is(by-groups(keyword.declaration, text, name.variable.instance)) -> go-to(instancevardecl)
 
-lex(literals):
-  r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
-  r"[0-9]+" is(literal.number.integer)
-  r"[0-9][0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
-  r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
-  r"\126/([^\n])*?/[gisx]*" is(literal.string.regex)
-  r"\b(true|false|null)\b" is(keyword.constant)
+  lex(literals):
+    r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
+    r"[0-9]+" is(literal.number.integer)
+    r"[0-9][0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
+    r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
+    r"\126/([^\n])*?/[gisx]*" is(literal.string.regex)
+    r"\b(true|false|null)\b" is(keyword.constant)
 
-lex(whitespace):
-  any-of(comments)
-  r"\s+" is(text)
+  lex(whitespace):
+    any-of(comments)
+    r"\s+" is(text)
 
-lex(interfacedefprebody):
-  any-of(whitespace)
-  r"(extends)" is(keyword.declaration) -> go-to(typedecl)
-  r"{" is(punctuation) -> do-all(pop, go-to(classdefbody))
+  lex(interfacedefprebody):
+    any-of(whitespace)
+    r"(extends)" is(keyword.declaration) -> go-to(typedecl)
+    r"{" is(punctuation) -> do-all(pop, go-to(classdefbody))
 
-lex(type):
-  any-of(whitespace)
-  r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
-  r"<" is(punctuation) -> go-to(generictypedecl)
-  r"->" is(keyword.type)
-  r"(?=[{}(),;=])" is(text) -> pop
+  lex(type):
+    any-of(whitespace)
+    r"(?:(?:[a-z0-9_\.])*[A-Z_][A-Za-z0-9_]*)" is(name.class)
+    r"<" is(punctuation) -> go-to(generictypedecl)
+    r"->" is(keyword.type)
+    r"(?=[{}(),;=])" is(text) -> pop
 
-lex(vardecl):
-  any-of(whitespace)
-  any-of(typelabel)
-  r"=" is(operator) -> pop
-  r";" is(punctuation) -> pop
+  lex(vardecl):
+    any-of(whitespace)
+    any-of(typelabel)
+    r"=" is(operator) -> pop
+    r";" is(punctuation) -> pop
 
-lex(comments):
-  r"//.*?\n" is(comment.single)
-  r"/\*.*?\*/" is(comment.multiline)
-  r"\#[^\n]*" is(comment.preproc)
+  lex(comments):
+    r"//.*?\n" is(comment.single)
+    r"/\*.*?\*/" is(comment.multiline)
+    r"\#[^\n]*" is(comment.preproc)
 
-lex(enumdef):
-  r"enum" is(keyword.declaration) -> do-all(go-to(enumdefprebody), go-to(typedecl))
+  lex(enumdef):
+    r"enum" is(keyword.declaration) -> do-all(go-to(enumdefprebody), go-to(typedecl))
 
-lex(imports):
-  r"(package|import|using)(\s+)([^;]+)(;)" is(by-groups(keyword.namespace, text, name.namespace, punctuation))
+  lex(imports):
+    r"(package|import|using)(\s+)([^;]+)(;)" is(by-groups(keyword.namespace, text, name.namespace, punctuation))
 
-lex(new):
-  r"\bnew\b" is(keyword) -> go-to(typedecl)
+  lex(new):
+    r"\bnew\b" is(keyword) -> go-to(typedecl)
 
-lex(typelabel):
-  r":" is(punctuation) -> go-to(type)
+  lex(typelabel):
+    r":" is(punctuation) -> go-to(type)
 
-lex(root):
-  any-of(whitespace)
-  any-of(comments)
-  r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
-  any-of(enumdef)
-  any-of(typedef)
-  any-of(classdef)
-  any-of(imports)
+  lex(root):
+    any-of(whitespace)
+    any-of(comments)
+    r"(?:public|private|override|static|inline|extern|dynamic)" is(keyword.declaration)
+    any-of(enumdef)
+    any-of(typedef)
+    any-of(classdef)
+    any-of(imports)
 
-lex(funargdecl):
-  any-of(whitespace)
-  r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name.variable)
-  any-of(typelabel)
-  any-of(literals)
-  r"=" is(operator)
-  r"," is(punctuation)
-  r"\?" is(punctuation)
-  r"\)" is(punctuation) -> pop
+  lex(funargdecl):
+    any-of(whitespace)
+    r"(?:[a-zA-Z_][a-zA-Z0-9_]*)" is(name.variable)
+    any-of(typelabel)
+    any-of(literals)
+    r"=" is(operator)
+    r"," is(punctuation)
+    r"\?" is(punctuation)
+    r"\)" is(punctuation) -> pop
 
 const-set(.Lexer, lexer)

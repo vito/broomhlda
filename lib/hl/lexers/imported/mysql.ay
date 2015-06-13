@@ -2,36 +2,36 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "MySQL"
-aliases: ["mysql"]
-extensions: []
-mimetypes: ["text/x-mysql"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "MySQL"
+  aliases: ["mysql"]
+  extensions: []
+  mimetypes: ["text/x-mysql"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(multiline-comments):
-  r"/\*" is(comment.multiline) -> go-to(multiline-comments)
-  r"\*/" is(comment.multiline) -> pop
-  r"[^/\*]+" is(comment.multiline)
-  r"[/*]" is(comment.multiline)
+  lex(multiline-comments):
+    r"/\*" is(comment.multiline) -> go-to(multiline-comments)
+    r"\*/" is(comment.multiline) -> pop
+    r"[^/\*]+" is(comment.multiline)
+    r"[/*]" is(comment.multiline)
 
-lex(root):
-  r"\s+" is(text)
-  r"(\#|--\s+).*?\n" is(comment.single)
-  r"/\*" is(comment.multiline) -> go-to(multiline-comments)
-  r"[0-9]+" is(literal.number.integer)
-  r"[0-9]*\.[0-9]+(e[+-][0-9]+)" is(literal.number.float)
-  r"'(''|[^'])*'" is(literal.string.single)
-  r"\"(\"\"|[^\"])*\"" is(literal.string.double)
-  r"`(``|[^`])*`" is(literal.string.symbol)
-  r"[+*/<>=\126!@\#%^&|`?-]" is(operator)
-  r"\b(tinyint|smallint|mediumint|int|integer|bigint|date|datetime|time|bit|bool|tinytext|mediumtext|longtext|text|tinyblob|mediumblob|longblob|blob|float|double|double\s+precision|real|numeric|dec|decimal|timestamp|year|char|varchar|varbinary|varcharacter|enum|set)(\b\s*)(\()?" is(by-groups(keyword.type, text, punctuation))
-  r"\b(add|all|alter|analyze|and|as|asc|asensitive|before|between|bigint|binary|blob|both|by|call|cascade|case|change|char|character|check|collate|column|condition|constraint|continue|convert|create|cross|current_date|current_time|current_timestamp|current_user|cursor|database|databases|day_hour|day_microsecond|day_minute|day_second|dec|decimal|declare|default|delayed|delete|desc|describe|deterministic|distinct|distinctrow|div|double|drop|dual|each|else|elseif|enclosed|escaped|exists|exit|explain|fetch|float|float4|float8|for|force|foreign|from|fulltext|grant|group|having|high_priority|hour_microsecond|hour_minute|hour_second|if|ignore|in|index|infile|inner|inout|insensitive|insert|int|int1|int2|int3|int4|int8|integer|interval|into|is|iterate|join|key|keys|kill|leading|leave|left|like|limit|lines|load|localtime|localtimestamp|lock|long|loop|low_priority|match|minute_microsecond|minute_second|mod|modifies|natural|no_write_to_binlog|not|numeric|on|optimize|option|optionally|or|order|out|outer|outfile|precision|primary|procedure|purge|raid0|read|reads|real|references|regexp|release|rename|repeat|replace|require|restrict|return|revoke|right|rlike|schema|schemas|second_microsecond|select|sensitive|separator|set|show|smallint|soname|spatial|specific|sql|sql_big_result|sql_calc_found_rows|sql_small_result|sqlexception|sqlstate|sqlwarning|ssl|starting|straight_join|table|terminated|then|to|trailing|trigger|undo|union|unique|unlock|unsigned|update|usage|use|using|utc_date|utc_time|utc_timestamp|values|varying|when|where|while|with|write|x509|xor|year_month|zerofill)\b" is(keyword)
-  r"\b(auto_increment|engine|charset|tables)\b" is(keyword.pseudo)
-  r"(true|false|null)" is(name.constant)
-  r"([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\()" is(by-groups(name.function, text, punctuation))
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
-  r"@[A-Za-z0-9]*[._]*[A-Za-z0-9]*" is(name.variable)
-  r"[;:()\[\],\.]" is(punctuation)
+  lex(root):
+    r"\s+" is(text)
+    r"(\#|--\s+).*?\n" is(comment.single)
+    r"/\*" is(comment.multiline) -> go-to(multiline-comments)
+    r"[0-9]+" is(literal.number.integer)
+    r"[0-9]*\.[0-9]+(e[+-][0-9]+)" is(literal.number.float)
+    r"'(''|[^'])*'" is(literal.string.single)
+    r"\"(\"\"|[^\"])*\"" is(literal.string.double)
+    r"`(``|[^`])*`" is(literal.string.symbol)
+    r"[+*/<>=\126!@\#%^&|`?-]" is(operator)
+    r"\b(tinyint|smallint|mediumint|int|integer|bigint|date|datetime|time|bit|bool|tinytext|mediumtext|longtext|text|tinyblob|mediumblob|longblob|blob|float|double|double\s+precision|real|numeric|dec|decimal|timestamp|year|char|varchar|varbinary|varcharacter|enum|set)(\b\s*)(\()?" is(by-groups(keyword.type, text, punctuation))
+    r"\b(add|all|alter|analyze|and|as|asc|asensitive|before|between|bigint|binary|blob|both|by|call|cascade|case|change|char|character|check|collate|column|condition|constraint|continue|convert|create|cross|current_date|current_time|current_timestamp|current_user|cursor|database|databases|day_hour|day_microsecond|day_minute|day_second|dec|decimal|declare|default|delayed|delete|desc|describe|deterministic|distinct|distinctrow|div|double|drop|dual|each|else|elseif|enclosed|escaped|exists|exit|explain|fetch|float|float4|float8|for|force|foreign|from|fulltext|grant|group|having|high_priority|hour_microsecond|hour_minute|hour_second|if|ignore|in|index|infile|inner|inout|insensitive|insert|int|int1|int2|int3|int4|int8|integer|interval|into|is|iterate|join|key|keys|kill|leading|leave|left|like|limit|lines|load|localtime|localtimestamp|lock|long|loop|low_priority|match|minute_microsecond|minute_second|mod|modifies|natural|no_write_to_binlog|not|numeric|on|optimize|option|optionally|or|order|out|outer|outfile|precision|primary|procedure|purge|raid0|read|reads|real|references|regexp|release|rename|repeat|replace|require|restrict|return|revoke|right|rlike|schema|schemas|second_microsecond|select|sensitive|separator|set|show|smallint|soname|spatial|specific|sql|sql_big_result|sql_calc_found_rows|sql_small_result|sqlexception|sqlstate|sqlwarning|ssl|starting|straight_join|table|terminated|then|to|trailing|trigger|undo|union|unique|unlock|unsigned|update|usage|use|using|utc_date|utc_time|utc_timestamp|values|varying|when|where|while|with|write|x509|xor|year_month|zerofill)\b" is(keyword)
+    r"\b(auto_increment|engine|charset|tables)\b" is(keyword.pseudo)
+    r"(true|false|null)" is(name.constant)
+    r"([a-zA-Z_][a-zA-Z0-9_]*)(\s*)(\()" is(by-groups(name.function, text, punctuation))
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
+    r"@[A-Za-z0-9]*[._]*[A-Za-z0-9]*" is(name.variable)
+    r"[;:()\[\],\.]" is(punctuation)
 
 const-set(.Lexer, lexer)

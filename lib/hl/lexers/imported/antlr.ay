@@ -2,94 +2,94 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "ANTLR"
-aliases: ["antlr"]
-extensions: []
-mimetypes: []
-start: .root
-flags: 0
+  name: "ANTLR"
+  aliases: ["antlr"]
+  extensions: []
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(tokens):
-  any-of(whitespace)
-  any-of(comments)
-  r"{" is(punctuation)
-  r"([A-Z][A-Za-z_0-9]*)(\s*)(=)?(\s*)(\'(?:\\\\|\\\'|[^\']*)\')?(\s*)(;)" is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, literal.string, text.whitespace, punctuation))
-  r"}" is(punctuation) -> pop
+  lex(tokens):
+    any-of(whitespace)
+    any-of(comments)
+    r"{" is(punctuation)
+    r"([A-Z][A-Za-z_0-9]*)(\s*)(=)?(\s*)(\'(?:\\\\|\\\'|[^\']*)\')?(\s*)(;)" is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, literal.string, text.whitespace, punctuation))
+    r"}" is(punctuation) -> pop
 
-lex(exception):
-  r"\n" is(text.whitespace) -> pop
-  r"\s" is(text.whitespace)
-  any-of(comments)
-  r"\[" is(punctuation) -> go-to(nested-arg-action)
-  r"\{" is(punctuation) -> go-to(action)
+  lex(exception):
+    r"\n" is(text.whitespace) -> pop
+    r"\s" is(text.whitespace)
+    any-of(comments)
+    r"\[" is(punctuation) -> go-to(nested-arg-action)
+    r"\{" is(punctuation) -> go-to(action)
 
-lex(whitespace):
-  r"\s+" is(text.whitespace)
+  lex(whitespace):
+    r"\s+" is(text.whitespace)
 
-lex(action):
-  r"([^\${}\'\"/\\]+|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|/(?!\*)(\\\\|\\/|[^/])*/|\\(?!%)|/)+" is(other)
-  r"(\\)(%)" is(by-groups(punctuation, other))
-  r"(\$[a-zA-Z]+)(\.?)(text|value)?" is(by-groups(name.variable, punctuation, name.property))
-  r"{" is(punctuation) -> push
-  r"}" is(punctuation) -> pop
+  lex(action):
+    r"([^\${}\'\"/\\]+|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|/(?!\*)(\\\\|\\/|[^/])*/|\\(?!%)|/)+" is(other)
+    r"(\\)(%)" is(by-groups(punctuation, other))
+    r"(\$[a-zA-Z]+)(\.?)(text|value)?" is(by-groups(name.variable, punctuation, name.property))
+    r"{" is(punctuation) -> push
+    r"}" is(punctuation) -> pop
 
-lex(nested-arg-action):
-  r"([^\$\[\]\'\"/]+|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|/(?!\*)(\\\\|\\/|[^/])*/|/)+" is(other)
-  r"\[" is(punctuation) -> push
-  r"\]" is(punctuation) -> pop
-  r"(\$[a-zA-Z]+)(\.?)(text|value)?" is(by-groups(name.variable, punctuation, name.property))
-  r"(\\\\|\\\]|\\\[|[^\[\]])+" is(other)
+  lex(nested-arg-action):
+    r"([^\$\[\]\'\"/]+|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|/(?!\*)(\\\\|\\/|[^/])*/|/)+" is(other)
+    r"\[" is(punctuation) -> push
+    r"\]" is(punctuation) -> pop
+    r"(\$[a-zA-Z]+)(\.?)(text|value)?" is(by-groups(name.variable, punctuation, name.property))
+    r"(\\\\|\\\]|\\\[|[^\[\]])+" is(other)
 
-lex(rule-prelims):
-  any-of(whitespace)
-  any-of(comments)
-  r"returns\b" is(keyword)
-  r"\[" is(punctuation) -> go-to(nested-arg-action)
-  r"\{" is(punctuation) -> go-to(action)
-  r"(throws)(\s+)([A-Za-z][A-Za-z_0-9]*)" is(by-groups(keyword, text.whitespace, name.label))
-  r"(,)(\s*)([A-Za-z][A-Za-z_0-9]*)" is(by-groups(punctuation, text.whitespace, name.label))
-  r"options\b" is(keyword) -> go-to(options)
-  r"(scope)(\s+)({)" is(by-groups(keyword, text.whitespace, punctuation)) -> go-to(action)
-  r"(scope)(\s+)([A-Za-z][A-Za-z_0-9]*)(\s*)(;)" is(by-groups(keyword, text.whitespace, name.label, text.whitespace, punctuation))
-  r"(@[A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(name.label, text.whitespace, punctuation)) -> go-to(action)
-  r":" is(punctuation) -> pop
+  lex(rule-prelims):
+    any-of(whitespace)
+    any-of(comments)
+    r"returns\b" is(keyword)
+    r"\[" is(punctuation) -> go-to(nested-arg-action)
+    r"\{" is(punctuation) -> go-to(action)
+    r"(throws)(\s+)([A-Za-z][A-Za-z_0-9]*)" is(by-groups(keyword, text.whitespace, name.label))
+    r"(,)(\s*)([A-Za-z][A-Za-z_0-9]*)" is(by-groups(punctuation, text.whitespace, name.label))
+    r"options\b" is(keyword) -> go-to(options)
+    r"(scope)(\s+)({)" is(by-groups(keyword, text.whitespace, punctuation)) -> go-to(action)
+    r"(scope)(\s+)([A-Za-z][A-Za-z_0-9]*)(\s*)(;)" is(by-groups(keyword, text.whitespace, name.label, text.whitespace, punctuation))
+    r"(@[A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(name.label, text.whitespace, punctuation)) -> go-to(action)
+    r":" is(punctuation) -> pop
 
-lex(root):
-  any-of(whitespace)
-  any-of(comments)
-  r"(lexer|parser|tree)?(\s*)(grammar\b)(\s*)([A-Za-z][A-Za-z_0-9]*)(;)" is(by-groups(keyword, text.whitespace, keyword, text.whitespace, name.class, punctuation))
-  r"options\b" is(keyword) -> go-to(options)
-  r"tokens\b" is(keyword) -> go-to(tokens)
-  r"(scope)(\s*)([A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(keyword, text.whitespace, name.variable, text.whitespace, punctuation)) -> go-to(action)
-  r"(catch|finally)\b" is(keyword) -> go-to(exception)
-  r"(@[A-Za-z][A-Za-z_0-9]*)(\s*)(::)?(\s*)([A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, name.label, text.whitespace, punctuation)) -> go-to(action)
-  r"((?:protected|private|public|fragment)\b)?(\s*)([A-Za-z][A-Za-z_0-9]*)(!)?" is(by-groups(keyword, text.whitespace, name.label, punctuation)) -> do-all(go-to(rule-alts), go-to(rule-prelims))
+  lex(root):
+    any-of(whitespace)
+    any-of(comments)
+    r"(lexer|parser|tree)?(\s*)(grammar\b)(\s*)([A-Za-z][A-Za-z_0-9]*)(;)" is(by-groups(keyword, text.whitespace, keyword, text.whitespace, name.class, punctuation))
+    r"options\b" is(keyword) -> go-to(options)
+    r"tokens\b" is(keyword) -> go-to(tokens)
+    r"(scope)(\s*)([A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(keyword, text.whitespace, name.variable, text.whitespace, punctuation)) -> go-to(action)
+    r"(catch|finally)\b" is(keyword) -> go-to(exception)
+    r"(@[A-Za-z][A-Za-z_0-9]*)(\s*)(::)?(\s*)([A-Za-z][A-Za-z_0-9]*)(\s*)({)" is(by-groups(name.label, text.whitespace, punctuation, text.whitespace, name.label, text.whitespace, punctuation)) -> go-to(action)
+    r"((?:protected|private|public|fragment)\b)?(\s*)([A-Za-z][A-Za-z_0-9]*)(!)?" is(by-groups(keyword, text.whitespace, name.label, punctuation)) -> do-all(go-to(rule-alts), go-to(rule-prelims))
 
-lex(rule-alts):
-  any-of(whitespace)
-  any-of(comments)
-  r"options\b" is(keyword) -> go-to(options)
-  r":" is(punctuation)
-  r"'(\\\\|\\'|[^'])*'" is(literal.string)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
-  r"<<([^>]|>[^>])>>" is(literal.string)
-  r"\$?[A-Z_][A-Za-z_0-9]*" is(name.constant)
-  r"\$?[a-z_][A-Za-z_0-9]*" is(name.variable)
-  r"(\+|\||->|=>|=|\(|\)|\.\.|\.|\?|\*|\^|!|\\#|\126)" is(operator)
-  r"," is(punctuation)
-  r"\[" is(punctuation) -> go-to(nested-arg-action)
-  r"\{" is(punctuation) -> go-to(action)
-  r";" is(punctuation) -> pop
+  lex(rule-alts):
+    any-of(whitespace)
+    any-of(comments)
+    r"options\b" is(keyword) -> go-to(options)
+    r":" is(punctuation)
+    r"'(\\\\|\\'|[^'])*'" is(literal.string)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
+    r"<<([^>]|>[^>])>>" is(literal.string)
+    r"\$?[A-Z_][A-Za-z_0-9]*" is(name.constant)
+    r"\$?[a-z_][A-Za-z_0-9]*" is(name.variable)
+    r"(\+|\||->|=>|=|\(|\)|\.\.|\.|\?|\*|\^|!|\\#|\126)" is(operator)
+    r"," is(punctuation)
+    r"\[" is(punctuation) -> go-to(nested-arg-action)
+    r"\{" is(punctuation) -> go-to(action)
+    r";" is(punctuation) -> pop
 
-lex(comments):
-  r"//.*$" is(comment)
-  r"/\*(.|\n)*?\*/" is(comment)
+  lex(comments):
+    r"//.*$" is(comment)
+    r"/\*(.|\n)*?\*/" is(comment)
 
-lex(options):
-  any-of(whitespace)
-  any-of(comments)
-  r"{" is(punctuation)
-  r"([A-Za-z][A-Za-z_0-9]*)(\s*)(=)(\s*)([A-Za-z][A-Za-z_0-9]*|\'(?:\\\\|\\\'|[^\']*)\'|[0-9]+|\*)(\s*)(;)" is(by-groups(name.variable, text.whitespace, punctuation, text.whitespace, text, text.whitespace, punctuation))
-  r"}" is(punctuation) -> pop
+  lex(options):
+    any-of(whitespace)
+    any-of(comments)
+    r"{" is(punctuation)
+    r"([A-Za-z][A-Za-z_0-9]*)(\s*)(=)(\s*)([A-Za-z][A-Za-z_0-9]*|\'(?:\\\\|\\\'|[^\']*)\'|[0-9]+|\*)(\s*)(;)" is(by-groups(name.variable, text.whitespace, punctuation, text.whitespace, text, text.whitespace, punctuation))
+    r"}" is(punctuation) -> pop
 
 const-set(.Lexer, lexer)

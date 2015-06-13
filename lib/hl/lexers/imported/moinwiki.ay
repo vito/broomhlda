@@ -2,32 +2,32 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "MoinMoin/Trac Wiki markup"
-aliases: ["trac-wiki", "moin"]
-extensions: []
-mimetypes: ["text/x-trac-wiki"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "MoinMoin/Trac Wiki markup"
+  aliases: ["trac-wiki", "moin"]
+  extensions: []
+  mimetypes: ["text/x-trac-wiki"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"^\#.*$" is(comment)
-  r"(!)(\S+)" is(by-groups(keyword, text))
-  r"^(=+)([^=]+)(=+)(\s*\#.+)?$" is(by-groups(generic.heading, using(self class), generic.heading, literal.string))
-  r"({{{)(\n\#!.+)?" is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
-  r"(\'\'\'?|\|\||`|__|\126\126|\^|,,|::)" is(comment)
-  r"^( +)([.*-])( )" is(by-groups(text, name.builtin, text))
-  r"^( +)([a-z]{1,5}\.)( )" is(by-groups(text, name.builtin, text))
-  r"\[\[\w+.*?\]\]" is(keyword)
-  r"(\[[^\s\]]+)(\s+[^\]]+?)?(\])" is(by-groups(keyword, literal.string, keyword))
-  r"^----+$" is(keyword)
-  r"[^\n\'\[{!_\126^,|]+" is(text)
-  r"\n" is(text)
-  r"." is(text)
+  lex(root):
+    r"^\#.*$" is(comment)
+    r"(!)(\S+)" is(by-groups(keyword, text))
+    r"^(=+)([^=]+)(=+)(\s*\#.+)?$" is(by-groups(generic.heading, using(self class), generic.heading, literal.string))
+    r"({{{)(\n\#!.+)?" is(by-groups(name.builtin, name.namespace)) -> go-to(codeblock)
+    r"(\'\'\'?|\|\||`|__|\126\126|\^|,,|::)" is(comment)
+    r"^( +)([.*-])( )" is(by-groups(text, name.builtin, text))
+    r"^( +)([a-z]{1,5}\.)( )" is(by-groups(text, name.builtin, text))
+    r"\[\[\w+.*?\]\]" is(keyword)
+    r"(\[[^\s\]]+)(\s+[^\]]+?)?(\])" is(by-groups(keyword, literal.string, keyword))
+    r"^----+$" is(keyword)
+    r"[^\n\'\[{!_\126^,|]+" is(text)
+    r"\n" is(text)
+    r"." is(text)
 
-lex(codeblock):
-  r"}}}" is(name.builtin) -> pop
-  r"{{{" is(text) -> push
-  r"[^{}]+" is(comment.preproc)
-  r"." is(comment.preproc)
+  lex(codeblock):
+    r"}}}" is(name.builtin) -> pop
+    r"{{{" is(text) -> push
+    r"[^{}]+" is(comment.preproc)
+    r"." is(comment.preproc)
 
 const-set(.Lexer, lexer)

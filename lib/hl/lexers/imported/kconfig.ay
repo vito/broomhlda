@@ -2,70 +2,70 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Kconfig"
-aliases: ["kconfig", "menuconfig", "linux-config", "kernel-config"]
-extensions: ["Kconfig", "Config.in", "external.in", "standard-modules.in"]
-mimetypes: ["text/x-kconfig"]
-start: .root
-flags: 0
+  name: "Kconfig"
+  aliases: ["kconfig", "menuconfig", "linux-config", "kernel-config"]
+  extensions: ["Kconfig", "Config.in", "external.in", "standard-modules.in"]
+  mimetypes: ["text/x-kconfig"]
+  start: .root
+  flags: 0
 
-lex(indent1):
-  r"(?:\t| {1,7}\t| {8}){1}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent1):
+    r"(?:\t| {1,7}\t| {8}){1}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(indent3):
-  r"(?:\t| {1,7}\t| {8}){3}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent3):
+    r"(?:\t| {1,7}\t| {8}){3}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(indent2):
-  r"(?:\t| {1,7}\t| {8}){2}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent2):
+    r"(?:\t| {1,7}\t| {8}){2}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(indent5):
-  r"(?:\t| {1,7}\t| {8}){5}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent5):
+    r"(?:\t| {1,7}\t| {8}){5}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(help):
-  r"\s*\n" is(text)
-  r"(?:\t| {1,7}\t| {8}){7}.*\n" is(literal.string.doc) -> go-to(indent7)
-  r"(?:\t| {1,7}\t| {8}){6}.*\n" is(literal.string.doc) -> go-to(indent6)
-  r"(?:\t| {1,7}\t| {8}){5}.*\n" is(literal.string.doc) -> go-to(indent5)
-  r"(?:\t| {1,7}\t| {8}){4}.*\n" is(literal.string.doc) -> go-to(indent4)
-  r"(?:\t| {1,7}\t| {8}){3}.*\n" is(literal.string.doc) -> go-to(indent3)
-  r"(?:\t| {1,7}\t| {8}){2}.*\n" is(literal.string.doc) -> go-to(indent2)
-  r"(?:\t| {1,7}\t| {8}){1}.*\n" is(literal.string.doc) -> go-to(indent1)
-  r"" is(text) -> pop
+  lex(help):
+    r"\s*\n" is(text)
+    r"(?:\t| {1,7}\t| {8}){7}.*\n" is(literal.string.doc) -> go-to(indent7)
+    r"(?:\t| {1,7}\t| {8}){6}.*\n" is(literal.string.doc) -> go-to(indent6)
+    r"(?:\t| {1,7}\t| {8}){5}.*\n" is(literal.string.doc) -> go-to(indent5)
+    r"(?:\t| {1,7}\t| {8}){4}.*\n" is(literal.string.doc) -> go-to(indent4)
+    r"(?:\t| {1,7}\t| {8}){3}.*\n" is(literal.string.doc) -> go-to(indent3)
+    r"(?:\t| {1,7}\t| {8}){2}.*\n" is(literal.string.doc) -> go-to(indent2)
+    r"(?:\t| {1,7}\t| {8}){1}.*\n" is(literal.string.doc) -> go-to(indent1)
+    r"" is(text) -> pop
 
-lex(indent7):
-  r"(?:\t| {1,7}\t| {8}){7}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent7):
+    r"(?:\t| {1,7}\t| {8}){7}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(indent6):
-  r"(?:\t| {1,7}\t| {8}){6}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent6):
+    r"(?:\t| {1,7}\t| {8}){6}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
-lex(root):
-  r"\s+" is(text)
-  r"\#.*?\n" is(comment.single)
-  r"(mainmenu|config|menuconfig|choice|endchoice|comment|menu|endmenu|visible if|if|endif|source|prompt|select|depends on|default|range|option)\b" is(keyword)
-  r"(---help---|help)[\t ]*\n" is(keyword) -> go-to(help)
-  r"(bool|tristate|string|hex|int|defconfig_list|modules|env)\b" is(name.builtin)
-  r"[!=&|]" is(operator)
-  r"[()]" is(punctuation)
-  r"[0-9]+" is(literal.number.integer)
-  r"'(''|[^'])*'" is(literal.string.single)
-  r"\"(\"\"|[^\"])*\"" is(literal.string.double)
-  r"\S+" is(text)
+  lex(root):
+    r"\s+" is(text)
+    r"\#.*?\n" is(comment.single)
+    r"(mainmenu|config|menuconfig|choice|endchoice|comment|menu|endmenu|visible if|if|endif|source|prompt|select|depends on|default|range|option)\b" is(keyword)
+    r"(---help---|help)[\t ]*\n" is(keyword) -> go-to(help)
+    r"(bool|tristate|string|hex|int|defconfig_list|modules|env)\b" is(name.builtin)
+    r"[!=&|]" is(operator)
+    r"[()]" is(punctuation)
+    r"[0-9]+" is(literal.number.integer)
+    r"'(''|[^'])*'" is(literal.string.single)
+    r"\"(\"\"|[^\"])*\"" is(literal.string.double)
+    r"\S+" is(text)
 
-lex(indent4):
-  r"(?:\t| {1,7}\t| {8}){4}.*\n" is(literal.string.doc)
-  r"\s*\n" is(text)
-  r"" is(generic) -> pop(2)
+  lex(indent4):
+    r"(?:\t| {1,7}\t| {8}){4}.*\n" is(literal.string.doc)
+    r"\s*\n" is(text)
+    r"" is(generic) -> pop(2)
 
 const-set(.Lexer, lexer)

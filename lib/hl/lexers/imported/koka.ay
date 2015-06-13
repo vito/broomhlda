@@ -2,103 +2,103 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Koka"
-aliases: ["koka"]
-extensions: [".kk", ".kki"]
-mimetypes: ["text/x-koka"]
-start: .root
-flags: 0
+  name: "Koka"
+  aliases: ["koka"]
+  extensions: [".kk", ".kki"]
+  mimetypes: ["text/x-koka"]
+  start: .root
+  flags: 0
 
-lex(comment):
-  r"[^/\*]+" is(comment.multiline)
-  r"/\*" is(comment.multiline) -> push
-  r"\*/" is(comment.multiline) -> pop
-  r"[\*/]" is(comment.multiline)
+  lex(comment):
+    r"[^/\*]+" is(comment.multiline)
+    r"/\*" is(comment.multiline) -> push
+    r"\*/" is(comment.multiline) -> pop
+    r"[\*/]" is(comment.multiline)
 
-lex(string):
-  r"[^\\\"\n]+" is(literal.string.double)
-  any-of(escape-sequence)
-  r"[\"\n]" is(literal.string.double) -> pop
+  lex(string):
+    r"[^\\\"\n]+" is(literal.string.double)
+    any-of(escape-sequence)
+    r"[\"\n]" is(literal.string.double) -> pop
 
-lex(type-nested):
-  r"[\)\]>]" is(keyword.type) -> pop
-  r"[\(\[<]" is(keyword.type) -> go-to(type-nested)
-  r"," is(keyword.type)
-  r"([a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)(\s*)(:)(?!:)" is(by-groups(name.variable, text, keyword.type))
-  any-of(type-content)
+  lex(type-nested):
+    r"[\)\]>]" is(keyword.type) -> pop
+    r"[\(\[<]" is(keyword.type) -> go-to(type-nested)
+    r"," is(keyword.type)
+    r"([a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)(\s*)(:)(?!:)" is(by-groups(name.variable, text, keyword.type))
+    any-of(type-content)
 
-lex(char):
-  r"[^\\\'\n]+" is(literal.string.char)
-  any-of(escape-sequence)
-  r"[\'\n]" is(literal.string.char) -> pop
+  lex(char):
+    r"[^\\\'\n]+" is(literal.string.char)
+    any-of(escape-sequence)
+    r"[\'\n]" is(literal.string.char) -> pop
 
-lex(alias-type):
-  r"=" is(keyword)
-  any-of(type)
+  lex(alias-type):
+    r"=" is(keyword)
+    any-of(type)
 
-lex(litstring):
-  r"[^\"]+" is(literal.string.double)
-  r"\"\"" is(literal.string.escape)
-  r"\"" is(literal.string.double) -> pop
+  lex(litstring):
+    r"[^\"]+" is(literal.string.double)
+    r"\"\"" is(literal.string.escape)
+    r"\"" is(literal.string.double) -> pop
 
-lex(whitespace):
-  r"\s+" is(text)
-  r"/\*" is(comment.multiline) -> go-to(comment)
-  r"//.*$" is(comment.single)
+  lex(whitespace):
+    r"\s+" is(text)
+    r"/\*" is(comment.multiline) -> go-to(comment)
+    r"//.*$" is(comment.single)
 
-lex(struct-type):
-  r"(?=\((?!,*\)))" is(punctuation) -> pop
-  any-of(type)
+  lex(struct-type):
+    r"(?=\((?!,*\)))" is(punctuation) -> pop
+    any-of(type)
 
-lex(root):
-  any-of(whitespace)
-  r"::?(?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(keyword.type) -> go-to(type)
-  r"alias(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(alias-type)
-  r"struct(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(struct-type)
-  r"(type|cotype|rectype|alias|struct|enum)(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(type)
-  r"(module)(\s*)((?:interface)?)(\s*)((?:[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*\.)*[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)" is(by-groups(keyword, text, keyword, text, name.namespace))
-  r"(import)(\s+)((?:[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*\.)*[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)(\s*)((?:as)?)((?:[A-Z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)?)" is(by-groups(keyword, text, name.namespace, text, keyword, name.namespace))
-  r"(forall|exists|some|with)(?![a-zA-Z0-9_\-])" is(keyword.type)
-  r"(infix|infixr|infixl|prefix|postfix|type|cotype|rectype|alias|struct|con|fun|function|val|var|external|if|then|else|elif|return|match|private|public|private|module|import|as|include|inline|rec|try|yield|enum|interface|instance)(?![a-zA-Z0-9_\-])" is(keyword)
-  r"(for|while|repeat|foreach|foreach-indexed|error|catch|finally|cs|js|file|ref|assigned)(?![a-zA-Z0-9_\-])" is(keyword.pseudo)
-  r"::|:=|\->|[=\.:](?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(keyword)
-  r"\-(?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(generic.strong)
-  r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?=\.)" is(name.namespace)
-  r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?!\.)" is(name.class)
-  r"[a-z]([a-zA-Z0-9_]|\-[a-zA-Z])*" is(name)
-  r"_([a-zA-Z0-9_]|\-[a-zA-Z])*" is(name.variable)
-  r"@\"" is(literal.string.double) -> go-to(litstring)
-  r"[\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+" is(operator)
-  r"`" is(operator)
-  r"[\{\}\(\)\[\];,]" is(punctuation)
-  r"[0-9]+\.[0-9]+([eE][\-\+]?[0-9]+)?" is(literal.number.float)
-  r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
-  r"[0-9]+" is(literal.number.integer)
-  r"'" is(literal.string.char) -> go-to(char)
-  r"\"" is(literal.string.double) -> go-to(string)
+  lex(root):
+    any-of(whitespace)
+    r"::?(?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(keyword.type) -> go-to(type)
+    r"alias(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(alias-type)
+    r"struct(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(struct-type)
+    r"(type|cotype|rectype|alias|struct|enum)(?![a-zA-Z0-9_\-])" is(keyword) -> go-to(type)
+    r"(module)(\s*)((?:interface)?)(\s*)((?:[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*\.)*[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)" is(by-groups(keyword, text, keyword, text, name.namespace))
+    r"(import)(\s+)((?:[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*\.)*[a-z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)(\s*)((?:as)?)((?:[A-Z](?:[a-zA-Z0-9_]|\-[a-zA-Z])*)?)" is(by-groups(keyword, text, name.namespace, text, keyword, name.namespace))
+    r"(forall|exists|some|with)(?![a-zA-Z0-9_\-])" is(keyword.type)
+    r"(infix|infixr|infixl|prefix|postfix|type|cotype|rectype|alias|struct|con|fun|function|val|var|external|if|then|else|elif|return|match|private|public|private|module|import|as|include|inline|rec|try|yield|enum|interface|instance)(?![a-zA-Z0-9_\-])" is(keyword)
+    r"(for|while|repeat|foreach|foreach-indexed|error|catch|finally|cs|js|file|ref|assigned)(?![a-zA-Z0-9_\-])" is(keyword.pseudo)
+    r"::|:=|\->|[=\.:](?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(keyword)
+    r"\-(?![\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+)" is(generic.strong)
+    r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?=\.)" is(name.namespace)
+    r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?!\.)" is(name.class)
+    r"[a-z]([a-zA-Z0-9_]|\-[a-zA-Z])*" is(name)
+    r"_([a-zA-Z0-9_]|\-[a-zA-Z])*" is(name.variable)
+    r"@\"" is(literal.string.double) -> go-to(litstring)
+    r"[\$%&\*\+@!/\\^\126=\.:\-\?\|<>]+" is(operator)
+    r"`" is(operator)
+    r"[\{\}\(\)\[\];,]" is(punctuation)
+    r"[0-9]+\.[0-9]+([eE][\-\+]?[0-9]+)?" is(literal.number.float)
+    r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
+    r"[0-9]+" is(literal.number.integer)
+    r"'" is(literal.string.char) -> go-to(char)
+    r"\"" is(literal.string.double) -> go-to(string)
 
-lex(escape-sequence):
-  r"\\[abfnrtv0\\\\"\'\?]" is(literal.string.escape)
-  r"\\x[0-9a-fA-F]{2}" is(literal.string.escape)
-  r"\\u[0-9a-fA-F]{4}" is(literal.string.escape)
-  r"\\U[0-9a-fA-F]{6}" is(literal.string.escape)
+  lex(escape-sequence):
+    r"\\[abfnrtv0\\\\"\'\?]" is(literal.string.escape)
+    r"\\x[0-9a-fA-F]{2}" is(literal.string.escape)
+    r"\\u[0-9a-fA-F]{4}" is(literal.string.escape)
+    r"\\U[0-9a-fA-F]{6}" is(literal.string.escape)
 
-lex(type-content):
-  any-of(whitespace)
-  r"(forall|exists|some|with)(?![a-zA-Z0-9_\-])" is(keyword.type)
-  r"(?=((infix|infixr|infixl|prefix|postfix|type|cotype|rectype|alias|struct|con|fun|function|val|var|external|if|then|else|elif|return|match|private|public|private|module|import|as|include|inline|rec|try|yield|enum|interface|instance)(?![a-zA-Z0-9_\-])))" is(keyword) -> pop
-  r"[EPH](?![a-zA-Z0-9_\-])" is(keyword.type)
-  r"[*!]" is(keyword.type)
-  r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?=\.)" is(name.namespace)
-  r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?!\.)" is(name.class)
-  r"[a-z][0-9]*(?![a-zA-Z_\-])" is(keyword.type)
-  r"_([a-zA-Z0-9_]|\-[a-zA-Z])*" is(keyword.type)
-  r"[a-z]([a-zA-Z0-9_]|\-[a-zA-Z])*" is(keyword.type)
-  r"::|\->|[\.:|]" is(keyword.type)
-  r"" is(text) -> pop
+  lex(type-content):
+    any-of(whitespace)
+    r"(forall|exists|some|with)(?![a-zA-Z0-9_\-])" is(keyword.type)
+    r"(?=((infix|infixr|infixl|prefix|postfix|type|cotype|rectype|alias|struct|con|fun|function|val|var|external|if|then|else|elif|return|match|private|public|private|module|import|as|include|inline|rec|try|yield|enum|interface|instance)(?![a-zA-Z0-9_\-])))" is(keyword) -> pop
+    r"[EPH](?![a-zA-Z0-9_\-])" is(keyword.type)
+    r"[*!]" is(keyword.type)
+    r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?=\.)" is(name.namespace)
+    r"[A-Z]([a-zA-Z0-9_]|\-[a-zA-Z])*(?!\.)" is(name.class)
+    r"[a-z][0-9]*(?![a-zA-Z_\-])" is(keyword.type)
+    r"_([a-zA-Z0-9_]|\-[a-zA-Z])*" is(keyword.type)
+    r"[a-z]([a-zA-Z0-9_]|\-[a-zA-Z])*" is(keyword.type)
+    r"::|\->|[\.:|]" is(keyword.type)
+    r"" is(text) -> pop
 
-lex(type):
-  r"[\(\[<]" is(keyword.type) -> go-to(type-nested)
-  any-of(type-content)
+  lex(type):
+    r"[\(\[<]" is(keyword.type) -> go-to(type-nested)
+    any-of(type-content)
 
 const-set(.Lexer, lexer)

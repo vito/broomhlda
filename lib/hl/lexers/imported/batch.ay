@@ -2,44 +2,44 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Batchfile"
-aliases: ["bat"]
-extensions: [".bat", ".cmd"]
-mimetypes: ["application/x-dos-batch"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "Batchfile"
+  aliases: ["bat"]
+  extensions: [".bat", ".cmd"]
+  mimetypes: ["application/x-dos-batch"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(basic):
-  r"\".*?\"" is(literal.string.double)
-  r"'.*?'" is(literal.string.single)
-  r"`.*?`" is(literal.string.backtick)
-  r"-?\d+" is(literal.number)
-  r"," is(punctuation)
-  r"=" is(operator)
-  r"/\S+" is(name)
-  r":\w+" is(name.label)
-  r"\w:\w+" is(text)
-  r"([<>|])(\s*)(\w+)" is(by-groups(punctuation, text, name))
+  lex(basic):
+    r"\".*?\"" is(literal.string.double)
+    r"'.*?'" is(literal.string.single)
+    r"`.*?`" is(literal.string.backtick)
+    r"-?\d+" is(literal.number)
+    r"," is(punctuation)
+    r"=" is(operator)
+    r"/\S+" is(name)
+    r":\w+" is(name.label)
+    r"\w:\w+" is(text)
+    r"([<>|])(\s*)(\w+)" is(by-groups(punctuation, text, name))
 
-lex(root):
-  r"^\s*@" is(punctuation)
-  r"^(\s*)(rem\s.*)$" is(by-groups(text, comment))
-  r"\".*?\"" is(literal.string.double)
-  r"'.*?'" is(literal.string.single)
-  r"%%?[\126$:\w]+%?" is(name.variable)
-  r"::.*" is(comment)
-  r"(set)(\s+)(\w+)" is(by-groups(keyword, text, name.variable))
-  r"(call)(\s+)(:\w+)" is(by-groups(keyword, text, name.label))
-  r"(goto)(\s+)(\w+)" is(by-groups(keyword, text, name.label))
-  r"\b(set|call|echo|on|off|endlocal|for|do|goto|if|pause|setlocal|shift|errorlevel|exist|defined|cmdextversion|errorlevel|else|cd|md|del|deltree|cls|choice)\b" is(keyword)
-  r"\b(equ|neq|lss|leq|gtr|geq)\b" is(operator)
-  any-of(basic)
-  r"." is(text)
+  lex(root):
+    r"^\s*@" is(punctuation)
+    r"^(\s*)(rem\s.*)$" is(by-groups(text, comment))
+    r"\".*?\"" is(literal.string.double)
+    r"'.*?'" is(literal.string.single)
+    r"%%?[\126$:\w]+%?" is(name.variable)
+    r"::.*" is(comment)
+    r"(set)(\s+)(\w+)" is(by-groups(keyword, text, name.variable))
+    r"(call)(\s+)(:\w+)" is(by-groups(keyword, text, name.label))
+    r"(goto)(\s+)(\w+)" is(by-groups(keyword, text, name.label))
+    r"\b(set|call|echo|on|off|endlocal|for|do|goto|if|pause|setlocal|shift|errorlevel|exist|defined|cmdextversion|errorlevel|else|cd|md|del|deltree|cls|choice)\b" is(keyword)
+    r"\b(equ|neq|lss|leq|gtr|geq)\b" is(operator)
+    any-of(basic)
+    r"." is(text)
 
-lex(echo):
-  r"\^\^|\^<|\^>|\^\|" is(literal.string.escape)
-  r"\n" is(text) -> pop
-  any-of(basic)
-  r"[^\'\"^]+" is(text)
+  lex(echo):
+    r"\^\^|\^<|\^>|\^\|" is(literal.string.escape)
+    r"\n" is(text) -> pop
+    any-of(basic)
+    r"[^\'\"^]+" is(text)
 
 const-set(.Lexer, lexer)

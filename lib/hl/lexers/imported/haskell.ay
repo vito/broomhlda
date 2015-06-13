@@ -2,88 +2,88 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Haskell"
-aliases: ["haskell", "hs"]
-extensions: [".hs"]
-mimetypes: ["text/x-haskell"]
-start: .root
-flags: 0
+  name: "Haskell"
+  aliases: ["haskell", "hs"]
+  extensions: [".hs"]
+  mimetypes: ["text/x-haskell"]
+  start: .root
+  flags: 0
 
-lex(comment):
-  r"[^-{}]+" is(comment.multiline)
-  r"{-" is(comment.multiline) -> push
-  r"-}" is(comment.multiline) -> pop
-  r"[-{}]" is(comment.multiline)
+  lex(comment):
+    r"[^-{}]+" is(comment.multiline)
+    r"{-" is(comment.multiline) -> push
+    r"-}" is(comment.multiline) -> pop
+    r"[-{}]" is(comment.multiline)
 
-lex(funclist):
-  r"\s+" is(text)
-  r"[A-Z][a-zA-Z0-9_]*" is(keyword.type)
-  r"(_[\w\']+|[a-z][\w\']*)" is(name.function)
-  r"--.*$" is(comment.single)
-  r"{-" is(comment.multiline) -> go-to(comment)
-  r"," is(punctuation)
-  r"[:!\#$%&*+.\\/<=>?@^|\126-]+" is(operator)
-  r"\(" is(punctuation) -> do-all(go-to(funclist), go-to(funclist))
-  r"\)" is(punctuation) -> pop(2)
+  lex(funclist):
+    r"\s+" is(text)
+    r"[A-Z][a-zA-Z0-9_]*" is(keyword.type)
+    r"(_[\w\']+|[a-z][\w\']*)" is(name.function)
+    r"--.*$" is(comment.single)
+    r"{-" is(comment.multiline) -> go-to(comment)
+    r"," is(punctuation)
+    r"[:!\#$%&*+.\\/<=>?@^|\126-]+" is(operator)
+    r"\(" is(punctuation) -> do-all(go-to(funclist), go-to(funclist))
+    r"\)" is(punctuation) -> pop(2)
 
-lex(string):
-  r"[^\\\"]+" is(literal.string)
-  r"\\" is(literal.string.escape) -> go-to(escape)
-  r"\"" is(literal.string) -> pop
+  lex(string):
+    r"[^\\\"]+" is(literal.string)
+    r"\\" is(literal.string.escape) -> go-to(escape)
+    r"\"" is(literal.string) -> pop
 
-lex(import):
-  r"\s+" is(text)
-  r"\"" is(literal.string) -> go-to(string)
-  r"\)" is(punctuation) -> pop
-  r"qualified\b" is(keyword)
-  r"([A-Z][a-zA-Z0-9_.]*)(\s+)(as)(\s+)([A-Z][a-zA-Z0-9_.]*)" is(by-groups(name.namespace, text, keyword, text, name)) -> pop
-  r"([A-Z][a-zA-Z0-9_.]*)(\s+)(hiding)(\s+)(\()" is(by-groups(name.namespace, text, keyword, text, punctuation)) -> go-to(funclist)
-  r"([A-Z][a-zA-Z0-9_.]*)(\s+)(\()" is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
-  r"[a-zA-Z0-9_.]+" is(name.namespace) -> pop
+  lex(import):
+    r"\s+" is(text)
+    r"\"" is(literal.string) -> go-to(string)
+    r"\)" is(punctuation) -> pop
+    r"qualified\b" is(keyword)
+    r"([A-Z][a-zA-Z0-9_.]*)(\s+)(as)(\s+)([A-Z][a-zA-Z0-9_.]*)" is(by-groups(name.namespace, text, keyword, text, name)) -> pop
+    r"([A-Z][a-zA-Z0-9_.]*)(\s+)(hiding)(\s+)(\()" is(by-groups(name.namespace, text, keyword, text, punctuation)) -> go-to(funclist)
+    r"([A-Z][a-zA-Z0-9_.]*)(\s+)(\()" is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
+    r"[a-zA-Z0-9_.]+" is(name.namespace) -> pop
 
-lex(escape):
-  r"[abfnrtv\"\'&\\]" is(literal.string.escape) -> pop
-  r"\^[\]\[A-Z@\^_]" is(literal.string.escape) -> pop
-  r"NUL|SOH|[SE]TX|EOT|ENQ|ACK|BEL|BS|HT|LF|VT|FF|CR|S[OI]|DLE|DC[1-4]|NAK|SYN|ETB|CAN|EM|SUB|ESC|[FGRU]S|SP|DEL" is(literal.string.escape) -> pop
-  r"o[0-7]+" is(literal.string.escape) -> pop
-  r"x[\da-fA-F]+" is(literal.string.escape) -> pop
-  r"\d+" is(literal.string.escape) -> pop
-  r"\s+\\" is(literal.string.escape) -> pop
+  lex(escape):
+    r"[abfnrtv\"\'&\\]" is(literal.string.escape) -> pop
+    r"\^[\]\[A-Z@\^_]" is(literal.string.escape) -> pop
+    r"NUL|SOH|[SE]TX|EOT|ENQ|ACK|BEL|BS|HT|LF|VT|FF|CR|S[OI]|DLE|DC[1-4]|NAK|SYN|ETB|CAN|EM|SUB|ESC|[FGRU]S|SP|DEL" is(literal.string.escape) -> pop
+    r"o[0-7]+" is(literal.string.escape) -> pop
+    r"x[\da-fA-F]+" is(literal.string.escape) -> pop
+    r"\d+" is(literal.string.escape) -> pop
+    r"\s+\\" is(literal.string.escape) -> pop
 
-lex(root):
-  r"\s+" is(text)
-  r"--(?![!\#$%&*+./<=>?@\^|_\126:\\]).*?$" is(comment.single)
-  r"{-" is(comment.multiline) -> go-to(comment)
-  r"\bimport\b" is(keyword.reserved) -> go-to(import)
-  r"\bmodule\b" is(keyword.reserved) -> go-to(module)
-  r"\berror\b" is(name.exception)
-  r"\b(case|class|data|default|deriving|do|else|if|in|infix[lr]?|instance|let|newtype|of|then|type|where|_)(?!\')\b" is(keyword.reserved)
-  r"^[_a-z][\w\']*" is(name.function)
-  r"'?[_a-z][\w']*" is(name)
-  r"('')?[A-Z][\w\']*" is(keyword.type)
-  r"\\(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(name.function)
-  r"(<-|::|->|=>|=)(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(operator.word)
-  r":[:!\#$%&*+.\\/<=>?@^|\126-]*" is(keyword.type)
-  r"[:!\#$%&*+.\\/<=>?@^|\126-]+" is(operator)
-  r"\d+[eE][+-]?\d+" is(literal.number.float)
-  r"\d+\.\d+([eE][+-]?\d+)?" is(literal.number.float)
-  r"0[oO][0-7]+" is(literal.number.oct)
-  r"0[xX][\da-fA-F]+" is(literal.number.hex)
-  r"\d+" is(literal.number.integer)
-  r"'" is(literal.string.char) -> go-to(character)
-  r"\"" is(literal.string) -> go-to(string)
-  r"\[\]" is(keyword.type)
-  r"\(\)" is(name.builtin)
-  r"[\]\[(),;`{}]" is(punctuation)
+  lex(root):
+    r"\s+" is(text)
+    r"--(?![!\#$%&*+./<=>?@\^|_\126:\\]).*?$" is(comment.single)
+    r"{-" is(comment.multiline) -> go-to(comment)
+    r"\bimport\b" is(keyword.reserved) -> go-to(import)
+    r"\bmodule\b" is(keyword.reserved) -> go-to(module)
+    r"\berror\b" is(name.exception)
+    r"\b(case|class|data|default|deriving|do|else|if|in|infix[lr]?|instance|let|newtype|of|then|type|where|_)(?!\')\b" is(keyword.reserved)
+    r"^[_a-z][\w\']*" is(name.function)
+    r"'?[_a-z][\w']*" is(name)
+    r"('')?[A-Z][\w\']*" is(keyword.type)
+    r"\\(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(name.function)
+    r"(<-|::|->|=>|=)(?![:!\#$%&*+.\\/<=>?@^|\126-]+)" is(operator.word)
+    r":[:!\#$%&*+.\\/<=>?@^|\126-]*" is(keyword.type)
+    r"[:!\#$%&*+.\\/<=>?@^|\126-]+" is(operator)
+    r"\d+[eE][+-]?\d+" is(literal.number.float)
+    r"\d+\.\d+([eE][+-]?\d+)?" is(literal.number.float)
+    r"0[oO][0-7]+" is(literal.number.oct)
+    r"0[xX][\da-fA-F]+" is(literal.number.hex)
+    r"\d+" is(literal.number.integer)
+    r"'" is(literal.string.char) -> go-to(character)
+    r"\"" is(literal.string) -> go-to(string)
+    r"\[\]" is(keyword.type)
+    r"\(\)" is(name.builtin)
+    r"[\]\[(),;`{}]" is(punctuation)
 
-lex(module):
-  r"\s+" is(text)
-  r"([A-Z][a-zA-Z0-9_.]*)(\s+)(\()" is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
-  r"[A-Z][a-zA-Z0-9_.]*" is(name.namespace) -> pop
+  lex(module):
+    r"\s+" is(text)
+    r"([A-Z][a-zA-Z0-9_.]*)(\s+)(\()" is(by-groups(name.namespace, text, punctuation)) -> go-to(funclist)
+    r"[A-Z][a-zA-Z0-9_.]*" is(name.namespace) -> pop
 
-lex(character):
-  r"[^\\']" is(literal.string.char)
-  r"\\" is(literal.string.escape) -> go-to(escape)
-  r"'" is(literal.string.char) -> pop
+  lex(character):
+    r"[^\\']" is(literal.string.char)
+    r"\\" is(literal.string.escape) -> go-to(escape)
+    r"'" is(literal.string.char) -> pop
 
 const-set(.Lexer, lexer)

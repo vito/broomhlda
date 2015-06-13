@@ -208,12 +208,12 @@ def convert_lexer(mod, name, aliases, filenames, mimetypes, flags):
 use(require("hl/define"))
 
 lexer = lexer:
-name: %s
-aliases: %s
-extensions: %s
-mimetypes: %s
-start: .root
-flags: %s
+  name: %s
+  aliases: %s
+  extensions: %s
+  mimetypes: %s
+  start: .root
+  flags: %s
 
 """ % (dq(name), dq(aliases), dq([convert_filename(x) for x in filenames]),
        dq(mimetypes), convert_flags(flags))
@@ -272,7 +272,7 @@ def try_converting(k, l, to = "lib/hl/lexers/imported"):
     mod.write(convert_lexer(k, name, aliases, filenames, mimetypes, cls.flags))
 
     for name, state in cls.tokens.items():
-        mod.write(convert_state(cls.tokens, name, state) + "\n")
+        mod.write(re.sub(r"(?m)^([^\n]+)$", "  \\1", convert_state(cls.tokens, name, state)) + "\n")
 
     mod.write("const-set(.Lexer, lexer)\n")
 

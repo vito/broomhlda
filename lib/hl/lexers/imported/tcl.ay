@@ -2,109 +2,109 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Tcl"
-aliases: ["tcl"]
-extensions: [".tcl"]
-mimetypes: ["text/x-tcl", "text/x-script.tcl", "application/x-tcl"]
-start: .root
-flags: 0
+  name: "Tcl"
+  aliases: ["tcl"]
+  extensions: [".tcl"]
+  mimetypes: ["text/x-tcl", "text/x-script.tcl", "application/x-tcl"]
+  start: .root
+  flags: 0
 
-lex(comment):
-  r".*[^\\]\n" is(comment) -> pop
-  r".*\\\n" is(comment)
+  lex(comment):
+    r".*[^\\]\n" is(comment) -> pop
+    r".*\\\n" is(comment)
 
-lex(string-square):
-  r"\[" is(literal.string.double) -> go-to(string-square)
-  r"(?m)(\\\\|\\[0-7]+|\\.|\\\n|[^\]\\])" is(literal.string.double)
-  r"\]" is(literal.string.double) -> pop
+  lex(string-square):
+    r"\[" is(literal.string.double) -> go-to(string-square)
+    r"(?m)(\\\\|\\[0-7]+|\\.|\\\n|[^\]\\])" is(literal.string.double)
+    r"\]" is(literal.string.double) -> pop
 
-lex(string):
-  r"\[" is(literal.string.double) -> go-to(string-square)
-  r"(?m)(\\\\|\\[0-7]+|\\.|[^\"\\])" is(literal.string.double)
-  r"\"" is(literal.string.double) -> pop
+  lex(string):
+    r"\[" is(literal.string.double) -> go-to(string-square)
+    r"(?m)(\\\\|\\[0-7]+|\\.|[^\"\\])" is(literal.string.double)
+    r"\"" is(literal.string.double) -> pop
 
-lex(command-in-paren):
-  r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-paren)
-  r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-paren)
-  r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-paren)
-  r"\#" is(comment) -> go-to(comment)
+  lex(command-in-paren):
+    r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-paren)
+    r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-paren)
+    r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-paren)
+    r"\#" is(comment) -> go-to(comment)
 
-lex(data):
-  r"\s+" is(text)
-  r"0x[a-fA-F0-9]+" is(literal.number.hex)
-  r"0[0-7]+" is(literal.number.oct)
-  r"\d+\.\d+" is(literal.number.float)
-  r"\d+" is(literal.number.integer)
-  r"\$([\w\.\-\:]+)" is(name.variable)
-  r"([\w\.\-\:]+)" is(text)
+  lex(data):
+    r"\s+" is(text)
+    r"0x[a-fA-F0-9]+" is(literal.number.hex)
+    r"0[0-7]+" is(literal.number.oct)
+    r"\d+\.\d+" is(literal.number.float)
+    r"\d+" is(literal.number.integer)
+    r"\$([\w\.\-\:]+)" is(name.variable)
+    r"([\w\.\-\:]+)" is(text)
 
-lex(brace):
-  r"}" is(keyword) -> pop
-  any-of(command-in-brace)
-  any-of(basic)
-  any-of(data)
+  lex(brace):
+    r"}" is(keyword) -> pop
+    any-of(command-in-brace)
+    any-of(basic)
+    any-of(data)
 
-lex(paren):
-  r"\)" is(keyword) -> pop
-  any-of(command-in-paren)
-  any-of(basic)
-  any-of(data)
+  lex(paren):
+    r"\)" is(keyword) -> pop
+    any-of(command-in-paren)
+    any-of(basic)
+    any-of(data)
 
-lex(params-in-paren):
-  r"\)" is(keyword) -> do-all(pop, pop)
-  any-of(params)
+  lex(params-in-paren):
+    r"\)" is(keyword) -> do-all(pop, pop)
+    any-of(params)
 
-lex(bracket):
-  r"\]" is(keyword) -> pop
-  any-of(command-in-bracket)
-  any-of(basic)
-  any-of(data)
+  lex(bracket):
+    r"\]" is(keyword) -> pop
+    any-of(command-in-bracket)
+    any-of(basic)
+    any-of(data)
 
-lex(command):
-  r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params)
-  r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params)
-  r"([\w\.\-]+)" is(name.variable) -> go-to(params)
-  r"\#" is(comment) -> go-to(comment)
+  lex(command):
+    r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params)
+    r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params)
+    r"([\w\.\-]+)" is(name.variable) -> go-to(params)
+    r"\#" is(comment) -> go-to(comment)
 
-lex(params):
-  r";" is(keyword) -> pop
-  r"\n" is(text) -> pop
-  r"(else|elseif|then)\b" is(keyword)
-  any-of(basic)
-  any-of(data)
+  lex(params):
+    r";" is(keyword) -> pop
+    r"\n" is(text) -> pop
+    r"(else|elseif|then)\b" is(keyword)
+    any-of(basic)
+    any-of(data)
 
-lex(basic):
-  r"\(" is(keyword) -> go-to(paren)
-  r"\[" is(keyword) -> go-to(bracket)
-  r"\{" is(keyword) -> go-to(brace)
-  r"\"" is(literal.string.double) -> go-to(string)
-  r"(eq|ne|in|ni)\b" is(operator.word)
-  r"!=|==|<<|>>|<=|>=|&&|\|\||\*\*|[-+\126!*/%<>&^|?:]" is(operator)
+  lex(basic):
+    r"\(" is(keyword) -> go-to(paren)
+    r"\[" is(keyword) -> go-to(bracket)
+    r"\{" is(keyword) -> go-to(brace)
+    r"\"" is(literal.string.double) -> go-to(string)
+    r"(eq|ne|in|ni)\b" is(operator.word)
+    r"!=|==|<<|>>|<=|>=|&&|\|\||\*\*|[-+\126!*/%<>&^|?:]" is(operator)
 
-lex(params-in-bracket):
-  r"\]" is(keyword) -> do-all(pop, pop)
-  any-of(params)
+  lex(params-in-bracket):
+    r"\]" is(keyword) -> do-all(pop, pop)
+    any-of(params)
 
-lex(command-in-bracket):
-  r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-bracket)
-  r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-bracket)
-  r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-bracket)
-  r"\#" is(comment) -> go-to(comment)
+  lex(command-in-bracket):
+    r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-bracket)
+    r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-bracket)
+    r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-bracket)
+    r"\#" is(comment) -> go-to(comment)
 
-lex(params-in-brace):
-  r"}" is(keyword) -> do-all(pop, pop)
-  any-of(params)
+  lex(params-in-brace):
+    r"}" is(keyword) -> do-all(pop, pop)
+    any-of(params)
 
-lex(root):
-  any-of(command)
-  any-of(basic)
-  any-of(data)
-  r"}" is(keyword)
+  lex(root):
+    any-of(command)
+    any-of(basic)
+    any-of(data)
+    r"}" is(keyword)
 
-lex(command-in-brace):
-  r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-brace)
-  r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-brace)
-  r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-brace)
-  r"\#" is(comment) -> go-to(comment)
+  lex(command-in-brace):
+    r"\b(after|apply|array|break|catch|continue|elseif|else|error|eval|expr|for|foreach|global|if|namespace|proc|rename|return|set|switch|then|trace|unset|update|uplevel|upvar|variable|vwait|while)\b" is(keyword) -> go-to(params-in-brace)
+    r"\b(append|bgerror|binary|cd|chan|clock|close|concat|dde|dict|encoding|eof|exec|exit|fblocked|fconfigure|fcopy|file|fileevent|flush|format|gets|glob|history|http|incr|info|interp|join|lappend|lassign|lindex|linsert|list|llength|load|loadTk|lrange|lrepeat|lreplace|lreverse|lsearch|lset|lsort|mathfunc|mathop|memory|msgcat|open|package|pid|pkg::create|pkg_mkIndex|platform|platform::shell|puts|pwd|re_syntax|read|refchan|regexp|registry|regsub|scan|seek|socket|source|split|string|subst|tell|time|tm|unknown|unload)\b" is(name.builtin) -> go-to(params-in-brace)
+    r"([\w\.\-]+)" is(name.variable) -> go-to(params-in-brace)
+    r"\#" is(comment) -> go-to(comment)
 
 const-set(.Lexer, lexer)

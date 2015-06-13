@@ -2,152 +2,152 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Opa"
-aliases: ["opa"]
-extensions: [".opa"]
-mimetypes: ["text/x-opa"]
-start: .root
-flags: 0
+  name: "Opa"
+  aliases: ["opa"]
+  extensions: [".opa"]
+  mimetypes: ["text/x-opa"]
+  start: .root
+  flags: 0
 
-lex(html-attr):
-  r"\s+" is(text)
-  r"[\w\-:]+=" is(literal.string.single) -> go-to(html-attr-value)
-  r"/>" is(literal.string.single) -> pop
-  r">" is(literal.string.single) -> do-all(pop, go-to(html-content))
+  lex(html-attr):
+    r"\s+" is(text)
+    r"[\w\-:]+=" is(literal.string.single) -> go-to(html-attr-value)
+    r"/>" is(literal.string.single) -> pop
+    r">" is(literal.string.single) -> do-all(pop, go-to(html-content))
 
-lex(html-open-tag):
-  r"[\w\-:]+" is(literal.string.single) -> do-all(pop, go-to(html-attr))
-  r">" is(literal.string.single) -> do-all(pop, go-to(html-content))
+  lex(html-open-tag):
+    r"[\w\-:]+" is(literal.string.single) -> do-all(pop, go-to(html-attr))
+    r">" is(literal.string.single) -> do-all(pop, go-to(html-content))
 
-lex(html-content):
-  r"<!--" is(comment) -> go-to(html-comment)
-  r"</" is(literal.string.single) -> do-all(pop, go-to(html-end-tag))
-  r"<" is(literal.string.single) -> go-to(html-open-tag)
-  r"{" is(operator) -> go-to(root)
-  r"[^<{]+" is(literal.string.single)
+  lex(html-content):
+    r"<!--" is(comment) -> go-to(html-comment)
+    r"</" is(literal.string.single) -> do-all(pop, go-to(html-end-tag))
+    r"<" is(literal.string.single) -> go-to(html-open-tag)
+    r"{" is(operator) -> go-to(root)
+    r"[^<{]+" is(literal.string.single)
 
-lex(string):
-  r"[^\\\"{]+" is(literal.string.double)
-  r"\"" is(literal.string.double) -> pop
-  r"{" is(operator) -> go-to(root)
-  any-of(escape-sequence)
+  lex(string):
+    r"[^\\\"{]+" is(literal.string.double)
+    r"\"" is(literal.string.double) -> pop
+    r"{" is(operator) -> go-to(root)
+    any-of(escape-sequence)
 
-lex(html-attr-value):
-  r"'" is(literal.string.single) -> do-all(pop, go-to(single-string))
-  r"\"" is(literal.string.single) -> do-all(pop, go-to(string))
-  r"\#(([a-zA-Z_]\w*)|(`[^`]*`))" is(literal.string.single) -> pop
-  r"\#(?={)" is(literal.string.single) -> do-all(pop, go-to(root))
-  r"[^\"\'{`=<>]+" is(literal.string.single) -> pop
-  r"{" is(operator) -> do-all(pop, go-to(root))
+  lex(html-attr-value):
+    r"'" is(literal.string.single) -> do-all(pop, go-to(single-string))
+    r"\"" is(literal.string.single) -> do-all(pop, go-to(string))
+    r"\#(([a-zA-Z_]\w*)|(`[^`]*`))" is(literal.string.single) -> pop
+    r"\#(?={)" is(literal.string.single) -> do-all(pop, go-to(root))
+    r"[^\"\'{`=<>]+" is(literal.string.single) -> pop
+    r"{" is(operator) -> do-all(pop, go-to(root))
 
-lex(type-tuple):
-  any-of(comments-and-spaces)
-  r"[^\(\)/*]+" is(keyword.type)
-  r"[/*]" is(keyword.type)
-  r"\(" is(keyword.type) -> push
-  r"\)" is(keyword.type) -> pop
+  lex(type-tuple):
+    any-of(comments-and-spaces)
+    r"[^\(\)/*]+" is(keyword.type)
+    r"[/*]" is(keyword.type)
+    r"\(" is(keyword.type) -> push
+    r"\)" is(keyword.type) -> pop
 
-lex(html-comment):
-  r"-->" is(comment) -> pop
-  r"[^\-]+|-" is(comment)
+  lex(html-comment):
+    r"-->" is(comment) -> pop
+    r"[^\-]+|-" is(comment)
 
-lex(comments-and-spaces):
-  any-of(comments)
-  r"\s+" is(text)
+  lex(comments-and-spaces):
+    any-of(comments)
+    r"\s+" is(text)
 
-lex(nested-comment):
-  r"[^/*]+" is(comment)
-  r"/\*" is(comment) -> push
-  r"\*/" is(comment) -> pop
-  r"[/*]" is(comment)
+  lex(nested-comment):
+    r"[^/*]+" is(comment)
+    r"/\*" is(comment) -> push
+    r"\*/" is(comment) -> pop
+    r"[/*]" is(comment)
 
-lex(type-lhs-1):
-  any-of(comments-and-spaces)
-  r"->" is(keyword.type) -> do-all(pop, go-to(type))
-  r"(?=,)" is(keyword.type) -> do-all(pop, go-to(type-arrow))
-  r"" is(keyword.type) -> pop
+  lex(type-lhs-1):
+    any-of(comments-and-spaces)
+    r"->" is(keyword.type) -> do-all(pop, go-to(type))
+    r"(?=,)" is(keyword.type) -> do-all(pop, go-to(type-arrow))
+    r"" is(keyword.type) -> pop
 
-lex(escape-sequence):
-  r"\\[\\\\"\'ntr}]" is(literal.string.escape)
-  r"\\[0-9]{3}" is(literal.string.escape)
-  r"\\x[0-9a-fA-F]{2}" is(literal.string.escape)
+  lex(escape-sequence):
+    r"\\[\\\\"\'ntr}]" is(literal.string.escape)
+    r"\\[0-9]{3}" is(literal.string.escape)
+    r"\\x[0-9a-fA-F]{2}" is(literal.string.escape)
 
-lex(type-arrow):
-  any-of(comments-and-spaces)
-  r",(?=[^:]*?->)" is(keyword.type) -> go-to(type-with-slash)
-  r"->" is(keyword.type) -> do-all(pop, go-to(type))
-  r"" is(keyword.type) -> pop
+  lex(type-arrow):
+    any-of(comments-and-spaces)
+    r",(?=[^:]*?->)" is(keyword.type) -> go-to(type-with-slash)
+    r"->" is(keyword.type) -> do-all(pop, go-to(type))
+    r"" is(keyword.type) -> pop
 
-lex(type-record):
-  any-of(comments-and-spaces)
-  r"[^{}/*]+" is(keyword.type)
-  r"[/*]" is(keyword.type)
-  r"{" is(keyword.type) -> push
-  r"}" is(keyword.type) -> pop
+  lex(type-record):
+    any-of(comments-and-spaces)
+    r"[^{}/*]+" is(keyword.type)
+    r"[/*]" is(keyword.type)
+    r"{" is(keyword.type) -> push
+    r"}" is(keyword.type) -> pop
 
-lex(comments):
-  r"/\*" is(comment) -> go-to(nested-comment)
-  r"//.*?$" is(comment)
+  lex(comments):
+    r"/\*" is(comment) -> go-to(nested-comment)
+    r"//.*?$" is(comment)
 
-lex(slash-type-1):
-  any-of(comments-and-spaces)
-  r"/" is(keyword.type) -> do-all(pop, go-to(type-1))
-  r"" is(keyword.type) -> pop
+  lex(slash-type-1):
+    any-of(comments-and-spaces)
+    r"/" is(keyword.type) -> do-all(pop, go-to(type-1))
+    r"" is(keyword.type) -> pop
 
-lex(type):
-  any-of(comments-and-spaces)
-  r"->" is(keyword.type)
-  r"" is(keyword.type) -> do-all(pop, go-to(type-lhs-1), go-to(type-with-slash))
+  lex(type):
+    any-of(comments-and-spaces)
+    r"->" is(keyword.type)
+    r"" is(keyword.type) -> do-all(pop, go-to(type-lhs-1), go-to(type-with-slash))
 
-lex(type-1):
-  any-of(comments-and-spaces)
-  r"\(" is(keyword.type) -> do-all(pop, go-to(type-tuple))
-  r"\126?{" is(keyword.type) -> do-all(pop, go-to(type-record))
-  r"(([a-zA-Z_]\w*)|(`[^`]*`))\(" is(keyword.type) -> do-all(pop, go-to(type-tuple))
-  r"(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type) -> pop
-  r"'(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type)
-  r"" is(keyword.type) -> pop
+  lex(type-1):
+    any-of(comments-and-spaces)
+    r"\(" is(keyword.type) -> do-all(pop, go-to(type-tuple))
+    r"\126?{" is(keyword.type) -> do-all(pop, go-to(type-record))
+    r"(([a-zA-Z_]\w*)|(`[^`]*`))\(" is(keyword.type) -> do-all(pop, go-to(type-tuple))
+    r"(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type) -> pop
+    r"'(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type)
+    r"" is(keyword.type) -> pop
 
-lex(root):
-  any-of(comments-and-spaces)
-  r"\b(and|as|begin|css|database|db|do|else|end|external|forall|if|import|match|package|parser|rec|server|then|type|val|with|xml_parser)\b" is(keyword)
-  r"@(([a-zA-Z_]\w*)|(`[^`]*`))\b" is(name.builtin.pseudo)
-  r"-?.[\d]+([eE][+\-]?\d+)" is(literal.number.float)
-  r"-?\d+.\d*([eE][+\-]?\d+)" is(literal.number.float)
-  r"-?\d+[eE][+\-]?\d+" is(literal.number.float)
-  r"0[xX][\da-fA-F]+" is(literal.number.hex)
-  r"0[oO][0-7]+" is(literal.number.oct)
-  r"0[bB][01]+" is(literal.number.binary)
-  r"\d+" is(literal.number.integer)
-  r"\#[\da-fA-F]{3,6}" is(literal.number.integer)
-  r"\"" is(literal.string.double) -> go-to(string)
-  r"'(?:(\\[\\\\"'ntbr ])|(\\[0-9]{3})|(\\x[0-9a-fA-F]{2})|.)'" is(literal.string.char)
-  r"{" is(operator) -> push
-  r"}" is(operator) -> pop
-  r"<(?=[a-zA-Z>])" is(literal.string.single) -> go-to(html-open-tag)
-  r"[@?!]?(/\w+)+(\[_\])?" is(name.variable)
-  r"<-(?![.=\-<>,@\126%/+?*&^!])" is(name.variable)
-  r"\b([A-Z]\w*)(?=\.)" is(name.namespace)
-  r"=(?![.=\-<>,@\126%/+?*&^!])" is(keyword)
-  r"([.=\-<>,@\126%/+?*&^!])+" is(operator)
-  r"([()\[\],;|])+" is(operator)
-  r":" is(operator) -> go-to(type)
-  r"'(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type)
-  r"\#(([a-zA-Z_]\w*)|(`[^`]*`))" is(literal.string.single)
-  r"\#(?={)" is(literal.string.single)
-  r"(([a-zA-Z_]\w*)|(`[^`]*`))" is(text)
+  lex(root):
+    any-of(comments-and-spaces)
+    r"\b(and|as|begin|css|database|db|do|else|end|external|forall|if|import|match|package|parser|rec|server|then|type|val|with|xml_parser)\b" is(keyword)
+    r"@(([a-zA-Z_]\w*)|(`[^`]*`))\b" is(name.builtin.pseudo)
+    r"-?.[\d]+([eE][+\-]?\d+)" is(literal.number.float)
+    r"-?\d+.\d*([eE][+\-]?\d+)" is(literal.number.float)
+    r"-?\d+[eE][+\-]?\d+" is(literal.number.float)
+    r"0[xX][\da-fA-F]+" is(literal.number.hex)
+    r"0[oO][0-7]+" is(literal.number.oct)
+    r"0[bB][01]+" is(literal.number.binary)
+    r"\d+" is(literal.number.integer)
+    r"\#[\da-fA-F]{3,6}" is(literal.number.integer)
+    r"\"" is(literal.string.double) -> go-to(string)
+    r"'(?:(\\[\\\\"'ntbr ])|(\\[0-9]{3})|(\\x[0-9a-fA-F]{2})|.)'" is(literal.string.char)
+    r"{" is(operator) -> push
+    r"}" is(operator) -> pop
+    r"<(?=[a-zA-Z>])" is(literal.string.single) -> go-to(html-open-tag)
+    r"[@?!]?(/\w+)+(\[_\])?" is(name.variable)
+    r"<-(?![.=\-<>,@\126%/+?*&^!])" is(name.variable)
+    r"\b([A-Z]\w*)(?=\.)" is(name.namespace)
+    r"=(?![.=\-<>,@\126%/+?*&^!])" is(keyword)
+    r"([.=\-<>,@\126%/+?*&^!])+" is(operator)
+    r"([()\[\],;|])+" is(operator)
+    r":" is(operator) -> go-to(type)
+    r"'(([a-zA-Z_]\w*)|(`[^`]*`))" is(keyword.type)
+    r"\#(([a-zA-Z_]\w*)|(`[^`]*`))" is(literal.string.single)
+    r"\#(?={)" is(literal.string.single)
+    r"(([a-zA-Z_]\w*)|(`[^`]*`))" is(text)
 
-lex(html-end-tag):
-  r"[\w\-:]*>" is(literal.string.single) -> pop
+  lex(html-end-tag):
+    r"[\w\-:]*>" is(literal.string.single) -> pop
 
-lex(type-with-slash):
-  any-of(comments-and-spaces)
-  r"" is(keyword.type) -> do-all(pop, go-to(slash-type-1), go-to(type-1))
+  lex(type-with-slash):
+    any-of(comments-and-spaces)
+    r"" is(keyword.type) -> do-all(pop, go-to(slash-type-1), go-to(type-1))
 
-lex(single-string):
-  r"[^\\\'{]+" is(literal.string.double)
-  r"\'" is(literal.string.double) -> pop
-  r"{" is(operator) -> go-to(root)
-  any-of(escape-sequence)
+  lex(single-string):
+    r"[^\\\'{]+" is(literal.string.double)
+    r"\'" is(literal.string.double) -> pop
+    r"{" is(operator) -> go-to(root)
+    any-of(escape-sequence)
 
 const-set(.Lexer, lexer)

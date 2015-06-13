@@ -2,46 +2,46 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "JSON"
-aliases: ["json"]
-extensions: [".json"]
-mimetypes: ["application/json"]
-start: .root
-flags: Regexp MULTILINE
+  name: "JSON"
+  aliases: ["json"]
+  extensions: [".json"]
+  mimetypes: ["application/json"]
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(objectattribute):
-  any-of(value)
-  r":" is(punctuation)
-  r"," is(punctuation) -> pop
-  r"}" is(punctuation) -> do-all(pop, pop)
+  lex(objectattribute):
+    any-of(value)
+    r":" is(punctuation)
+    r"," is(punctuation) -> pop
+    r"}" is(punctuation) -> do-all(pop, pop)
 
-lex(whitespace):
-  r"\s+" is(text)
+  lex(whitespace):
+    r"\s+" is(text)
 
-lex(root):
-  any-of(value)
+  lex(root):
+    any-of(value)
 
-lex(simplevalue):
-  r"(true|false|null)\b" is(keyword.constant)
-  r"-?(0|[1-9]\d*)(\.\d+[eE](\+|-)?\d+|[eE](\+|-)?\d+|\.\d+)" is(literal.number.float)
-  r"-?(0|[1-9]\d*)" is(literal.number.integer)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
+  lex(simplevalue):
+    r"(true|false|null)\b" is(keyword.constant)
+    r"-?(0|[1-9]\d*)(\.\d+[eE](\+|-)?\d+|[eE](\+|-)?\d+|\.\d+)" is(literal.number.float)
+    r"-?(0|[1-9]\d*)" is(literal.number.integer)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
 
-lex(value):
-  any-of(whitespace)
-  any-of(simplevalue)
-  r"{" is(punctuation) -> go-to(objectvalue)
-  r"\[" is(punctuation) -> go-to(arrayvalue)
+  lex(value):
+    any-of(whitespace)
+    any-of(simplevalue)
+    r"{" is(punctuation) -> go-to(objectvalue)
+    r"\[" is(punctuation) -> go-to(arrayvalue)
 
-lex(arrayvalue):
-  any-of(whitespace)
-  any-of(value)
-  r"," is(punctuation)
-  r"]" is(punctuation) -> pop
+  lex(arrayvalue):
+    any-of(whitespace)
+    any-of(value)
+    r"," is(punctuation)
+    r"]" is(punctuation) -> pop
 
-lex(objectvalue):
-  any-of(whitespace)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(name.tag) -> go-to(objectattribute)
-  r"}" is(punctuation) -> pop
+  lex(objectvalue):
+    any-of(whitespace)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(name.tag) -> go-to(objectattribute)
+    r"}" is(punctuation) -> pop
 
 const-set(.Lexer, lexer)

@@ -2,17 +2,17 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "INI"
-aliases: ["ini", "cfg"]
-extensions: [".ini", ".cfg"]
-mimetypes: ["text/x-ini"]
-start: .root
-flags: 0
+  name: "INI"
+  aliases: ["ini", "cfg"]
+  extensions: [".ini", ".cfg"]
+  mimetypes: ["text/x-ini"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\s+" is(text)
-  r"[;\#].*" is(comment.single)
-  r"\[.*?\]$" is(keyword)
-  r"(.*?)([ \t]*)(=)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
+  lex(root):
+    r"\s+" is(text)
+    r"[;\#].*" is(comment.single)
+    r"\[.*?\]$" is(keyword)
+    r"(.*?)([ \t]*)(=)([ \t]*)(.*(?:\n[ \t].+)*)" is(by-groups(name.attribute, text, operator, text, literal.string))
 
 const-set(.Lexer, lexer)

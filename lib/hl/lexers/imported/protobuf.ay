@@ -2,42 +2,42 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Protocol Buffer"
-aliases: ["protobuf"]
-extensions: [".proto"]
-mimetypes: []
-start: .root
-flags: 0
+  name: "Protocol Buffer"
+  aliases: ["protobuf"]
+  extensions: [".proto"]
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(type):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name) -> pop
+  lex(type):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name) -> pop
 
-lex(message):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
+  lex(message):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
 
-lex(root):
-  r"[ \t]+" is(text)
-  r"[,;{}\[\]\(\)]" is(punctuation)
-  r"/(\\\n)?/(\n|(.|\n)*?[^\\]\n)" is(comment.single)
-  r"/(\\\n)?\*(.|\n)*?\*(\\\n)?/" is(comment.multiline)
-  r"\b(import|option|optional|required|repeated|default|packed|ctype|extensions|to|max|rpc|returns)\b" is(keyword)
-  r"(int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|float|double|bool|string|bytes)\b" is(keyword.type)
-  r"(true|false)\b" is(keyword.constant)
-  r"(package)(\s+)" is(by-groups(keyword.namespace, text)) -> go-to(package)
-  r"(message|extend)(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(message)
-  r"(enum|group|service)(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(type)
-  r"\\".*\\"" is(literal.string)
-  r"(\d+\.\d*|\.\d+|\d+)[eE][+-]?\d+[LlUu]*" is(literal.number.float)
-  r"(\d+\.\d*|\.\d+|\d+[fF])[fF]?" is(literal.number.float)
-  r"(\-?(inf|nan))" is(literal.number.float)
-  r"0x[0-9a-fA-F]+[LlUu]*" is(literal.number.hex)
-  r"0[0-7]+[LlUu]*" is(literal.number.oct)
-  r"\d+[LlUu]*" is(literal.number.integer)
-  r"[+-=]" is(operator)
-  r"([a-zA-Z_][a-zA-Z0-9_\.]*)([ \t]*)(=)" is(by-groups(name.attribute, text, operator))
-  r"[a-zA-Z_][a-zA-Z0-9_\.]*" is(name)
+  lex(root):
+    r"[ \t]+" is(text)
+    r"[,;{}\[\]\(\)]" is(punctuation)
+    r"/(\\\n)?/(\n|(.|\n)*?[^\\]\n)" is(comment.single)
+    r"/(\\\n)?\*(.|\n)*?\*(\\\n)?/" is(comment.multiline)
+    r"\b(import|option|optional|required|repeated|default|packed|ctype|extensions|to|max|rpc|returns)\b" is(keyword)
+    r"(int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|float|double|bool|string|bytes)\b" is(keyword.type)
+    r"(true|false)\b" is(keyword.constant)
+    r"(package)(\s+)" is(by-groups(keyword.namespace, text)) -> go-to(package)
+    r"(message|extend)(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(message)
+    r"(enum|group|service)(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(type)
+    r"\\".*\\"" is(literal.string)
+    r"(\d+\.\d*|\.\d+|\d+)[eE][+-]?\d+[LlUu]*" is(literal.number.float)
+    r"(\d+\.\d*|\.\d+|\d+[fF])[fF]?" is(literal.number.float)
+    r"(\-?(inf|nan))" is(literal.number.float)
+    r"0x[0-9a-fA-F]+[LlUu]*" is(literal.number.hex)
+    r"0[0-7]+[LlUu]*" is(literal.number.oct)
+    r"\d+[LlUu]*" is(literal.number.integer)
+    r"[+-=]" is(operator)
+    r"([a-zA-Z_][a-zA-Z0-9_\.]*)([ \t]*)(=)" is(by-groups(name.attribute, text, operator))
+    r"[a-zA-Z_][a-zA-Z0-9_\.]*" is(name)
 
-lex(package):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.namespace) -> pop
+  lex(package):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.namespace) -> pop
 
 const-set(.Lexer, lexer)

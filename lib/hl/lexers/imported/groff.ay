@@ -2,37 +2,37 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Groff"
-aliases: ["groff", "nroff", "man"]
-extensions: [".[1234567]", ".man"]
-mimetypes: ["application/x-troff", "text/troff"]
-start: .root
-flags: 0
+  name: "Groff"
+  aliases: ["groff", "nroff", "man"]
+  extensions: [".[1234567]", ".man"]
+  mimetypes: ["application/x-troff", "text/troff"]
+  start: .root
+  flags: 0
 
-lex(request):
-  r"\n" is(text) -> pop
-  any-of(escapes)
-  r"\"[^\n\"]+\"" is(literal.string.double)
-  r"\d+" is(literal.number)
-  r"\S+" is(literal.string)
-  r"\s+" is(text)
+  lex(request):
+    r"\n" is(text) -> pop
+    any-of(escapes)
+    r"\"[^\n\"]+\"" is(literal.string.double)
+    r"\d+" is(literal.number)
+    r"\S+" is(literal.string)
+    r"\s+" is(text)
 
-lex(escapes):
-  r"\\\"[^\n]*" is(comment)
-  r"\\[fn]\w" is(literal.string.escape)
-  r"\\\(.{2}" is(literal.string.escape)
-  r"\\.\[.*\]" is(literal.string.escape)
-  r"\\." is(literal.string.escape)
-  r"\\\n" is(text) -> go-to(request)
+  lex(escapes):
+    r"\\\"[^\n]*" is(comment)
+    r"\\[fn]\w" is(literal.string.escape)
+    r"\\\(.{2}" is(literal.string.escape)
+    r"\\.\[.*\]" is(literal.string.escape)
+    r"\\." is(literal.string.escape)
+    r"\\\n" is(text) -> go-to(request)
 
-lex(root):
-  r"(\.)(\w+)" is(by-groups(text, keyword)) -> go-to(request)
-  r"\." is(punctuation) -> go-to(request)
-  r"[^\\\n]*" is(text) -> go-to(textline)
+  lex(root):
+    r"(\.)(\w+)" is(by-groups(text, keyword)) -> go-to(request)
+    r"\." is(punctuation) -> go-to(request)
+    r"[^\\\n]*" is(text) -> go-to(textline)
 
-lex(textline):
-  any-of(escapes)
-  r"[^\\\n]+" is(text)
-  r"\n" is(text) -> pop
+  lex(textline):
+    any-of(escapes)
+    r"[^\\\n]+" is(text)
+    r"\n" is(text) -> pop
 
 const-set(.Lexer, lexer)

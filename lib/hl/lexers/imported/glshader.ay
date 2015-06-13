@@ -2,30 +2,30 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "GLSL"
-aliases: ["glsl"]
-extensions: [".vert", ".frag", ".geo"]
-mimetypes: ["text/x-glslsrc"]
-start: .root
-flags: 0
+  name: "GLSL"
+  aliases: ["glsl"]
+  extensions: [".vert", ".frag", ".geo"]
+  mimetypes: ["text/x-glslsrc"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"^\#.*" is(comment.preproc)
-  r"//.*" is(comment.single)
-  r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
-  r"\+|-|\126|!=?|\*|/|%|<<|>>|<=?|>=?|==?|&&?|\^|\|\|?" is(operator)
-  r"[?:]" is(operator)
-  r"\bdefined\b" is(operator)
-  r"[;{}(),\[\]]" is(punctuation)
-  r"[+-]?\d*\.\d+([eE][-+]?\d+)?" is(literal.number.float)
-  r"[+-]?\d+\.\d*([eE][-+]?\d+)?" is(literal.number.float)
-  r"0[xX][0-9a-fA-F]*" is(literal.number.hex)
-  r"0[0-7]*" is(literal.number.oct)
-  r"[1-9][0-9]*" is(literal.number.integer)
-  r"\b(attribute|const|uniform|varying|centroid|break|continue|do|for|while|if|else|in|out|inout|float|int|void|bool|true|false|invariant|discard|return|mat[234]|mat[234]x[234]|vec[234]|[ib]vec[234]|sampler[123]D|samplerCube|sampler[12]DShadow|struct)\b" is(keyword)
-  r"\b(asm|class|union|enum|typedef|template|this|packed|goto|switch|default|inline|noinline|volatile|public|static|extern|external|interface|long|short|double|half|fixed|unsigned|lowp|mediump|highp|precision|input|output|hvec[234]|[df]vec[234]|sampler[23]DRect|sampler2DRectShadow|sizeof|cast|namespace|using)\b" is(keyword)
-  r"[a-zA-Z_][a-zA-Z_0-9]*" is(name)
-  r"\." is(punctuation)
-  r"\s+" is(text)
+  lex(root):
+    r"^\#.*" is(comment.preproc)
+    r"//.*" is(comment.single)
+    r"/(\\\n)?[*](.|\n)*?[*](\\\n)?/" is(comment.multiline)
+    r"\+|-|\126|!=?|\*|/|%|<<|>>|<=?|>=?|==?|&&?|\^|\|\|?" is(operator)
+    r"[?:]" is(operator)
+    r"\bdefined\b" is(operator)
+    r"[;{}(),\[\]]" is(punctuation)
+    r"[+-]?\d*\.\d+([eE][-+]?\d+)?" is(literal.number.float)
+    r"[+-]?\d+\.\d*([eE][-+]?\d+)?" is(literal.number.float)
+    r"0[xX][0-9a-fA-F]*" is(literal.number.hex)
+    r"0[0-7]*" is(literal.number.oct)
+    r"[1-9][0-9]*" is(literal.number.integer)
+    r"\b(attribute|const|uniform|varying|centroid|break|continue|do|for|while|if|else|in|out|inout|float|int|void|bool|true|false|invariant|discard|return|mat[234]|mat[234]x[234]|vec[234]|[ib]vec[234]|sampler[123]D|samplerCube|sampler[12]DShadow|struct)\b" is(keyword)
+    r"\b(asm|class|union|enum|typedef|template|this|packed|goto|switch|default|inline|noinline|volatile|public|static|extern|external|interface|long|short|double|half|fixed|unsigned|lowp|mediump|highp|precision|input|output|hvec[234]|[df]vec[234]|sampler[23]DRect|sampler2DRectShadow|sizeof|cast|namespace|using)\b" is(keyword)
+    r"[a-zA-Z_][a-zA-Z_0-9]*" is(name)
+    r"\." is(punctuation)
+    r"\s+" is(text)
 
 const-set(.Lexer, lexer)

@@ -2,55 +2,55 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Lua"
-aliases: ["lua"]
-extensions: [".lua", ".wlua"]
-mimetypes: ["text/x-lua", "application/x-lua"]
-start: .root
-flags: 0
+  name: "Lua"
+  aliases: ["lua"]
+  extensions: [".lua", ".wlua"]
+  mimetypes: ["text/x-lua", "application/x-lua"]
+  start: .root
+  flags: 0
 
-lex(string):
-  r"." is(literal.string)
+  lex(string):
+    r"." is(literal.string)
 
-lex(dqs):
-  r"\"" is(literal.string) -> pop
-  any-of(string)
+  lex(dqs):
+    r"\"" is(literal.string) -> pop
+    any-of(string)
 
-lex(sqs):
-  r"'" is(literal.string) -> pop
-  any-of(string)
+  lex(sqs):
+    r"'" is(literal.string) -> pop
+    any-of(string)
 
-lex(funcname):
-  r"\s+" is(text)
-  r"(?:([A-Za-z_][A-Za-z0-9_]*)(\.))?([A-Za-z_][A-Za-z0-9_]*)" is(by-groups(name.class, punctuation, name.function)) -> pop
-  r"\(" is(punctuation) -> pop
+  lex(funcname):
+    r"\s+" is(text)
+    r"(?:([A-Za-z_][A-Za-z0-9_]*)(\.))?([A-Za-z_][A-Za-z0-9_]*)" is(by-groups(name.class, punctuation, name.function)) -> pop
+    r"\(" is(punctuation) -> pop
 
-lex(stringescape):
-  r"\\([abfnrtv\\\"']|\d{1,3})" is(literal.string.escape)
+  lex(stringescape):
+    r"\\([abfnrtv\\\"']|\d{1,3})" is(literal.string.escape)
 
-lex(base):
-  r"(?m)--\[(=*)\[.*?\]\1\]" is(comment.multiline)
-  r"--.*$" is(comment.single)
-  r"(?i)(\d*\.\d+|\d+\.\d*)(e[+-]?\d+)?" is(literal.number.float)
-  r"(?i)\d+e[+-]?\d+" is(literal.number.float)
-  r"(?i)0x[0-9a-f]*" is(literal.number.hex)
-  r"\d+" is(literal.number.integer)
-  r"\n" is(text)
-  r"[^\S\n]" is(text)
-  r"(?m)\[(=*)\[.*?\]\1\]" is(literal.string)
-  r"(==|\126=|<=|>=|\.\.\.|\.\.|[=+\-*/%^<>\#])" is(operator)
-  r"[\[\]\{\}\(\)\.,:;]" is(punctuation)
-  r"(and|or|not)\b" is(operator.word)
-  r"(break|do|else|elseif|end|for|if|in|repeat|return|then|until|while)\b" is(keyword)
-  r"(local)\b" is(keyword.declaration)
-  r"(true|false|nil)\b" is(keyword.constant)
-  r"(function)\b" is(keyword) -> go-to(funcname)
-  r"[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?" is(name)
-  r"'" is(literal.string.single) -> combined(stringescape, sqs)
-  r"\"" is(literal.string.double) -> combined(stringescape, dqs)
+  lex(base):
+    r"(?m)--\[(=*)\[.*?\]\1\]" is(comment.multiline)
+    r"--.*$" is(comment.single)
+    r"(?i)(\d*\.\d+|\d+\.\d*)(e[+-]?\d+)?" is(literal.number.float)
+    r"(?i)\d+e[+-]?\d+" is(literal.number.float)
+    r"(?i)0x[0-9a-f]*" is(literal.number.hex)
+    r"\d+" is(literal.number.integer)
+    r"\n" is(text)
+    r"[^\S\n]" is(text)
+    r"(?m)\[(=*)\[.*?\]\1\]" is(literal.string)
+    r"(==|\126=|<=|>=|\.\.\.|\.\.|[=+\-*/%^<>\#])" is(operator)
+    r"[\[\]\{\}\(\)\.,:;]" is(punctuation)
+    r"(and|or|not)\b" is(operator.word)
+    r"(break|do|else|elseif|end|for|if|in|repeat|return|then|until|while)\b" is(keyword)
+    r"(local)\b" is(keyword.declaration)
+    r"(true|false|nil)\b" is(keyword.constant)
+    r"(function)\b" is(keyword) -> go-to(funcname)
+    r"[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?" is(name)
+    r"'" is(literal.string.single) -> combined(stringescape, sqs)
+    r"\"" is(literal.string.double) -> combined(stringescape, dqs)
 
-lex(root):
-  r"\#!(.*?)$" is(comment.preproc)
-  r"" is(text) -> go-to(base)
+  lex(root):
+    r"\#!(.*?)$" is(comment.preproc)
+    r"" is(text) -> go-to(base)
 
 const-set(.Lexer, lexer)

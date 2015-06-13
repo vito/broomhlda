@@ -2,25 +2,25 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "MOOCode"
-aliases: ["moocode"]
-extensions: [".moo"]
-mimetypes: ["text/x-moocode"]
-start: .root
-flags: 0
+  name: "MOOCode"
+  aliases: ["moocode"]
+  extensions: [".moo"]
+  mimetypes: ["text/x-moocode"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"(0|[1-9][0-9_]*)" is(literal.number.integer)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
-  r"(E_PERM|E_DIV)" is(name.exception)
-  r"((\#[-0-9]+)|(\$[a-z_A-Z0-9]+))" is(name.entity)
-  r"\b(if|else|elseif|endif|for|endfor|fork|endfork|while|endwhile|break|continue|return|try|except|endtry|finally|in)\b" is(keyword)
-  r"(random|length)" is(name.builtin)
-  r"(player|caller|this|args)" is(name.variable.instance)
-  r"\s+" is(text)
-  r"\n" is(text)
-  r"([!;=,{}&\|:\.\[\]@\(\)\<\>\?]+)" is(operator)
-  r"([a-z_A-Z0-9]+)(\()" is(by-groups(name.function, operator))
-  r"([a-zA-Z_0-9]+)" is(text)
+  lex(root):
+    r"(0|[1-9][0-9_]*)" is(literal.number.integer)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
+    r"(E_PERM|E_DIV)" is(name.exception)
+    r"((\#[-0-9]+)|(\$[a-z_A-Z0-9]+))" is(name.entity)
+    r"\b(if|else|elseif|endif|for|endfor|fork|endfork|while|endwhile|break|continue|return|try|except|endtry|finally|in)\b" is(keyword)
+    r"(random|length)" is(name.builtin)
+    r"(player|caller|this|args)" is(name.variable.instance)
+    r"\s+" is(text)
+    r"\n" is(text)
+    r"([!;=,{}&\|:\.\[\]@\(\)\<\>\?]+)" is(operator)
+    r"([a-z_A-Z0-9]+)(\()" is(by-groups(name.function, operator))
+    r"([a-zA-Z_0-9]+)" is(text)
 
 const-set(.Lexer, lexer)

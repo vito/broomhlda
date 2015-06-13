@@ -2,139 +2,139 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Felix"
-aliases: ["felix", "flx"]
-extensions: [".flx", ".flxh"]
-mimetypes: ["text/x-felix"]
-start: .root
-flags: 0
+  name: "Felix"
+  aliases: ["felix", "flx"]
+  extensions: [".flx", ".flxh"]
+  mimetypes: ["text/x-felix"]
+  start: .root
+  flags: 0
 
-lex(comment):
-  r"//(.*?)\n" is(comment.single)
-  r"/[*]" is(comment.multiline) -> go-to(comment2)
+  lex(comment):
+    r"//(.*?)\n" is(comment.single)
+    r"/[*]" is(comment.multiline) -> go-to(comment2)
 
-lex(modulename2):
-  any-of(whitespace)
-  r"([a-zA-Z_]\w*)" is(name.namespace) -> pop(2)
+  lex(modulename2):
+    any-of(whitespace)
+    r"([a-zA-Z_]\w*)" is(name.namespace) -> pop(2)
 
-lex(modulename):
-  any-of(whitespace)
-  r"\[" is(punctuation) -> do-all(go-to(modulename2), go-to(tvarlist))
-  r"" is(error) -> go-to(modulename2)
+  lex(modulename):
+    any-of(whitespace)
+    r"\[" is(punctuation) -> do-all(go-to(modulename2), go-to(tvarlist))
+    r"" is(error) -> go-to(modulename2)
 
-lex(if0):
-  r"^\s*\#if.*?(?<!\\)\n" is(comment) -> push
-  r"^\s*\#endif.*?(?<!\\)\n" is(comment) -> pop
-  r".*?\n" is(comment)
+  lex(if0):
+    r"^\s*\#if.*?(?<!\\)\n" is(comment) -> push
+    r"^\s*\#endif.*?(?<!\\)\n" is(comment) -> pop
+    r".*?\n" is(comment)
 
-lex(whitespace):
-  r"\n" is(text)
-  r"\s+" is(text)
-  any-of(comment)
-  r"\#\s*if\s+0" is(comment.preproc) -> go-to(if0)
-  r"\#" is(comment.preproc) -> go-to(macro)
+  lex(whitespace):
+    r"\n" is(text)
+    r"\s+" is(text)
+    any-of(comment)
+    r"\#\s*if\s+0" is(comment.preproc) -> go-to(if0)
+    r"\#" is(comment.preproc) -> go-to(macro)
 
-lex(dqs):
-  r"\"" is(literal.string) -> pop
-  r"\\\\|\\\"|\\\n" is(literal.string.escape)
-  any-of(strings)
+  lex(dqs):
+    r"\"" is(literal.string) -> pop
+    r"\\\\|\\\"|\\\n" is(literal.string.escape)
+    any-of(strings)
 
-lex(sqs):
-  r"'" is(literal.string) -> pop
-  r"\\\\|\\'|\\\n" is(literal.string.escape)
-  any-of(strings)
+  lex(sqs):
+    r"'" is(literal.string) -> pop
+    r"\\\\|\\'|\\\n" is(literal.string.escape)
+    any-of(strings)
 
-lex(macro):
-  any-of(comment)
-  r"(import|include)(\s+)(<[^>]*?>)" is(by-groups(comment.preproc, text, literal.string)) -> pop
-  r"(import|include)(\s+)(\"[^\"]*?\")" is(by-groups(comment.preproc, text, literal.string)) -> pop
-  r"(import|include)(\s+)('[^']*?')" is(by-groups(comment.preproc, text, literal.string)) -> pop
-  r"[^/\n]+" is(comment.preproc)
-  r"/" is(comment.preproc)
-  r"(?<=\\)\n" is(comment.preproc)
-  r"\n" is(comment.preproc) -> pop
+  lex(macro):
+    any-of(comment)
+    r"(import|include)(\s+)(<[^>]*?>)" is(by-groups(comment.preproc, text, literal.string)) -> pop
+    r"(import|include)(\s+)(\"[^\"]*?\")" is(by-groups(comment.preproc, text, literal.string)) -> pop
+    r"(import|include)(\s+)('[^']*?')" is(by-groups(comment.preproc, text, literal.string)) -> pop
+    r"[^/\n]+" is(comment.preproc)
+    r"/" is(comment.preproc)
+    r"(?<=\\)\n" is(comment.preproc)
+    r"\n" is(comment.preproc) -> pop
 
-lex(operators):
-  r"(and|not|in|is|isin|or|xor)\b" is(operator.word)
-  r"!=|==|<<|>>|\|\||&&|[-\126+/*%=<>&^|.$]" is(operator)
+  lex(operators):
+    r"(and|not|in|is|isin|or|xor)\b" is(operator.word)
+    r"!=|==|<<|>>|\|\||&&|[-\126+/*%=<>&^|.$]" is(operator)
 
-lex(tsqs):
-  r"'''" is(literal.string) -> pop
-  any-of(strings)
-  any-of(nl)
+  lex(tsqs):
+    r"'''" is(literal.string) -> pop
+    any-of(strings)
+    any-of(nl)
 
-lex(comment2):
-  r"[^\/*]" is(comment.multiline)
-  r"/[*]" is(comment.multiline) -> push
-  r"[*]/" is(comment.multiline) -> pop
-  r"[\/*]" is(comment.multiline)
+  lex(comment2):
+    r"[^\/*]" is(comment.multiline)
+    r"/[*]" is(comment.multiline) -> push
+    r"[*]/" is(comment.multiline) -> pop
+    r"[\/*]" is(comment.multiline)
 
-lex(classname):
-  any-of(whitespace)
-  r"[a-zA-Z_]\w*" is(name.class) -> pop
-  r"(?=\{)" is(text) -> pop
+  lex(classname):
+    any-of(whitespace)
+    r"[a-zA-Z_]\w*" is(name.class) -> pop
+    r"(?=\{)" is(text) -> pop
 
-lex(stringescape):
-  r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
+  lex(stringescape):
+    r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
 
-lex(tdqs):
-  r"\"\"\"" is(literal.string) -> pop
-  any-of(strings)
-  any-of(nl)
+  lex(tdqs):
+    r"\"\"\"" is(literal.string) -> pop
+    any-of(strings)
+    any-of(nl)
 
-lex(nl):
-  r"\n" is(literal.string)
+  lex(nl):
+    r"\n" is(literal.string)
 
-lex(funcname):
-  any-of(whitespace)
-  r"[a-zA-Z_]\w*" is(name.function) -> pop
-  r"(?=\()" is(text) -> pop
+  lex(funcname):
+    any-of(whitespace)
+    r"[a-zA-Z_]\w*" is(name.function) -> pop
+    r"(?=\()" is(text) -> pop
 
-lex(root):
-  any-of(whitespace)
-  r"(axiom|ctor|fun|gen|proc|reduce|union)\b" is(keyword) -> go-to(funcname)
-  r"(class|cclass|cstruct|obj|struct)\b" is(keyword) -> go-to(classname)
-  r"(instance|module|typeclass)\b" is(keyword) -> go-to(modulename)
-  r"(_|_deref|all|as|assert|attempt|call|callback|case|caseno|cclass|code|compound|ctypes|do|done|downto|elif|else|endattempt|endcase|endif|endmatch|enum|except|exceptions|expect|finally|for|forall|forget|fork|functor|goto|ident|if|incomplete|inherit|instance|interface|jump|lambda|loop|match|module|namespace|new|noexpand|nonterm|obj|of|open|parse|raise|regexp|reglex|regmatch|rename|return|the|then|to|type|typecase|typedef|typematch|typeof|upto|when|whilst|with|yield)\b" is(keyword)
-  r"(_gc_pointer|_gc_type|body|comment|const|export|header|inline|lval|macro|noinline|noreturn|package|private|pod|property|public|publish|requires|todo|virtual|use)\b" is(name.decorator)
-  r"(def|let|ref|val|var)\b" is(keyword.declaration)
-  r"(unit|void|any|bool|byte|offset|address|caddress|cvaddress|vaddress|tiny|short|int|long|vlong|utiny|ushort|vshort|uint|ulong|uvlong|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float|double|ldouble|complex|dcomplex|lcomplex|imaginary|dimaginary|limaginary|char|wchar|uchar|charp|charcp|ucharp|ucharcp|string|wstring|ustring|cont|array|varray|list|lvalue|opt|slice)\b" is(keyword.type)
-  r"(false|true)\b" is(keyword.constant)
-  any-of(operators)
-  r"0[xX]([0-9a-fA-F_]*\.[0-9a-fA-F_]+|[0-9a-fA-F_]+)[pP][+\-]?[0-9_]+[lLfFdD]?" is(literal.number.float)
-  r"[0-9_]+(\.[0-9_]+[eE][+\-]?[0-9_]+|\.[0-9_]*|[eE][+\-]?[0-9_]+)[lLfFdD]?" is(literal.number.float)
-  r"\.(0|[1-9][0-9_]*)([eE][+\-]?[0-9_]+)?[lLfFdD]?" is(literal.number.float)
-  r"0[Bb][01_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number)
-  r"0[0-7_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.oct)
-  r"0[xX][0-9a-fA-F_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.hex)
-  r"(0|[1-9][0-9_]*)([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.integer)
-  r"([rR][cC]?|[cC][rR])\"\"\"" is(literal.string) -> go-to(tdqs)
-  r"([rR][cC]?|[cC][rR])'''" is(literal.string) -> go-to(tsqs)
-  r"([rR][cC]?|[cC][rR])\"" is(literal.string) -> go-to(dqs)
-  r"([rR][cC]?|[cC][rR])'" is(literal.string) -> go-to(sqs)
-  r"[cCfFqQwWuU]?\"\"\"" is(literal.string) -> combined(stringescape, tdqs)
-  r"[cCfFqQwWuU]?'''" is(literal.string) -> combined(stringescape, tsqs)
-  r"[cCfFqQwWuU]?\"" is(literal.string) -> combined(stringescape, dqs)
-  r"[cCfFqQwWuU]?'" is(literal.string) -> combined(stringescape, sqs)
-  r"[\[\]{}:(),;?]" is(punctuation)
-  r"[a-zA-Z_]\w*:>" is(name.label)
-  r"(_svc|while)\b" is(name.builtin)
-  r"(root|self|this)\b" is(name.builtin.pseudo)
-  r"[a-zA-Z_]\w*" is(name)
+  lex(root):
+    any-of(whitespace)
+    r"(axiom|ctor|fun|gen|proc|reduce|union)\b" is(keyword) -> go-to(funcname)
+    r"(class|cclass|cstruct|obj|struct)\b" is(keyword) -> go-to(classname)
+    r"(instance|module|typeclass)\b" is(keyword) -> go-to(modulename)
+    r"(_|_deref|all|as|assert|attempt|call|callback|case|caseno|cclass|code|compound|ctypes|do|done|downto|elif|else|endattempt|endcase|endif|endmatch|enum|except|exceptions|expect|finally|for|forall|forget|fork|functor|goto|ident|if|incomplete|inherit|instance|interface|jump|lambda|loop|match|module|namespace|new|noexpand|nonterm|obj|of|open|parse|raise|regexp|reglex|regmatch|rename|return|the|then|to|type|typecase|typedef|typematch|typeof|upto|when|whilst|with|yield)\b" is(keyword)
+    r"(_gc_pointer|_gc_type|body|comment|const|export|header|inline|lval|macro|noinline|noreturn|package|private|pod|property|public|publish|requires|todo|virtual|use)\b" is(name.decorator)
+    r"(def|let|ref|val|var)\b" is(keyword.declaration)
+    r"(unit|void|any|bool|byte|offset|address|caddress|cvaddress|vaddress|tiny|short|int|long|vlong|utiny|ushort|vshort|uint|ulong|uvlong|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float|double|ldouble|complex|dcomplex|lcomplex|imaginary|dimaginary|limaginary|char|wchar|uchar|charp|charcp|ucharp|ucharcp|string|wstring|ustring|cont|array|varray|list|lvalue|opt|slice)\b" is(keyword.type)
+    r"(false|true)\b" is(keyword.constant)
+    any-of(operators)
+    r"0[xX]([0-9a-fA-F_]*\.[0-9a-fA-F_]+|[0-9a-fA-F_]+)[pP][+\-]?[0-9_]+[lLfFdD]?" is(literal.number.float)
+    r"[0-9_]+(\.[0-9_]+[eE][+\-]?[0-9_]+|\.[0-9_]*|[eE][+\-]?[0-9_]+)[lLfFdD]?" is(literal.number.float)
+    r"\.(0|[1-9][0-9_]*)([eE][+\-]?[0-9_]+)?[lLfFdD]?" is(literal.number.float)
+    r"0[Bb][01_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number)
+    r"0[0-7_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.oct)
+    r"0[xX][0-9a-fA-F_]+([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.hex)
+    r"(0|[1-9][0-9_]*)([tTsSiIlLvV]|ll|LL|([iIuU])(8|16|32|64))?" is(literal.number.integer)
+    r"([rR][cC]?|[cC][rR])\"\"\"" is(literal.string) -> go-to(tdqs)
+    r"([rR][cC]?|[cC][rR])'''" is(literal.string) -> go-to(tsqs)
+    r"([rR][cC]?|[cC][rR])\"" is(literal.string) -> go-to(dqs)
+    r"([rR][cC]?|[cC][rR])'" is(literal.string) -> go-to(sqs)
+    r"[cCfFqQwWuU]?\"\"\"" is(literal.string) -> combined(stringescape, tdqs)
+    r"[cCfFqQwWuU]?'''" is(literal.string) -> combined(stringescape, tsqs)
+    r"[cCfFqQwWuU]?\"" is(literal.string) -> combined(stringescape, dqs)
+    r"[cCfFqQwWuU]?'" is(literal.string) -> combined(stringescape, sqs)
+    r"[\[\]{}:(),;?]" is(punctuation)
+    r"[a-zA-Z_]\w*:>" is(name.label)
+    r"(_svc|while)\b" is(name.builtin)
+    r"(root|self|this)\b" is(name.builtin.pseudo)
+    r"[a-zA-Z_]\w*" is(name)
 
-lex(strings):
-  r"%(\([a-zA-Z0-9]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
-  r"[^\\\'\"%\n]+" is(literal.string)
-  r"[\'\"\\]" is(literal.string)
-  r"%" is(literal.string)
+  lex(strings):
+    r"%(\([a-zA-Z0-9]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
+    r"[^\\\'\"%\n]+" is(literal.string)
+    r"[\'\"\\]" is(literal.string)
+    r"%" is(literal.string)
 
-lex(tvarlist):
-  any-of(whitespace)
-  any-of(operators)
-  r"\[" is(punctuation) -> push
-  r"\]" is(punctuation) -> pop
-  r"," is(punctuation)
-  r"(with|where)\b" is(keyword)
-  r"[a-zA-Z_]\w*" is(name)
+  lex(tvarlist):
+    any-of(whitespace)
+    any-of(operators)
+    r"\[" is(punctuation) -> push
+    r"\]" is(punctuation) -> pop
+    r"," is(punctuation)
+    r"(with|where)\b" is(keyword)
+    r"[a-zA-Z_]\w*" is(name)
 
 const-set(.Lexer, lexer)

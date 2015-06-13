@@ -2,37 +2,37 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "XSLT"
-aliases: ["xslt"]
-extensions: [".xsl", ".xslt", ".xpl"]
-mimetypes: ["application/xsl+xml", "application/xslt+xml"]
-start: .root
-flags: Regexp MULTILINE
+  name: "XSLT"
+  aliases: ["xslt"]
+  extensions: [".xsl", ".xslt", ".xpl"]
+  mimetypes: ["application/xsl+xml", "application/xslt+xml"]
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(comment):
-  r"[^-]+" is(comment)
-  r"-->" is(comment) -> pop
-  r"-" is(comment)
+  lex(comment):
+    r"[^-]+" is(comment)
+    r"-->" is(comment) -> pop
+    r"-" is(comment)
 
-lex(tag):
-  r"\s+" is(text)
-  r"[\w.:-]+\s*=" is(name.attribute) -> go-to(attr)
-  r"/?\s*>" is(name.tag) -> pop
+  lex(tag):
+    r"\s+" is(text)
+    r"[\w.:-]+\s*=" is(name.attribute) -> go-to(attr)
+    r"/?\s*>" is(name.tag) -> pop
 
-lex(root):
-  r"[^<&]+" is(text)
-  r"&\S*?;" is(name.entity)
-  r"\<\!\[CDATA\[.*?\]\]\>" is(comment.preproc)
-  r"<!--" is(comment) -> go-to(comment)
-  r"<\?.*?\?>" is(comment.preproc)
-  r"<![^>]*>" is(comment.preproc)
-  r"<\s*[\w:.-]+" is(name.tag) -> go-to(tag)
-  r"<\s*/\s*[\w:.-]+\s*>" is(name.tag)
+  lex(root):
+    r"[^<&]+" is(text)
+    r"&\S*?;" is(name.entity)
+    r"\<\!\[CDATA\[.*?\]\]\>" is(comment.preproc)
+    r"<!--" is(comment) -> go-to(comment)
+    r"<\?.*?\?>" is(comment.preproc)
+    r"<![^>]*>" is(comment.preproc)
+    r"<\s*[\w:.-]+" is(name.tag) -> go-to(tag)
+    r"<\s*/\s*[\w:.-]+\s*>" is(name.tag)
 
-lex(attr):
-  r"\s+" is(text)
-  r"\".*?\"" is(literal.string) -> pop
-  r"'.*?'" is(literal.string) -> pop
-  r"[^\s>]+" is(literal.string) -> pop
+  lex(attr):
+    r"\s+" is(text)
+    r"\".*?\"" is(literal.string) -> pop
+    r"'.*?'" is(literal.string) -> pop
+    r"[^\s>]+" is(literal.string) -> pop
 
 const-set(.Lexer, lexer)

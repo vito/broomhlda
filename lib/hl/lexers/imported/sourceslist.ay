@@ -2,36 +2,36 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Debian Sourcelist"
-aliases: ["sourceslist", "sources.list"]
-extensions: ["sources.list"]
-mimetypes: []
-start: .root
-flags: 0
+  name: "Debian Sourcelist"
+  aliases: ["sourceslist", "sources.list"]
+  extensions: ["sources.list"]
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(distribution):
-  r"\#.*?$" is(comment) -> pop
-  r"\$\(ARCH\)" is(name.variable)
-  r"[^\s$\[]+" is(literal.string)
-  r"\[" is(literal.string.other) -> go-to(escaped-distribution)
-  r"\$" is(literal.string)
-  r"\s+" is(text) -> go-to(components)
+  lex(distribution):
+    r"\#.*?$" is(comment) -> pop
+    r"\$\(ARCH\)" is(name.variable)
+    r"[^\s$\[]+" is(literal.string)
+    r"\[" is(literal.string.other) -> go-to(escaped-distribution)
+    r"\$" is(literal.string)
+    r"\s+" is(text) -> go-to(components)
 
-lex(root):
-  r"\s+" is(text)
-  r"\#.*?$" is(comment)
-  r"^(deb(?:-src)?)(\s+)" is(by-groups(keyword, text)) -> go-to(distribution)
+  lex(root):
+    r"\s+" is(text)
+    r"\#.*?$" is(comment)
+    r"^(deb(?:-src)?)(\s+)" is(by-groups(keyword, text)) -> go-to(distribution)
 
-lex(escaped-distribution):
-  r"\]" is(literal.string.other) -> pop
-  r"\$\(ARCH\)" is(name.variable)
-  r"[^\]$]+" is(literal.string.other)
-  r"\$" is(literal.string.other)
+  lex(escaped-distribution):
+    r"\]" is(literal.string.other) -> pop
+    r"\$\(ARCH\)" is(name.variable)
+    r"[^\]$]+" is(literal.string.other)
+    r"\$" is(literal.string.other)
 
-lex(components):
-  r"\#.*?$" is(comment) -> pop(2)
-  r"$" is(text) -> pop(2)
-  r"\s+" is(text)
-  r"\S+" is(keyword.pseudo)
+  lex(components):
+    r"\#.*?$" is(comment) -> pop(2)
+    r"$" is(text) -> pop(2)
+    r"\s+" is(text)
+    r"\S+" is(keyword.pseudo)
 
 const-set(.Lexer, lexer)

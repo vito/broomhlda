@@ -2,21 +2,21 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Diff"
-aliases: ["diff", "udiff"]
-extensions: [".diff", ".patch"]
-mimetypes: ["text/x-diff", "text/x-patch"]
-start: .root
-flags: 0
+  name: "Diff"
+  aliases: ["diff", "udiff"]
+  extensions: [".diff", ".patch"]
+  mimetypes: ["text/x-diff", "text/x-patch"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r" .*\n" is(text)
-  r"\+.*\n" is(generic.inserted)
-  r"-.*\n" is(generic.deleted)
-  r"!.*\n" is(generic.strong)
-  r"@.*\n" is(generic.subheading)
-  r"([Ii]ndex|diff).*\n" is(generic.heading)
-  r"=.*\n" is(generic.heading)
-  r".*\n" is(text)
+  lex(root):
+    r" .*\n" is(text)
+    r"\+.*\n" is(generic.inserted)
+    r"-.*\n" is(generic.deleted)
+    r"!.*\n" is(generic.strong)
+    r"@.*\n" is(generic.subheading)
+    r"([Ii]ndex|diff).*\n" is(generic.heading)
+    r"=.*\n" is(generic.heading)
+    r".*\n" is(text)
 
 const-set(.Lexer, lexer)

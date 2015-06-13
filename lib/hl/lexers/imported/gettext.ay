@@ -2,20 +2,20 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Gettext Catalog"
-aliases: ["pot", "po"]
-extensions: [".pot", ".po"]
-mimetypes: ["application/x-gettext", "text/x-gettext", "text/gettext"]
-start: .root
-flags: 0
+  name: "Gettext Catalog"
+  aliases: ["pot", "po"]
+  extensions: [".pot", ".po"]
+  mimetypes: ["application/x-gettext", "text/x-gettext", "text/gettext"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"^\#,\s.*?$" is(keyword.type)
-  r"^\#:\s.*?$" is(keyword.declaration)
-  r"^(\#|\#\.\s|\#\|\s|\#\126\s|\#\s).*$" is(comment.single)
-  r"^(\")([A-Za-z-]+:)(.*\")$" is(by-groups(literal.string, name.property, literal.string))
-  r"^\".*\"$" is(literal.string)
-  r"^(msgid|msgid_plural|msgstr)(\s+)(\".*\")$" is(by-groups(name.variable, text, literal.string))
-  r"^(msgstr\[)(\d)(\])(\s+)(\".*\")$" is(by-groups(name.variable, literal.number.integer, name.variable, text, literal.string))
+  lex(root):
+    r"^\#,\s.*?$" is(keyword.type)
+    r"^\#:\s.*?$" is(keyword.declaration)
+    r"^(\#|\#\.\s|\#\|\s|\#\126\s|\#\s).*$" is(comment.single)
+    r"^(\")([A-Za-z-]+:)(.*\")$" is(by-groups(literal.string, name.property, literal.string))
+    r"^\".*\"$" is(literal.string)
+    r"^(msgid|msgid_plural|msgstr)(\s+)(\".*\")$" is(by-groups(name.variable, text, literal.string))
+    r"^(msgstr\[)(\d)(\])(\s+)(\".*\")$" is(by-groups(name.variable, literal.number.integer, name.variable, text, literal.string))
 
 const-set(.Lexer, lexer)

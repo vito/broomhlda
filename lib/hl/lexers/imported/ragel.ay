@@ -2,69 +2,69 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Ragel"
-aliases: ["ragel"]
-extensions: []
-mimetypes: []
-start: .root
-flags: 0
+  name: "Ragel"
+  aliases: ["ragel"]
+  extensions: []
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(host):
-  r"([^{}\'\"/\#]+|[^\\][\\][{}]|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|\\#.*$\n?|/(?!\*)(\\\\|\\/|[^/])*/|/)+" is(other)
-  r"{" is(punctuation) -> push
-  r"}" is(punctuation) -> pop
+  lex(host):
+    r"([^{}\'\"/\#]+|[^\\][\\][{}]|\"(\\\\|\\\"|[^\"])*\"|'(\\\\|\\'|[^'])*'|//.*$\n?|/\*(.|\n)*?\*/|\\#.*$\n?|/(?!\*)(\\\\|\\/|[^/])*/|/)+" is(other)
+    r"{" is(punctuation) -> push
+    r"}" is(punctuation) -> pop
 
-lex(literals):
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
-  r"'(\\\\|\\'|[^'])*'" is(literal.string)
-  r"\[(\\\\|\\\]|[^\]])*\]" is(literal.string)
-  r"/(?!\*)(\\\\|\\/|[^/])*/" is(literal.string.regex)
+  lex(literals):
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string)
+    r"'(\\\\|\\'|[^'])*'" is(literal.string)
+    r"\[(\\\\|\\\]|[^\]])*\]" is(literal.string)
+    r"/(?!\*)(\\\\|\\/|[^/])*/" is(literal.string.regex)
 
-lex(whitespace):
-  r"\s+" is(text.whitespace)
+  lex(whitespace):
+    r"\s+" is(text.whitespace)
 
-lex(keywords):
-  r"(access|action|alphtype)\b" is(keyword)
-  r"(getkey|write|machine|include)\b" is(keyword)
-  r"(any|ascii|extend|alpha|digit|alnum|lower|upper)\b" is(keyword)
-  r"(xdigit|cntrl|graph|print|punct|space|zlen|empty)\b" is(keyword)
+  lex(keywords):
+    r"(access|action|alphtype)\b" is(keyword)
+    r"(getkey|write|machine|include)\b" is(keyword)
+    r"(any|ascii|extend|alpha|digit|alnum|lower|upper)\b" is(keyword)
+    r"(xdigit|cntrl|graph|print|punct|space|zlen|empty)\b" is(keyword)
 
-lex(operators):
-  r"," is(operator)
-  r"\||&|--?" is(operator)
-  r"\.|<:|:>>?" is(operator)
-  r":" is(operator)
-  r"->" is(operator)
-  r"(>|\$|%|<|@|<>)(/|eof\b)" is(operator)
-  r"(>|\$|%|<|@|<>)(!|err\b)" is(operator)
-  r"(>|\$|%|<|@|<>)(\^|lerr\b)" is(operator)
-  r"(>|\$|%|<|@|<>)(\126|to\b)" is(operator)
-  r"(>|\$|%|<|@|<>)(\*|from\b)" is(operator)
-  r">|@|\$|%" is(operator)
-  r"\*|\?|\+|{[0-9]*,[0-9]*}" is(operator)
-  r"!|\^" is(operator)
-  r"\(|\)" is(operator)
+  lex(operators):
+    r"," is(operator)
+    r"\||&|--?" is(operator)
+    r"\.|<:|:>>?" is(operator)
+    r":" is(operator)
+    r"->" is(operator)
+    r"(>|\$|%|<|@|<>)(/|eof\b)" is(operator)
+    r"(>|\$|%|<|@|<>)(!|err\b)" is(operator)
+    r"(>|\$|%|<|@|<>)(\^|lerr\b)" is(operator)
+    r"(>|\$|%|<|@|<>)(\126|to\b)" is(operator)
+    r"(>|\$|%|<|@|<>)(\*|from\b)" is(operator)
+    r">|@|\$|%" is(operator)
+    r"\*|\?|\+|{[0-9]*,[0-9]*}" is(operator)
+    r"!|\^" is(operator)
+    r"\(|\)" is(operator)
 
-lex(identifiers):
-  r"[a-zA-Z_][a-zA-Z_0-9]*" is(name.variable)
+  lex(identifiers):
+    r"[a-zA-Z_][a-zA-Z_0-9]*" is(name.variable)
 
-lex(root):
-  any-of(literals)
-  any-of(whitespace)
-  any-of(comments)
-  any-of(keywords)
-  any-of(numbers)
-  any-of(identifiers)
-  any-of(operators)
-  r"{" is(punctuation) -> go-to(host)
-  r"=" is(operator)
-  r";" is(punctuation)
+  lex(root):
+    any-of(literals)
+    any-of(whitespace)
+    any-of(comments)
+    any-of(keywords)
+    any-of(numbers)
+    any-of(identifiers)
+    any-of(operators)
+    r"{" is(punctuation) -> go-to(host)
+    r"=" is(operator)
+    r";" is(punctuation)
 
-lex(comments):
-  r"\\#.*$" is(comment)
+  lex(comments):
+    r"\\#.*$" is(comment)
 
-lex(numbers):
-  r"0x[0-9A-Fa-f]+" is(literal.number.hex)
-  r"[+-]?[0-9]+" is(literal.number.integer)
+  lex(numbers):
+    r"0x[0-9A-Fa-f]+" is(literal.number.hex)
+    r"[+-]?[0-9]+" is(literal.number.integer)
 
 const-set(.Lexer, lexer)

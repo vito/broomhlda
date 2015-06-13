@@ -2,35 +2,35 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "cfstatement"
-aliases: ["cfs"]
-extensions: []
-mimetypes: []
-start: .root
-flags: Regexp IGNORECASE
+  name: "cfstatement"
+  aliases: ["cfs"]
+  extensions: []
+  mimetypes: []
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"//.*" is(comment)
-  r"\+\+|--" is(operator)
-  r"[-+*/^&=!]" is(operator)
-  r"<=|>=|<|>" is(operator)
-  r"mod\b" is(operator)
-  r"(eq|lt|gt|lte|gte|not|is|and|or)\b" is(operator)
-  r"\|\||&&" is(operator)
-  r"\"" is(literal.string.double) -> go-to(string)
-  r"'.*?'" is(literal.string.single)
-  r"\d+" is(literal.number)
-  r"(if|else|len|var|case|default|break|switch)\b" is(keyword)
-  r"([A-Za-z_$][A-Za-z0-9_.]*)(\s*)(\()" is(by-groups(name.function, text, punctuation))
-  r"[A-Za-z_$][A-Za-z0-9_.]*" is(name.variable)
-  r"[()\[\]{};:,.\\]" is(punctuation)
-  r"\s+" is(text)
+  lex(root):
+    r"//.*" is(comment)
+    r"\+\+|--" is(operator)
+    r"[-+*/^&=!]" is(operator)
+    r"<=|>=|<|>" is(operator)
+    r"mod\b" is(operator)
+    r"(eq|lt|gt|lte|gte|not|is|and|or)\b" is(operator)
+    r"\|\||&&" is(operator)
+    r"\"" is(literal.string.double) -> go-to(string)
+    r"'.*?'" is(literal.string.single)
+    r"\d+" is(literal.number)
+    r"(if|else|len|var|case|default|break|switch)\b" is(keyword)
+    r"([A-Za-z_$][A-Za-z0-9_.]*)(\s*)(\()" is(by-groups(name.function, text, punctuation))
+    r"[A-Za-z_$][A-Za-z0-9_.]*" is(name.variable)
+    r"[()\[\]{};:,.\\]" is(punctuation)
+    r"\s+" is(text)
 
-lex(string):
-  r"\"\"" is(literal.string.double)
-  r"\#.+?\#" is(literal.string.interp)
-  r"[^\"\#]+" is(literal.string.double)
-  r"\#" is(literal.string.double)
-  r"\"" is(literal.string.double) -> pop
+  lex(string):
+    r"\"\"" is(literal.string.double)
+    r"\#.+?\#" is(literal.string.interp)
+    r"[^\"\#]+" is(literal.string.double)
+    r"\#" is(literal.string.double)
+    r"\"" is(literal.string.double) -> pop
 
 const-set(.Lexer, lexer)

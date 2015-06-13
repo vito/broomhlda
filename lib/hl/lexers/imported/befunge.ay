@@ -2,25 +2,25 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Befunge"
-aliases: ["befunge"]
-extensions: [".befunge"]
-mimetypes: ["application/x-befunge"]
-start: .root
-flags: 0
+  name: "Befunge"
+  aliases: ["befunge"]
+  extensions: [".befunge"]
+  mimetypes: ["application/x-befunge"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"[0-9a-f]" is(literal.number)
-  r"[\+\*/%!`-]" is(operator)
-  r"[<>^v?\[\]rxjk]" is(name.variable)
-  r"[:\\$.,n]" is(name.builtin)
-  r"[|_mw]" is(keyword)
-  r"[{}]" is(name.tag)
-  r"\".*?\"" is(literal.string.double)
-  r"\'." is(literal.string.single)
-  r"[\#;]" is(comment)
-  r"[pg&\126=@iotsy]" is(keyword)
-  r"[()A-Z]" is(comment)
-  r"\s+" is(text)
+  lex(root):
+    r"[0-9a-f]" is(literal.number)
+    r"[\+\*/%!`-]" is(operator)
+    r"[<>^v?\[\]rxjk]" is(name.variable)
+    r"[:\\$.,n]" is(name.builtin)
+    r"[|_mw]" is(keyword)
+    r"[{}]" is(name.tag)
+    r"\".*?\"" is(literal.string.double)
+    r"\'." is(literal.string.single)
+    r"[\#;]" is(comment)
+    r"[pg&\126=@iotsy]" is(keyword)
+    r"[()A-Z]" is(comment)
+    r"\s+" is(text)
 
 const-set(.Lexer, lexer)

@@ -2,142 +2,142 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Lasso"
-aliases: ["lasso", "lassoscript"]
-extensions: [".lasso", ".lasso[89]"]
-mimetypes: ["text/x-lasso"]
-start: .root
-flags: Regexp IGNORECASE | Regexp MULTILINE
+  name: "Lasso"
+  aliases: ["lasso", "lassoscript"]
+  extensions: [".lasso", ".lasso[89]"]
+  mimetypes: ["text/x-lasso"]
+  start: .root
+  flags: Regexp IGNORECASE | Regexp MULTILINE
 
-lex(anglebrackets):
-  r"\?>" is(comment.preproc) -> pop
-  any-of(lasso)
+  lex(anglebrackets):
+    r"\?>" is(comment.preproc) -> pop
+    any-of(lasso)
 
-lex(nosquarebrackets):
-  r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> go-to(anglebrackets)
-  r"<" is(other)
-  r"[^<]+" is(other)
+  lex(nosquarebrackets):
+    r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> go-to(anglebrackets)
+    r"<" is(other)
+    r"[^<]+" is(other)
 
-lex(delimiters):
-  r"\[no_square_brackets\]" is(comment.preproc) -> go-to(nosquarebrackets)
-  r"\[noprocess\]" is(comment.preproc) -> go-to(noprocess)
-  r"\[" is(comment.preproc) -> go-to(squarebrackets)
-  r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> go-to(anglebrackets)
-  r"<" is(other)
-  r"[^\[<]+" is(other)
+  lex(delimiters):
+    r"\[no_square_brackets\]" is(comment.preproc) -> go-to(nosquarebrackets)
+    r"\[noprocess\]" is(comment.preproc) -> go-to(noprocess)
+    r"\[" is(comment.preproc) -> go-to(squarebrackets)
+    r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> go-to(anglebrackets)
+    r"<" is(other)
+    r"[^\[<]+" is(other)
 
-lex(doublestring):
-  r"\"" is(literal.string.double) -> pop
-  r"[^\"\\]+" is(literal.string.double)
-  any-of(escape)
-  r"\\+" is(literal.string.double)
+  lex(doublestring):
+    r"\"" is(literal.string.double) -> pop
+    r"[^\"\\]+" is(literal.string.double)
+    any-of(escape)
+    r"\\+" is(literal.string.double)
 
-lex(escape):
-  r"\\(U[\da-f]{8}|u[\da-f]{4}|x[\da-f]{1,2}|[0-7]{1,3}|:[^:]+:|[abefnrtv?\\"\'\\]|$)" is(literal.string.escape)
+  lex(escape):
+    r"\\(U[\da-f]{8}|u[\da-f]{4}|x[\da-f]{1,2}|[0-7]{1,3}|:[^:]+:|[abefnrtv?\\"\'\\]|$)" is(literal.string.escape)
 
-lex(squarebrackets):
-  r"\]" is(comment.preproc) -> pop
-  any-of(lasso)
+  lex(squarebrackets):
+    r"\]" is(comment.preproc) -> pop
+    any-of(lasso)
 
-lex(signature):
-  r"=>" is(operator) -> pop
-  r"\)" is(punctuation) -> pop
-  r"[(,]" is(punctuation) -> go-to(parameter)
-  any-of(lasso)
+  lex(signature):
+    r"=>" is(operator) -> pop
+    r"\)" is(punctuation) -> pop
+    r"[(,]" is(punctuation) -> go-to(parameter)
+    any-of(lasso)
 
-lex(lassofile):
-  r"\]" is(comment.preproc) -> pop
-  r"\?>" is(comment.preproc) -> pop
-  any-of(lasso)
+  lex(lassofile):
+    r"\]" is(comment.preproc) -> pop
+    r"\?>" is(comment.preproc) -> pop
+    any-of(lasso)
 
-lex(singlestring):
-  r"'" is(literal.string.single) -> pop
-  r"[^'\\]+" is(literal.string.single)
-  any-of(escape)
-  r"\\+" is(literal.string.single)
+  lex(singlestring):
+    r"'" is(literal.string.single) -> pop
+    r"[^'\\]+" is(literal.string.single)
+    any-of(escape)
+    r"\\+" is(literal.string.single)
 
-lex(whitespacecomments):
-  r"\s+" is(text)
-  r"//.*?\n" is(comment.single)
-  r"/\*\*!.*?\*/" is(literal.string.doc)
-  r"/\*.*?\*/" is(comment.multiline)
+  lex(whitespacecomments):
+    r"\s+" is(text)
+    r"//.*?\n" is(comment.single)
+    r"/\*\*!.*?\*/" is(literal.string.doc)
+    r"/\*.*?\*/" is(comment.multiline)
 
-lex(requiresection):
-  r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\())" is(name) -> go-to(requiresignature)
-  r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=(\s*::\s*[\w.]+)?\s*,))" is(name)
-  r"[a-z_][\w.]*=?|[-+*/%<>]|==" is(name) -> pop
-  r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
-  r"," is(punctuation)
-  any-of(whitespacecomments)
+  lex(requiresection):
+    r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\())" is(name) -> go-to(requiresignature)
+    r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=(\s*::\s*[\w.]+)?\s*,))" is(name)
+    r"[a-z_][\w.]*=?|[-+*/%<>]|==" is(name) -> pop
+    r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
+    r"," is(punctuation)
+    any-of(whitespacecomments)
 
-lex(requiresignature):
-  r"(\)(?=(\s*::\s*[\w.]+)?\s*,))" is(punctuation) -> pop
-  r"\)" is(punctuation) -> pop(2)
-  r"-?[a-z_][\w.]*" is(name.attribute)
-  r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
-  r"\.\.\." is(name.builtin.pseudo)
-  r"[(,]" is(punctuation)
-  any-of(whitespacecomments)
+  lex(requiresignature):
+    r"(\)(?=(\s*::\s*[\w.]+)?\s*,))" is(punctuation) -> pop
+    r"\)" is(punctuation) -> pop(2)
+    r"-?[a-z_][\w.]*" is(name.attribute)
+    r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
+    r"\.\.\." is(name.builtin.pseudo)
+    r"[(,]" is(punctuation)
+    any-of(whitespacecomments)
 
-lex(parameter):
-  r"\)" is(punctuation) -> pop
-  r"-?[a-z_][\w.]*" is(name.attribute) -> pop
-  r"\.\.\." is(name.builtin.pseudo)
-  any-of(lasso)
+  lex(parameter):
+    r"\)" is(punctuation) -> pop
+    r"-?[a-z_][\w.]*" is(name.attribute) -> pop
+    r"\.\.\." is(name.builtin.pseudo)
+    any-of(lasso)
 
-lex(root):
-  r"^\#!.+lasso9\b" is(comment.preproc) -> go-to(lasso)
-  r"\[no_square_brackets\]" is(comment.preproc) -> go-to(nosquarebrackets)
-  r"\[noprocess\]" is(comment.preproc) -> do-all(go-to(delimiters), go-to(noprocess))
-  r"\[" is(comment.preproc) -> do-all(go-to(delimiters), go-to(squarebrackets))
-  r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> do-all(go-to(delimiters), go-to(anglebrackets))
-  r"<" is(other) -> go-to(delimiters)
-  r"\s+" is(other)
-  r"" is(other) -> do-all(go-to(delimiters), go-to(lassofile))
+  lex(root):
+    r"^\#!.+lasso9\b" is(comment.preproc) -> go-to(lasso)
+    r"\[no_square_brackets\]" is(comment.preproc) -> go-to(nosquarebrackets)
+    r"\[noprocess\]" is(comment.preproc) -> do-all(go-to(delimiters), go-to(noprocess))
+    r"\[" is(comment.preproc) -> do-all(go-to(delimiters), go-to(squarebrackets))
+    r"<\?(LassoScript|lasso|=)" is(comment.preproc) -> do-all(go-to(delimiters), go-to(anglebrackets))
+    r"<" is(other) -> go-to(delimiters)
+    r"\s+" is(other)
+    r"" is(other) -> do-all(go-to(delimiters), go-to(lassofile))
 
-lex(noprocess):
-  r"\[/noprocess\]" is(comment.preproc) -> pop
-  r"\[" is(other)
-  r"[^\[]" is(other)
+  lex(noprocess):
+    r"\[/noprocess\]" is(comment.preproc) -> pop
+    r"\[" is(other)
+    r"[^\[]" is(other)
 
-lex(lasso):
-  any-of(whitespacecomments)
-  r"\d*\.\d+(e[+-]?\d+)?" is(literal.number.float)
-  r"0x[\da-f]+" is(literal.number.hex)
-  r"\d+" is(literal.number.integer)
-  r"([+-]?)(infinity|NaN)\b" is(by-groups(operator, literal.number))
-  r"'" is(literal.string.single) -> go-to(singlestring)
-  r"\"" is(literal.string.double) -> go-to(doublestring)
-  r"`[^`]*`" is(literal.string.backtick)
-  r"\$[a-z_][\w.]*" is(name.variable)
-  r"\#[a-z_][\w.]*|\#\d+" is(name.variable.instance)
-  r"(\.)('[a-z_][\w.]*')" is(by-groups(name.builtin.pseudo, name.variable.class))
-  r"(self)(->)('[a-z_][\w.]*')" is(by-groups(name.builtin.pseudo, operator, name.variable.class))
-  r"(\.\.?)([a-z_][\w.]*)" is(by-groups(name.builtin.pseudo, name.other))
-  r"(self|inherited|global|void)\b" is(name.builtin.pseudo)
-  r"-[a-z_][\w.]*" is(name.attribute)
-  r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
-  r"(error_(code|msg)_\w+|Error_AddError|Error_ColumnRestriction|Error_DatabaseConnectionUnavailable|Error_DatabaseTimeout|Error_DeleteError|Error_FieldRestriction|Error_FileNotFound|Error_InvalidDatabase|Error_InvalidPassword|Error_InvalidUsername|Error_ModuleNotFound|Error_NoError|Error_NoPermission|Error_OutOfMemory|Error_ReqColumnMissing|Error_ReqFieldMissing|Error_RequiredColumnMissing|Error_RequiredFieldMissing|Error_UpdateError)\b" is(name.exception)
-  r"(define)(\s+)([a-z_][\w.]*)(\s*)(=>)(\s*)(type|trait|thread)\b" is(by-groups(keyword.declaration, text, name.class, text, operator, text, keyword))
-  r"(define)(\s+)([a-z_][\w.]*)(->)([a-z_][\w.]*=?|[-+*/%<>]|==)" is(by-groups(keyword.declaration, text, name.class, operator, name.function)) -> go-to(signature)
-  r"(define)(\s+)([a-z_][\w.]*)" is(by-groups(keyword.declaration, text, name.function)) -> go-to(signature)
-  r"(public|protected|private|provide)(\s+)(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\())" is(by-groups(keyword, text, name.function)) -> go-to(signature)
-  r"(public|protected|private)(\s+)([a-z_][\w.]*)" is(by-groups(keyword, text, name.function))
-  r"(true|false|none|minimal|full|all)\b" is(keyword.constant)
-  r"(local|var|variable|data)\b" is(keyword.declaration)
-  r"(array|date|decimal|duration|integer|map|pair|string|tag|xml|null)\b" is(keyword.type)
-  r"([a-z_][\w.]*)(\s+)(in)\b" is(by-groups(name, text, keyword))
-  r"(let|into)(\s+)([a-z_][\w.]*)" is(by-groups(keyword, text, name))
-  r"require\b" is(keyword) -> go-to(requiresection)
-  r"(/?)(Namespace_Using)\b" is(by-groups(punctuation, keyword.namespace))
-  r"(/?)(Cache|Database_Names|Database_SchemaNames|Database_TableNames|Define_Tag|Define_Type|Email_Batch|Encode_Set|HTML_Comment|Handle|Handle_Error|Header|If|Inline|Iterate|LJAX_Target|Link|Link_CurrentAction|Link_CurrentGroup|Link_CurrentRecord|Link_Detail|Link_FirstGroup|Link_FirstRecord|Link_LastGroup|Link_LastRecord|Link_NextGroup|Link_NextRecord|Link_PrevGroup|Link_PrevRecord|Log|Loop|NoProcess|Output_None|Portal|Private|Protect|Records|Referer|Referrer|Repeating|ResultSet|Rows|Search_Args|Search_Arguments|Select|Sort_Args|Sort_Arguments|Thread_Atomic|Value_List|While|Abort|Case|Else|If_Empty|If_False|If_Null|If_True|Loop_Abort|Loop_Continue|Loop_Count|Params|Params_Up|Return|Return_Value|Run_Children|SOAP_DefineTag|SOAP_LastRequest|SOAP_LastResponse|Tag_Name|ascending|average|by|define|descending|do|equals|frozen|group|handle_failure|import|in|into|join|let|match|max|min|on|order|parent|protected|provide|public|require|skip|split_thread|sum|take|thread|to|trait|type|where|with|yield)\b" is(by-groups(punctuation, keyword))
-  r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\([^)]*\)\s*=>))" is(name.function) -> go-to(signature)
-  r"(and|or|not)\b" is(operator.word)
-  r"([a-z_][\w.]*)(\s*)(::\s*)([a-z_][\w.]*)(\s*)(=)" is(by-groups(name, text, punctuation, name.label, text, operator))
-  r"((?<!->)[a-z_][\w.]*)(\s*)(=(?!=))" is(by-groups(name, text, operator))
-  r"(/?)([\w.]+)" is(by-groups(punctuation, name.other))
-  r"(=)(bw|ew|cn|lte?|gte?|n?eq|ft|n?rx)\b" is(by-groups(operator, operator.word))
-  r":=|[-+*/%=<>&|!?\\]+" is(operator)
-  r"[{}():;,@^]" is(punctuation)
+  lex(lasso):
+    any-of(whitespacecomments)
+    r"\d*\.\d+(e[+-]?\d+)?" is(literal.number.float)
+    r"0x[\da-f]+" is(literal.number.hex)
+    r"\d+" is(literal.number.integer)
+    r"([+-]?)(infinity|NaN)\b" is(by-groups(operator, literal.number))
+    r"'" is(literal.string.single) -> go-to(singlestring)
+    r"\"" is(literal.string.double) -> go-to(doublestring)
+    r"`[^`]*`" is(literal.string.backtick)
+    r"\$[a-z_][\w.]*" is(name.variable)
+    r"\#[a-z_][\w.]*|\#\d+" is(name.variable.instance)
+    r"(\.)('[a-z_][\w.]*')" is(by-groups(name.builtin.pseudo, name.variable.class))
+    r"(self)(->)('[a-z_][\w.]*')" is(by-groups(name.builtin.pseudo, operator, name.variable.class))
+    r"(\.\.?)([a-z_][\w.]*)" is(by-groups(name.builtin.pseudo, name.other))
+    r"(self|inherited|global|void)\b" is(name.builtin.pseudo)
+    r"-[a-z_][\w.]*" is(name.attribute)
+    r"(::\s*)([a-z_][\w.]*)" is(by-groups(punctuation, name.label))
+    r"(error_(code|msg)_\w+|Error_AddError|Error_ColumnRestriction|Error_DatabaseConnectionUnavailable|Error_DatabaseTimeout|Error_DeleteError|Error_FieldRestriction|Error_FileNotFound|Error_InvalidDatabase|Error_InvalidPassword|Error_InvalidUsername|Error_ModuleNotFound|Error_NoError|Error_NoPermission|Error_OutOfMemory|Error_ReqColumnMissing|Error_ReqFieldMissing|Error_RequiredColumnMissing|Error_RequiredFieldMissing|Error_UpdateError)\b" is(name.exception)
+    r"(define)(\s+)([a-z_][\w.]*)(\s*)(=>)(\s*)(type|trait|thread)\b" is(by-groups(keyword.declaration, text, name.class, text, operator, text, keyword))
+    r"(define)(\s+)([a-z_][\w.]*)(->)([a-z_][\w.]*=?|[-+*/%<>]|==)" is(by-groups(keyword.declaration, text, name.class, operator, name.function)) -> go-to(signature)
+    r"(define)(\s+)([a-z_][\w.]*)" is(by-groups(keyword.declaration, text, name.function)) -> go-to(signature)
+    r"(public|protected|private|provide)(\s+)(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\())" is(by-groups(keyword, text, name.function)) -> go-to(signature)
+    r"(public|protected|private)(\s+)([a-z_][\w.]*)" is(by-groups(keyword, text, name.function))
+    r"(true|false|none|minimal|full|all)\b" is(keyword.constant)
+    r"(local|var|variable|data)\b" is(keyword.declaration)
+    r"(array|date|decimal|duration|integer|map|pair|string|tag|xml|null)\b" is(keyword.type)
+    r"([a-z_][\w.]*)(\s+)(in)\b" is(by-groups(name, text, keyword))
+    r"(let|into)(\s+)([a-z_][\w.]*)" is(by-groups(keyword, text, name))
+    r"require\b" is(keyword) -> go-to(requiresection)
+    r"(/?)(Namespace_Using)\b" is(by-groups(punctuation, keyword.namespace))
+    r"(/?)(Cache|Database_Names|Database_SchemaNames|Database_TableNames|Define_Tag|Define_Type|Email_Batch|Encode_Set|HTML_Comment|Handle|Handle_Error|Header|If|Inline|Iterate|LJAX_Target|Link|Link_CurrentAction|Link_CurrentGroup|Link_CurrentRecord|Link_Detail|Link_FirstGroup|Link_FirstRecord|Link_LastGroup|Link_LastRecord|Link_NextGroup|Link_NextRecord|Link_PrevGroup|Link_PrevRecord|Log|Loop|NoProcess|Output_None|Portal|Private|Protect|Records|Referer|Referrer|Repeating|ResultSet|Rows|Search_Args|Search_Arguments|Select|Sort_Args|Sort_Arguments|Thread_Atomic|Value_List|While|Abort|Case|Else|If_Empty|If_False|If_Null|If_True|Loop_Abort|Loop_Continue|Loop_Count|Params|Params_Up|Return|Return_Value|Run_Children|SOAP_DefineTag|SOAP_LastRequest|SOAP_LastResponse|Tag_Name|ascending|average|by|define|descending|do|equals|frozen|group|handle_failure|import|in|into|join|let|match|max|min|on|order|parent|protected|provide|public|require|skip|split_thread|sum|take|thread|to|trait|type|where|with|yield)\b" is(by-groups(punctuation, keyword))
+    r"(([a-z_][\w.]*=?|[-+*/%<>]|==)(?=\s*\([^)]*\)\s*=>))" is(name.function) -> go-to(signature)
+    r"(and|or|not)\b" is(operator.word)
+    r"([a-z_][\w.]*)(\s*)(::\s*)([a-z_][\w.]*)(\s*)(=)" is(by-groups(name, text, punctuation, name.label, text, operator))
+    r"((?<!->)[a-z_][\w.]*)(\s*)(=(?!=))" is(by-groups(name, text, operator))
+    r"(/?)([\w.]+)" is(by-groups(punctuation, name.other))
+    r"(=)(bw|ew|cn|lte?|gte?|n?eq|ft|n?rx)\b" is(by-groups(operator, operator.word))
+    r":=|[-+*/%=<>&|!?\\]+" is(operator)
+    r"[{}():;,@^]" is(punctuation)
 
 const-set(.Lexer, lexer)

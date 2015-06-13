@@ -2,48 +2,48 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Newspeak"
-aliases: ["newspeak"]
-extensions: [".ns2"]
-mimetypes: ["text/x-newspeak"]
-start: .root
-flags: 0
+  name: "Newspeak"
+  aliases: ["newspeak"]
+  extensions: [".ns2"]
+  mimetypes: ["text/x-newspeak"]
+  start: .root
+  flags: 0
 
-lex(literals):
-  r"\$." is(literal.string)
-  r"'[^']*'" is(literal.string)
-  r"\#'[^']*'" is(literal.string.symbol)
-  r"\#\w+:?" is(literal.string.symbol)
-  r"\#(\+|\/|\126|\*|<|>|=|@|%|\||&|\?|!|,|-)+" is(literal.string.symbol)
+  lex(literals):
+    r"\$." is(literal.string)
+    r"'[^']*'" is(literal.string)
+    r"\#'[^']*'" is(literal.string.symbol)
+    r"\#\w+:?" is(literal.string.symbol)
+    r"\#(\+|\/|\126|\*|<|>|=|@|%|\||&|\?|!|,|-)+" is(literal.string.symbol)
 
-lex(root):
-  r"\b(Newsqueak2)\b" is(keyword.declaration)
-  r"'[^']*'" is(literal.string)
-  r"\b(class)(\s+)([a-zA-Z0-9_]+)(\s*)" is(by-groups(keyword.declaration, text, name.class, text))
-  r"\b(mixin|self|super|private|public|protected|nil|true|false)\b" is(keyword)
-  r"([a-zA-Z0-9_]+\:)(\s*)([a-zA-Z_]\w+)" is(by-groups(name.function, text, name.variable))
-  r"([a-zA-Z0-9_]+)(\s*)(=)" is(by-groups(name.attribute, text, operator))
-  r"<[a-zA-Z0-9_]+>" is(comment.special)
-  any-of(expressionstat)
-  any-of(whitespace)
+  lex(root):
+    r"\b(Newsqueak2)\b" is(keyword.declaration)
+    r"'[^']*'" is(literal.string)
+    r"\b(class)(\s+)([a-zA-Z0-9_]+)(\s*)" is(by-groups(keyword.declaration, text, name.class, text))
+    r"\b(mixin|self|super|private|public|protected|nil|true|false)\b" is(keyword)
+    r"([a-zA-Z0-9_]+\:)(\s*)([a-zA-Z_]\w+)" is(by-groups(name.function, text, name.variable))
+    r"([a-zA-Z0-9_]+)(\s*)(=)" is(by-groups(name.attribute, text, operator))
+    r"<[a-zA-Z0-9_]+>" is(comment.special)
+    any-of(expressionstat)
+    any-of(whitespace)
 
-lex(whitespace):
-  r"\s+" is(text)
-  r"\"[^\"]*\"" is(comment)
+  lex(whitespace):
+    r"\s+" is(text)
+    r"\"[^\"]*\"" is(comment)
 
-lex(expressionstat):
-  r"(\d+\.\d*|\.\d+|\d+[fF])[fF]?" is(literal.number.float)
-  r"\d+" is(literal.number.integer)
-  r":\w+" is(name.variable)
-  r"(\w+)(::)" is(by-groups(name.variable, operator))
-  r"\w+:" is(name.function)
-  r"\w+" is(name.variable)
-  r"\(|\)" is(punctuation)
-  r"\[|\]" is(punctuation)
-  r"\{|\}" is(punctuation)
-  r"(\^|\+|\/|\126|\*|<|>|=|@|%|\||&|\?|!|,|-|:)" is(operator)
-  r"\.|;" is(punctuation)
-  any-of(whitespace)
-  any-of(literals)
+  lex(expressionstat):
+    r"(\d+\.\d*|\.\d+|\d+[fF])[fF]?" is(literal.number.float)
+    r"\d+" is(literal.number.integer)
+    r":\w+" is(name.variable)
+    r"(\w+)(::)" is(by-groups(name.variable, operator))
+    r"\w+:" is(name.function)
+    r"\w+" is(name.variable)
+    r"\(|\)" is(punctuation)
+    r"\[|\]" is(punctuation)
+    r"\{|\}" is(punctuation)
+    r"(\^|\+|\/|\126|\*|<|>|=|@|%|\||&|\?|!|,|-|:)" is(operator)
+    r"\.|;" is(punctuation)
+    any-of(whitespace)
+    any-of(literals)
 
 const-set(.Lexer, lexer)

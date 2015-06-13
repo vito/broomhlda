@@ -2,70 +2,70 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Smali"
-aliases: ["smali"]
-extensions: [".smali"]
-mimetypes: ["text/smali"]
-start: .root
-flags: 0
+  name: "Smali"
+  aliases: ["smali"]
+  extensions: [".smali"]
+  mimetypes: ["text/smali"]
+  start: .root
+  flags: 0
 
-lex(comment):
-  r"\#.*?\n" is(comment)
+  lex(comment):
+    r"\#.*?\n" is(comment)
 
-lex(instruction):
-  r"\b[vp]\d+\b" is(name.builtin)
-  r"\b[a-z][A-Za-z0-9/-]+\s+" is(text)
+  lex(instruction):
+    r"\b[vp]\d+\b" is(name.builtin)
+    r"\b[a-z][A-Za-z0-9/-]+\s+" is(text)
 
-lex(class):
-  r"(L)((?:[A-Za-z0-9_$]+/)*)([A-Za-z0-9_$]+)(;)" is(by-groups(keyword.type, text, name.class, text))
+  lex(class):
+    r"(L)((?:[A-Za-z0-9_$]+/)*)([A-Za-z0-9_$]+)(;)" is(by-groups(keyword.type, text, name.class, text))
 
-lex(whitespace):
-  r"\n" is(text)
-  r"\s+" is(text)
+  lex(whitespace):
+    r"\n" is(text)
+    r"\s+" is(text)
 
-lex(directive):
-  r"^[ \t]*\.(class|super|implements|field|subannotation|annotation|enum|method|registers|locals|array-data|packed-switch|sparse-switch|catchall|catch|line|parameter|local|prologue|epilogue|source)" is(keyword)
-  r"^[ \t]*\.end (field|subannotation|annotation|method|array-data|packed-switch|sparse-switch|parameter|local)" is(keyword)
-  r"^[ \t]*\.restart local" is(keyword)
+  lex(directive):
+    r"^[ \t]*\.(class|super|implements|field|subannotation|annotation|enum|method|registers|locals|array-data|packed-switch|sparse-switch|catchall|catch|line|parameter|local|prologue|epilogue|source)" is(keyword)
+    r"^[ \t]*\.end (field|subannotation|annotation|method|array-data|packed-switch|sparse-switch|parameter|local)" is(keyword)
+    r"^[ \t]*\.restart local" is(keyword)
 
-lex(type):
-  r"[ZBSCIJFDV\[]+" is(keyword.type)
+  lex(type):
+    r"[ZBSCIJFDV\[]+" is(keyword.type)
 
-lex(punctuation):
-  r"->" is(punctuation)
-  r"[{},\(\):=\.-]" is(punctuation)
+  lex(punctuation):
+    r"->" is(punctuation)
+    r"[{},\(\):=\.-]" is(punctuation)
 
-lex(label):
-  r":[A-Za-z0-9_]+" is(name.label)
+  lex(label):
+    r":[A-Za-z0-9_]+" is(name.label)
 
-lex(field):
-  r"(\$?\b)([A-Za-z0-9_$]*)(:)" is(by-groups(punctuation, name.variable, punctuation))
+  lex(field):
+    r"(\$?\b)([A-Za-z0-9_$]*)(:)" is(by-groups(punctuation, name.variable, punctuation))
 
-lex(literal):
-  r"\".*\"" is(literal.string)
-  r"0x[0-9A-Fa-f]+t?" is(literal.number.hex)
-  r"[0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
-  r"[0-9]+L?" is(literal.number.integer)
+  lex(literal):
+    r"\".*\"" is(literal.string)
+    r"0x[0-9A-Fa-f]+t?" is(literal.number.hex)
+    r"[0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
+    r"[0-9]+L?" is(literal.number.integer)
 
-lex(access-modifier):
-  r"(public|private|protected|static|final|synchronized|bridge|varargs|native|abstract|strictfp|synthetic|constructor|declared-synchronized|interface|enum|annotation|volatile|transient)" is(keyword)
+  lex(access-modifier):
+    r"(public|private|protected|static|final|synchronized|bridge|varargs|native|abstract|strictfp|synthetic|constructor|declared-synchronized|interface|enum|annotation|volatile|transient)" is(keyword)
 
-lex(root):
-  any-of(comment)
-  any-of(label)
-  any-of(field)
-  any-of(method)
-  any-of(class)
-  any-of(directive)
-  any-of(access-modifier)
-  any-of(instruction)
-  any-of(literal)
-  any-of(punctuation)
-  any-of(type)
-  any-of(whitespace)
+  lex(root):
+    any-of(comment)
+    any-of(label)
+    any-of(field)
+    any-of(method)
+    any-of(class)
+    any-of(directive)
+    any-of(access-modifier)
+    any-of(instruction)
+    any-of(literal)
+    any-of(punctuation)
+    any-of(type)
+    any-of(whitespace)
 
-lex(method):
-  r"<(?:cl)?init>" is(name.function)
-  r"(\$?\b)([A-Za-z0-9_$]*)(\()" is(by-groups(punctuation, name.function, punctuation))
+  lex(method):
+    r"<(?:cl)?init>" is(name.function)
+    r"(\$?\b)([A-Za-z0-9_$]*)(\()" is(by-groups(punctuation, name.function, punctuation))
 
 const-set(.Lexer, lexer)

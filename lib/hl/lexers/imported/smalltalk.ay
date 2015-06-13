@@ -2,92 +2,92 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Smalltalk"
-aliases: ["smalltalk", "squeak"]
-extensions: [".st"]
-mimetypes: ["text/x-smalltalk"]
-start: .root
-flags: 0
+  name: "Smalltalk"
+  aliases: ["smalltalk", "squeak"]
+  extensions: [".st"]
+  mimetypes: ["text/x-smalltalk"]
+  start: .root
+  flags: 0
 
-lex(objects):
-  r"\[" is(text) -> go-to(blockvariables)
-  r"\]" is(text) -> go-to(afterobject)
-  r"\b(self|super|true|false|nil|thisContext)\b" is(name.builtin.pseudo) -> go-to(afterobject)
-  r"\b[A-Z]\w*(?!:)\b" is(name.class) -> go-to(afterobject)
-  r"\b[a-z]\w*(?!:)\b" is(name.variable) -> go-to(afterobject)
-  r"\#(\"(\"\"|[^\"])*\"|[-+*/\\\126<>=|&!?,@%]+|[\w:]+)" is(literal.string.symbol) -> go-to(afterobject)
-  any-of(literals)
+  lex(objects):
+    r"\[" is(text) -> go-to(blockvariables)
+    r"\]" is(text) -> go-to(afterobject)
+    r"\b(self|super|true|false|nil|thisContext)\b" is(name.builtin.pseudo) -> go-to(afterobject)
+    r"\b[A-Z]\w*(?!:)\b" is(name.class) -> go-to(afterobject)
+    r"\b[a-z]\w*(?!:)\b" is(name.variable) -> go-to(afterobject)
+    r"\#(\"(\"\"|[^\"])*\"|[-+*/\\\126<>=|&!?,@%]+|[\w:]+)" is(literal.string.symbol) -> go-to(afterobject)
+    any-of(literals)
 
-lex(blockvariables):
-  any-of(whitespaces)
-  r"(:)(\s*)(\w+)" is(by-groups(operator, text, name.variable))
-  r"\|" is(operator) -> pop
-  r"" is(text) -> pop
+  lex(blockvariables):
+    any-of(whitespaces)
+    r"(:)(\s*)(\w+)" is(by-groups(operator, text, name.variable))
+    r"\|" is(operator) -> pop
+    r"" is(text) -> pop
 
-lex(_parenth-helper):
-  any-of(whitespaces)
-  r"(\d+r)?-?\d+(\.\d+)?(e-?\d+)?" is(literal.number)
-  r"[-+*/\\\126<>=|&\#!?,@%\w:]+" is(literal.string.symbol)
-  r"'(''|[^'])*'" is(literal.string)
-  r"\$." is(literal.string.char)
-  r"\#*\(" is(literal.string.symbol) -> go-to(inner-parenth)
+  lex(_parenth-helper):
+    any-of(whitespaces)
+    r"(\d+r)?-?\d+(\.\d+)?(e-?\d+)?" is(literal.number)
+    r"[-+*/\\\126<>=|&\#!?,@%\w:]+" is(literal.string.symbol)
+    r"'(''|[^'])*'" is(literal.string)
+    r"\$." is(literal.string.char)
+    r"\#*\(" is(literal.string.symbol) -> go-to(inner-parenth)
 
-lex(afterobject):
-  r"! !$" is(keyword) -> pop
-  any-of(whitespaces)
-  r"\b(ifTrue:|ifFalse:|whileTrue:|whileFalse:|timesRepeat:)" is(name.builtin) -> pop
-  r"\b(new\b(?!:))" is(name.builtin)
-  r"\:=|\_" is(operator) -> pop
-  r"\b[a-zA-Z]+\w*:" is(name.function) -> pop
-  r"\b[a-zA-Z]+\w*" is(name.function)
-  r"\w+:?|[-+*/\\\126<>=|&!?,@%]+" is(name.function) -> pop
-  r"\." is(punctuation) -> pop
-  r";" is(punctuation)
-  r"[\])}]" is(text)
-  r"[\[({]" is(text) -> pop
+  lex(afterobject):
+    r"! !$" is(keyword) -> pop
+    any-of(whitespaces)
+    r"\b(ifTrue:|ifFalse:|whileTrue:|whileFalse:|timesRepeat:)" is(name.builtin) -> pop
+    r"\b(new\b(?!:))" is(name.builtin)
+    r"\:=|\_" is(operator) -> pop
+    r"\b[a-zA-Z]+\w*:" is(name.function) -> pop
+    r"\b[a-zA-Z]+\w*" is(name.function)
+    r"\w+:?|[-+*/\\\126<>=|&!?,@%]+" is(name.function) -> pop
+    r"\." is(punctuation) -> pop
+    r";" is(punctuation)
+    r"[\])}]" is(text)
+    r"[\[({]" is(text) -> pop
 
-lex(literals):
-  r"'(''|[^'])*'" is(literal.string) -> go-to(afterobject)
-  r"\$." is(literal.string.char) -> go-to(afterobject)
-  r"\#\(" is(literal.string.symbol) -> go-to(parenth)
-  r"\)" is(text) -> go-to(afterobject)
-  r"(\d+r)?-?\d+(\.\d+)?(e-?\d+)?" is(literal.number) -> go-to(afterobject)
+  lex(literals):
+    r"'(''|[^'])*'" is(literal.string) -> go-to(afterobject)
+    r"\$." is(literal.string.char) -> go-to(afterobject)
+    r"\#\(" is(literal.string.symbol) -> go-to(parenth)
+    r"\)" is(text) -> go-to(afterobject)
+    r"(\d+r)?-?\d+(\.\d+)?(e-?\d+)?" is(literal.number) -> go-to(afterobject)
 
-lex(method-definition):
-  r"([a-zA-Z]+\w*:)(\s*)(\w+)" is(by-groups(name.function, text, name.variable))
-  r"^(\b[a-zA-Z]+\w*\b)(\s*)$" is(by-groups(name.function, text))
-  r"^([-+*/\\\126<>=|&!?,@%]+)(\s*)(\w+)(\s*)$" is(by-groups(name.function, text, name.variable, text))
+  lex(method-definition):
+    r"([a-zA-Z]+\w*:)(\s*)(\w+)" is(by-groups(name.function, text, name.variable))
+    r"^(\b[a-zA-Z]+\w*\b)(\s*)$" is(by-groups(name.function, text))
+    r"^([-+*/\\\126<>=|&!?,@%]+)(\s*)(\w+)(\s*)$" is(by-groups(name.function, text, name.variable, text))
 
-lex(parenth):
-  r"\)" is(literal.string.symbol) -> do-all(go-to(root), go-to(afterobject))
-  any-of(_parenth-helper)
+  lex(parenth):
+    r"\)" is(literal.string.symbol) -> do-all(go-to(root), go-to(afterobject))
+    any-of(_parenth-helper)
 
-lex(inner-parenth):
-  r"\)" is(literal.string.symbol) -> pop
-  any-of(_parenth-helper)
+  lex(inner-parenth):
+    r"\)" is(literal.string.symbol) -> pop
+    any-of(_parenth-helper)
 
-lex(whitespaces):
-  r"\s+" is(text)
-  r"\"(\"\"|[^\"])*\"" is(comment)
+  lex(whitespaces):
+    r"\s+" is(text)
+    r"\"(\"\"|[^\"])*\"" is(comment)
 
-lex(squeak-fileout):
-  r"^\"(\"\"|[^\"])*\"!" is(keyword)
-  r"^'(''|[^'])*'!" is(keyword)
-  r"^(!)(\w+)( commentStamp: )(.*?)( prior: .*?!\n)(.*?)(!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword, text, keyword))
-  r"^(!)(\w+(?: class)?)( methodsFor: )('(?:''|[^'])*')(.*?!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword))
-  r"^(\w+)( subclass: )(\#\w+)(\s+instanceVariableNames: )(.*?)(\s+classVariableNames: )(.*?)(\s+poolDictionaries: )(.*?)(\s+category: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string.symbol, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword))
-  r"^(\w+(?: class)?)(\s+instanceVariableNames: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string, keyword))
-  r"(!\n)(\].*)(! !)$" is(by-groups(keyword, text, keyword))
-  r"! !$" is(keyword)
+  lex(squeak-fileout):
+    r"^\"(\"\"|[^\"])*\"!" is(keyword)
+    r"^'(''|[^'])*'!" is(keyword)
+    r"^(!)(\w+)( commentStamp: )(.*?)( prior: .*?!\n)(.*?)(!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword, text, keyword))
+    r"^(!)(\w+(?: class)?)( methodsFor: )('(?:''|[^'])*')(.*?!)" is(by-groups(keyword, name.class, keyword, literal.string, keyword))
+    r"^(\w+)( subclass: )(\#\w+)(\s+instanceVariableNames: )(.*?)(\s+classVariableNames: )(.*?)(\s+poolDictionaries: )(.*?)(\s+category: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string.symbol, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword, literal.string, keyword))
+    r"^(\w+(?: class)?)(\s+instanceVariableNames: )(.*?)(!)" is(by-groups(name.class, keyword, literal.string, keyword))
+    r"(!\n)(\].*)(! !)$" is(by-groups(keyword, text, keyword))
+    r"! !$" is(keyword)
 
-lex(root):
-  r"(<)(\w+:)(.*?)(>)" is(by-groups(text, keyword, text, text))
-  any-of(squeak-fileout)
-  any-of(whitespaces)
-  any-of(method-definition)
-  r"(\|)([\w\s]*)(\|)" is(by-groups(operator, name.variable, operator))
-  any-of(objects)
-  r"\^|\:=|\_" is(operator)
-  r"[\]({}.;!]" is(text)
+  lex(root):
+    r"(<)(\w+:)(.*?)(>)" is(by-groups(text, keyword, text, text))
+    any-of(squeak-fileout)
+    any-of(whitespaces)
+    any-of(method-definition)
+    r"(\|)([\w\s]*)(\|)" is(by-groups(operator, name.variable, operator))
+    any-of(objects)
+    r"\^|\:=|\_" is(operator)
+    r"[\]({}.;!]" is(text)
 
 const-set(.Lexer, lexer)

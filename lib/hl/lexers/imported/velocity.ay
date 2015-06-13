@@ -2,49 +2,49 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Velocity"
-aliases: ["velocity"]
-extensions: [".vm", ".fhtml"]
-mimetypes: []
-start: .root
-flags: Regexp MULTILINE
+  name: "Velocity"
+  aliases: ["velocity"]
+  extensions: [".vm", ".fhtml"]
+  mimetypes: []
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(variable):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable)
-  r"\(" is(punctuation) -> go-to(funcparams)
-  r"(\.)([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(punctuation, name.variable)) -> push
-  r"\}" is(punctuation) -> pop
-  r"" is(other) -> pop
+  lex(variable):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.variable)
+    r"\(" is(punctuation) -> go-to(funcparams)
+    r"(\.)([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(punctuation, name.variable)) -> push
+    r"\}" is(punctuation) -> pop
+    r"" is(other) -> pop
 
-lex(rangeoperator):
-  r"\.\." is(operator)
-  any-of(funcparams)
-  r"\]" is(operator) -> pop
+  lex(rangeoperator):
+    r"\.\." is(operator)
+    any-of(funcparams)
+    r"\]" is(operator) -> pop
 
-lex(root):
-  r"[^{\#$]+" is(other)
-  r"(\#)(\*.*?\*)(\#)" is(by-groups(comment.preproc, comment, comment.preproc))
-  r"(\#\#)(.*?$)" is(by-groups(comment.preproc, comment))
-  r"(\#\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\}?)(\s?\()" is(by-groups(comment.preproc, name.function, comment.preproc, punctuation)) -> go-to(directiveparams)
-  r"(\#\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\}|\b)" is(by-groups(comment.preproc, name.function, comment.preproc))
-  r"\$\{?" is(punctuation) -> go-to(variable)
+  lex(root):
+    r"[^{\#$]+" is(other)
+    r"(\#)(\*.*?\*)(\#)" is(by-groups(comment.preproc, comment, comment.preproc))
+    r"(\#\#)(.*?$)" is(by-groups(comment.preproc, comment))
+    r"(\#\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\}?)(\s?\()" is(by-groups(comment.preproc, name.function, comment.preproc, punctuation)) -> go-to(directiveparams)
+    r"(\#\{?)([a-zA-Z_][a-zA-Z0-9_]*)(\}|\b)" is(by-groups(comment.preproc, name.function, comment.preproc))
+    r"\$\{?" is(punctuation) -> go-to(variable)
 
-lex(funcparams):
-  r"\$\{?" is(punctuation) -> go-to(variable)
-  r"\s+" is(text)
-  r"," is(punctuation)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
-  r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
-  r"0[xX][0-9a-fA-F]+[Ll]?" is(literal.number)
-  r"\b[0-9]+\b" is(literal.number)
-  r"(true|false|null)\b" is(keyword.constant)
-  r"\(" is(punctuation) -> push
-  r"\)" is(punctuation) -> pop
+  lex(funcparams):
+    r"\$\{?" is(punctuation) -> go-to(variable)
+    r"\s+" is(text)
+    r"," is(punctuation)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
+    r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
+    r"0[xX][0-9a-fA-F]+[Ll]?" is(literal.number)
+    r"\b[0-9]+\b" is(literal.number)
+    r"(true|false|null)\b" is(keyword.constant)
+    r"\(" is(punctuation) -> push
+    r"\)" is(punctuation) -> pop
 
-lex(directiveparams):
-  r"(&&|\|\||==?|!=?|[-<>+*%&\|\^/])|\b(eq|ne|gt|lt|ge|le|not|in)\b" is(operator)
-  r"\[" is(operator) -> go-to(rangeoperator)
-  r"\b[a-zA-Z_][a-zA-Z0-9_]*\b" is(name.function)
-  any-of(funcparams)
+  lex(directiveparams):
+    r"(&&|\|\||==?|!=?|[-<>+*%&\|\^/])|\b(eq|ne|gt|lt|ge|le|not|in)\b" is(operator)
+    r"\[" is(operator) -> go-to(rangeoperator)
+    r"\b[a-zA-Z_][a-zA-Z0-9_]*\b" is(name.function)
+    any-of(funcparams)
 
 const-set(.Lexer, lexer)

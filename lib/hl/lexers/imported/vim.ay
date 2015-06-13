@@ -2,27 +2,27 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "VimL"
-aliases: ["vim"]
-extensions: [".vim", ".vimrc", ".exrc", ".gvimrc", "_vimrc", "_exrc", "_gvimrc", "vimrc", "gvimrc"]
-mimetypes: ["text/x-vim"]
-start: .root
-flags: 0
+  name: "VimL"
+  aliases: ["vim"]
+  extensions: [".vim", ".vimrc", ".exrc", ".gvimrc", "_vimrc", "_exrc", "_gvimrc", "vimrc", "gvimrc"]
+  mimetypes: ["text/x-vim"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"^\s*\".*" is(comment)
-  r"[ \t]+" is(text)
-  r"/(\\\\|\\/|[^\n/])*/" is(literal.string.regex)
-  r"\"(\\\\|\\\"|[^\n\"])*\"" is(literal.string.double)
-  r"'(\\\\|\\'|[^\n'])*'" is(literal.string.single)
-  r"(?<=\s)\"[^\-:.%\#=*].*" is(comment)
-  r"-?\d+" is(literal.number)
-  r"\#[0-9a-f]{6}" is(literal.number.hex)
-  r"^:" is(punctuation)
-  r"[()<>+=!|,\126-]" is(punctuation)
-  r"\b(let|if|else|endif|elseif|fun|function|endfunction)\b" is(keyword)
-  r"\b(NONE|bold|italic|underline|dark|light)\b" is(name.builtin)
-  r"\b\w+\b" is(name.other)
-  r"." is(text)
+  lex(root):
+    r"^\s*\".*" is(comment)
+    r"[ \t]+" is(text)
+    r"/(\\\\|\\/|[^\n/])*/" is(literal.string.regex)
+    r"\"(\\\\|\\\"|[^\n\"])*\"" is(literal.string.double)
+    r"'(\\\\|\\'|[^\n'])*'" is(literal.string.single)
+    r"(?<=\s)\"[^\-:.%\#=*].*" is(comment)
+    r"-?\d+" is(literal.number)
+    r"\#[0-9a-f]{6}" is(literal.number.hex)
+    r"^:" is(punctuation)
+    r"[()<>+=!|,\126-]" is(punctuation)
+    r"\b(let|if|else|endif|elseif|fun|function|endfunction)\b" is(keyword)
+    r"\b(NONE|bold|italic|underline|dark|light)\b" is(name.builtin)
+    r"\b\w+\b" is(name.other)
+    r"." is(text)
 
 const-set(.Lexer, lexer)

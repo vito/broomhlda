@@ -2,38 +2,38 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "PostScript"
-aliases: ["postscript"]
-extensions: [".ps", ".eps"]
-mimetypes: ["application/postscript"]
-start: .root
-flags: 0
+  name: "PostScript"
+  aliases: ["postscript"]
+  extensions: [".ps", ".eps"]
+  mimetypes: ["application/postscript"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"^%!.+\n" is(comment.preproc)
-  r"%%.*\n" is(comment.special)
-  r"(^%.*\n){2,}" is(comment.multiline)
-  r"%.*\n" is(comment.single)
-  r"\(" is(literal.string) -> go-to(stringliteral)
-  r"[\{\}(\<\<)(\>\>)\[\]]" is(punctuation)
-  r"<[0-9A-Fa-f]+>(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.hex)
-  r"[0-9]+\\#(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.oct)
-  r"(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.float)
-  r"(\-|\+)?[0-9]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.integer)
-  r"\/[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.variable)
-  r"[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.function)
-  r"(false|true)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.constant)
-  r"(eq|ne|ge|gt|le|lt|and|or|not|if|ifelse|for|forall)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.reserved)
-  r"(abs|add|aload|arc|arcn|array|atan|begin|bind|ceiling|charpath|clip|closepath|concat|concatmatrix|copy|cos|currentlinewidth|currentmatrix|currentpoint|curveto|cvi|cvs|def|defaultmatrix|dict|dictstackoverflow|div|dtransform|dup|end|exch|exec|exit|exp|fill|findfont|floor|get|getinterval|grestore|gsave|gt|identmatrix|idiv|idtransform|index|invertmatrix|itransform|length|lineto|ln|load|log|loop|matrix|mod|moveto|mul|neg|newpath|pathforall|pathbbox|pop|print|pstack|put|quit|rand|rangecheck|rcurveto|repeat|restore|rlineto|rmoveto|roll|rotate|round|run|save|scale|scalefont|setdash|setfont|setgray|setlinecap|setlinejoin|setlinewidth|setmatrix|setrgbcolor|shfill|show|showpage|sin|sqrt|stack|stringwidth|stroke|strokepath|sub|syntaxerror|transform|translate|truncate|typecheck|undefined|undefinedfilename|undefinedresult)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.builtin)
-  r"\s+" is(text)
+  lex(root):
+    r"^%!.+\n" is(comment.preproc)
+    r"%%.*\n" is(comment.special)
+    r"(^%.*\n){2,}" is(comment.multiline)
+    r"%.*\n" is(comment.single)
+    r"\(" is(literal.string) -> go-to(stringliteral)
+    r"[\{\}(\<\<)(\>\>)\[\]]" is(punctuation)
+    r"<[0-9A-Fa-f]+>(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.hex)
+    r"[0-9]+\\#(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.oct)
+    r"(\-|\+)?([0-9]+\.?|[0-9]*\.[0-9]+|[0-9]+\.[0-9]*)((e|E)[0-9]+)?(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.float)
+    r"(\-|\+)?[0-9]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(literal.number.integer)
+    r"\/[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.variable)
+    r"[^\(\)\<\>\[\]\{\}\/\%\s]+(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.function)
+    r"(false|true)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.constant)
+    r"(eq|ne|ge|gt|le|lt|and|or|not|if|ifelse|for|forall)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(keyword.reserved)
+    r"(abs|add|aload|arc|arcn|array|atan|begin|bind|ceiling|charpath|clip|closepath|concat|concatmatrix|copy|cos|currentlinewidth|currentmatrix|currentpoint|curveto|cvi|cvs|def|defaultmatrix|dict|dictstackoverflow|div|dtransform|dup|end|exch|exec|exit|exp|fill|findfont|floor|get|getinterval|grestore|gsave|gt|identmatrix|idiv|idtransform|index|invertmatrix|itransform|length|lineto|ln|load|log|loop|matrix|mod|moveto|mul|neg|newpath|pathforall|pathbbox|pop|print|pstack|put|quit|rand|rangecheck|rcurveto|repeat|restore|rlineto|rmoveto|roll|rotate|round|run|save|scale|scalefont|setdash|setfont|setgray|setlinecap|setlinejoin|setlinewidth|setmatrix|setrgbcolor|shfill|show|showpage|sin|sqrt|stack|stringwidth|stroke|strokepath|sub|syntaxerror|transform|translate|truncate|typecheck|undefined|undefinedfilename|undefinedresult)(?=[\(\)\<\>\[\]\{\}\/\%\s])" is(name.builtin)
+    r"\s+" is(text)
 
-lex(stringliteral):
-  r"[^\(\)\\]+" is(literal.string)
-  r"\\" is(literal.string.escape) -> go-to(escape)
-  r"\(" is(literal.string) -> push
-  r"\)" is(literal.string) -> pop
+  lex(stringliteral):
+    r"[^\(\)\\]+" is(literal.string)
+    r"\\" is(literal.string.escape) -> go-to(escape)
+    r"\(" is(literal.string) -> push
+    r"\)" is(literal.string) -> pop
 
-lex(escape):
-  r"([0-8]{3}|n|r|t|b|f|\\|\(|\))?" is(literal.string.escape) -> pop
+  lex(escape):
+    r"([0-8]{3}|n|r|t|b|f|\\|\(|\))?" is(literal.string.escape) -> pop
 
 const-set(.Lexer, lexer)

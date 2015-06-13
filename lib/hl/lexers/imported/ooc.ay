@@ -2,44 +2,44 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Ooc"
-aliases: ["ooc"]
-extensions: [".ooc"]
-mimetypes: ["text/x-ooc"]
-start: .root
-flags: 0
+  name: "Ooc"
+  aliases: ["ooc"]
+  extensions: [".ooc"]
+  mimetypes: ["text/x-ooc"]
+  start: .root
+  flags: 0
 
-lex(include):
-  r"[\w/]+" is(name)
-  r"," is(punctuation)
-  r"[ \t]" is(text)
-  r"[;\n]" is(text) -> pop
+  lex(include):
+    r"[\w/]+" is(name)
+    r"," is(punctuation)
+    r"[ \t]" is(text)
+    r"[;\n]" is(text) -> pop
 
-lex(root):
-  r"\b(class|interface|implement|abstract|extends|from|this|super|new|const|final|static|import|use|extern|inline|proto|break|continue|fallthrough|operator|if|else|for|while|do|switch|case|as|in|version|return|true|false|null)\b" is(keyword)
-  r"include\b" is(keyword) -> go-to(include)
-  r"(cover)([ \t]+)(from)([ \t]+)([a-zA-Z0-9_]+[*@]?)" is(by-groups(keyword, text, keyword, text, name.class))
-  r"(func)((?:[ \t]|\\\n)+)(\126[a-z_][a-zA-Z0-9_]*)" is(by-groups(keyword, text, name.function))
-  r"\bfunc\b" is(keyword)
-  r"//.*" is(comment)
-  r"(?m)/\*.*?\*/" is(comment.multiline)
-  r"(==?|\+=?|-[=>]?|\*=?|/=?|:=|!=?|%=?|\?|>{1,3}=?|<{1,3}=?|\.\.|&&?|\|\|?|\^=?)" is(operator)
-  r"(\.)([ \t]*)([a-z]\w*)" is(by-groups(operator, text, name.function))
-  r"[A-Z][A-Z0-9_]+" is(name.constant)
-  r"[A-Z][a-zA-Z0-9_]*([@*]|\[[ \t]*\])?" is(name.class)
-  r"([a-z][a-zA-Z0-9_]*(?:\126[a-z][a-zA-Z0-9_]*)?)((?:[ \t]|\\\n)*)(?=\()" is(by-groups(name.function, text))
-  r"[a-z][a-zA-Z0-9_]*" is(name.variable)
-  r"[:(){}\[\];,]" is(punctuation)
-  r"0x[0-9a-fA-F]+" is(literal.number.hex)
-  r"0c[0-9]+" is(literal.number.oct)
-  r"0b[01]+" is(literal.number.binary)
-  r"[0-9_]\.[0-9_]*(?!\.)" is(literal.number.float)
-  r"[0-9_]+" is(literal.number.decimal)
-  r"\"(?:\\.|\\[0-7]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\\"])*\"" is(literal.string.double)
-  r"'(?:\\.|\\[0-9]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\'\n])'" is(literal.string.char)
-  r"@" is(punctuation)
-  r"\." is(punctuation)
-  r"\\[ \t\n]" is(text)
-  r"[ \t]+" is(text)
+  lex(root):
+    r"\b(class|interface|implement|abstract|extends|from|this|super|new|const|final|static|import|use|extern|inline|proto|break|continue|fallthrough|operator|if|else|for|while|do|switch|case|as|in|version|return|true|false|null)\b" is(keyword)
+    r"include\b" is(keyword) -> go-to(include)
+    r"(cover)([ \t]+)(from)([ \t]+)([a-zA-Z0-9_]+[*@]?)" is(by-groups(keyword, text, keyword, text, name.class))
+    r"(func)((?:[ \t]|\\\n)+)(\126[a-z_][a-zA-Z0-9_]*)" is(by-groups(keyword, text, name.function))
+    r"\bfunc\b" is(keyword)
+    r"//.*" is(comment)
+    r"(?m)/\*.*?\*/" is(comment.multiline)
+    r"(==?|\+=?|-[=>]?|\*=?|/=?|:=|!=?|%=?|\?|>{1,3}=?|<{1,3}=?|\.\.|&&?|\|\|?|\^=?)" is(operator)
+    r"(\.)([ \t]*)([a-z]\w*)" is(by-groups(operator, text, name.function))
+    r"[A-Z][A-Z0-9_]+" is(name.constant)
+    r"[A-Z][a-zA-Z0-9_]*([@*]|\[[ \t]*\])?" is(name.class)
+    r"([a-z][a-zA-Z0-9_]*(?:\126[a-z][a-zA-Z0-9_]*)?)((?:[ \t]|\\\n)*)(?=\()" is(by-groups(name.function, text))
+    r"[a-z][a-zA-Z0-9_]*" is(name.variable)
+    r"[:(){}\[\];,]" is(punctuation)
+    r"0x[0-9a-fA-F]+" is(literal.number.hex)
+    r"0c[0-9]+" is(literal.number.oct)
+    r"0b[01]+" is(literal.number.binary)
+    r"[0-9_]\.[0-9_]*(?!\.)" is(literal.number.float)
+    r"[0-9_]+" is(literal.number.decimal)
+    r"\"(?:\\.|\\[0-7]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\\"])*\"" is(literal.string.double)
+    r"'(?:\\.|\\[0-9]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\'\n])'" is(literal.string.char)
+    r"@" is(punctuation)
+    r"\." is(punctuation)
+    r"\\[ \t\n]" is(text)
+    r"[ \t]+" is(text)
 
 const-set(.Lexer, lexer)

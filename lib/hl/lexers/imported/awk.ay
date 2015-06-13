@@ -2,41 +2,41 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Awk"
-aliases: ["awk", "gawk", "mawk", "nawk"]
-extensions: [".awk"]
-mimetypes: ["application/x-awk"]
-start: .root
-flags: 0
+  name: "Awk"
+  aliases: ["awk", "gawk", "mawk", "nawk"]
+  extensions: [".awk"]
+  mimetypes: ["application/x-awk"]
+  start: .root
+  flags: 0
 
-lex(commentsandwhitespace):
-  r"\s+" is(text)
-  r"\#.*$" is(comment.single)
+  lex(commentsandwhitespace):
+    r"\s+" is(text)
+    r"\#.*$" is(comment.single)
 
-lex(root):
-  r"^(?=\s|/)" is(text) -> go-to(slashstartsregex)
-  any-of(commentsandwhitespace)
-  r"\+\+|--|\|\||&&|in|\$|!?\126|(\*\*|[-<>+*%\^/!=])=?" is(operator) -> go-to(slashstartsregex)
-  r"[{(\[;,]" is(punctuation) -> go-to(slashstartsregex)
-  r"[})\].]" is(punctuation)
-  r"(break|continue|do|while|exit|for|if|return)\b" is(keyword) -> go-to(slashstartsregex)
-  r"function\b" is(keyword.declaration) -> go-to(slashstartsregex)
-  r"(atan2|cos|exp|int|log|rand|sin|sqrt|srand|gensub|gsub|index|length|match|split|sprintf|sub|substr|tolower|toupper|close|fflush|getline|next|nextfile|print|printf|strftime|systime|delete|system)\b" is(keyword.reserved)
-  r"(ARGC|ARGIND|ARGV|CONVFMT|ENVIRON|ERRNO|FIELDWIDTHS|FILENAME|FNR|FS|IGNORECASE|NF|NR|OFMT|OFS|ORFS|RLENGTH|RS|RSTART|RT|SUBSEP)\b" is(name.builtin)
-  r"[$a-zA-Z_][a-zA-Z0-9_]*" is(name.other)
-  r"[0-9][0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
-  r"0x[0-9a-fA-F]+" is(literal.number.hex)
-  r"[0-9]+" is(literal.number.integer)
-  r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
-  r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
+  lex(root):
+    r"^(?=\s|/)" is(text) -> go-to(slashstartsregex)
+    any-of(commentsandwhitespace)
+    r"\+\+|--|\|\||&&|in|\$|!?\126|(\*\*|[-<>+*%\^/!=])=?" is(operator) -> go-to(slashstartsregex)
+    r"[{(\[;,]" is(punctuation) -> go-to(slashstartsregex)
+    r"[})\].]" is(punctuation)
+    r"(break|continue|do|while|exit|for|if|return)\b" is(keyword) -> go-to(slashstartsregex)
+    r"function\b" is(keyword.declaration) -> go-to(slashstartsregex)
+    r"(atan2|cos|exp|int|log|rand|sin|sqrt|srand|gensub|gsub|index|length|match|split|sprintf|sub|substr|tolower|toupper|close|fflush|getline|next|nextfile|print|printf|strftime|systime|delete|system)\b" is(keyword.reserved)
+    r"(ARGC|ARGIND|ARGV|CONVFMT|ENVIRON|ERRNO|FIELDWIDTHS|FILENAME|FNR|FS|IGNORECASE|NF|NR|OFMT|OFS|ORFS|RLENGTH|RS|RSTART|RT|SUBSEP)\b" is(name.builtin)
+    r"[$a-zA-Z_][a-zA-Z0-9_]*" is(name.other)
+    r"[0-9][0-9]*\.[0-9]+([eE][0-9]+)?[fd]?" is(literal.number.float)
+    r"0x[0-9a-fA-F]+" is(literal.number.hex)
+    r"[0-9]+" is(literal.number.integer)
+    r"\"(\\\\|\\\"|[^\"])*\"" is(literal.string.double)
+    r"'(\\\\|\\'|[^'])*'" is(literal.string.single)
 
-lex(slashstartsregex):
-  any-of(commentsandwhitespace)
-  r"/(\\.|[^\[/\\\n]|\[(\\.|[^\]\\\n])*])+/\B" is(literal.string.regex) -> pop
-  r"(?=/)" is(text) -> do-all(pop, go-to(badregex))
-  r"" is(text) -> pop
+  lex(slashstartsregex):
+    any-of(commentsandwhitespace)
+    r"/(\\.|[^\[/\\\n]|\[(\\.|[^\]\\\n])*])+/\B" is(literal.string.regex) -> pop
+    r"(?=/)" is(text) -> do-all(pop, go-to(badregex))
+    r"" is(text) -> pop
 
-lex(badregex):
-  r"\n" is(text) -> pop
+  lex(badregex):
+    r"\n" is(text) -> pop
 
 const-set(.Lexer, lexer)

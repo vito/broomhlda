@@ -2,37 +2,37 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "CMake"
-aliases: ["cmake"]
-extensions: [".cmake", "CMakeLists.txt"]
-mimetypes: ["text/x-cmake"]
-start: .root
-flags: 0
+  name: "CMake"
+  aliases: ["cmake"]
+  extensions: [".cmake", "CMakeLists.txt"]
+  mimetypes: ["text/x-cmake"]
+  start: .root
+  flags: 0
 
-lex(keywords):
-  r"\b(WIN32|UNIX|APPLE|CYGWIN|BORLAND|MINGW|MSVC|MSVC_IDE|MSVC60|MSVC70|MSVC71|MSVC80|MSVC90)\b" is(keyword)
+  lex(keywords):
+    r"\b(WIN32|UNIX|APPLE|CYGWIN|BORLAND|MINGW|MSVC|MSVC_IDE|MSVC60|MSVC70|MSVC71|MSVC80|MSVC90)\b" is(keyword)
 
-lex(ws):
-  r"[ \t]+" is(text)
-  r"\#.+\n" is(comment)
+  lex(ws):
+    r"[ \t]+" is(text)
+    r"\#.+\n" is(comment)
 
-lex(args):
-  r"\(" is(punctuation) -> push
-  r"\)" is(punctuation) -> pop
-  r"(\${)(.+?)(})" is(by-groups(operator, name.variable, operator))
-  r"(?m)\".*?\"" is(literal.string.double)
-  r"\\\S+" is(literal.string)
-  r"[^\)$\"\# \t\n]+" is(literal.string)
-  r"\n" is(text)
-  any-of(keywords)
-  any-of(ws)
+  lex(args):
+    r"\(" is(punctuation) -> push
+    r"\)" is(punctuation) -> pop
+    r"(\${)(.+?)(})" is(by-groups(operator, name.variable, operator))
+    r"(?m)\".*?\"" is(literal.string.double)
+    r"\\\S+" is(literal.string)
+    r"[^\)$\"\# \t\n]+" is(literal.string)
+    r"\n" is(text)
+    any-of(keywords)
+    any-of(ws)
 
-lex(root):
-  r"\b([A-Za-z_]+)([ \t]*)(\()" is(by-groups(name.builtin, text, punctuation)) -> go-to(args)
-  any-of(keywords)
-  any-of(ws)
+  lex(root):
+    r"\b([A-Za-z_]+)([ \t]*)(\()" is(by-groups(name.builtin, text, punctuation)) -> go-to(args)
+    any-of(keywords)
+    any-of(ws)
 
-lex(string):
-  
+  lex(string):
+    
 
 const-set(.Lexer, lexer)

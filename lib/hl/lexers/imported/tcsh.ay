@@ -2,51 +2,51 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Tcsh"
-aliases: ["tcsh", "csh"]
-extensions: [".tcsh", ".csh"]
-mimetypes: ["application/x-csh"]
-start: .root
-flags: 0
+  name: "Tcsh"
+  aliases: ["tcsh", "csh"]
+  extensions: [".tcsh", ".csh"]
+  mimetypes: ["application/x-csh"]
+  start: .root
+  flags: 0
 
-lex(curly):
-  r"}" is(keyword) -> pop
-  r":-" is(keyword)
-  r"[a-zA-Z0-9_]+" is(name.variable)
-  r"[^}:\"\'`$]+" is(punctuation)
-  r":" is(punctuation)
-  any-of(root)
+  lex(curly):
+    r"}" is(keyword) -> pop
+    r":-" is(keyword)
+    r"[a-zA-Z0-9_]+" is(name.variable)
+    r"[^}:\"\'`$]+" is(punctuation)
+    r":" is(punctuation)
+    any-of(root)
 
-lex(backticks):
-  r"`" is(literal.string.backtick) -> pop
-  any-of(root)
+  lex(backticks):
+    r"`" is(literal.string.backtick) -> pop
+    any-of(root)
 
-lex(root):
-  any-of(basic)
-  r"\$\(" is(keyword) -> go-to(paren)
-  r"\${\#?" is(keyword) -> go-to(curly)
-  r"`" is(literal.string.backtick) -> go-to(backticks)
-  any-of(data)
+  lex(root):
+    any-of(basic)
+    r"\$\(" is(keyword) -> go-to(paren)
+    r"\${\#?" is(keyword) -> go-to(curly)
+    r"`" is(literal.string.backtick) -> go-to(backticks)
+    any-of(data)
 
-lex(basic):
-  r"\b(if|endif|else|while|then|foreach|case|default|continue|goto|breaksw|end|switch|endsw)\s*\b" is(keyword)
-  r"\b(alias|alloc|bg|bindkey|break|builtins|bye|caller|cd|chdir|complete|dirs|echo|echotc|eval|exec|exit|fg|filetest|getxvers|glob|getspath|hashstat|history|hup|inlib|jobs|kill|limit|log|login|logout|ls-F|migrate|newgrp|nice|nohup|notify|onintr|popd|printenv|pushd|rehash|repeat|rootnode|popd|pushd|set|shift|sched|setenv|setpath|settc|setty|setxvers|shift|source|stop|suspend|source|suspend|telltc|time|umask|unalias|uncomplete|unhash|universe|unlimit|unset|unsetenv|ver|wait|warp|watchlog|where|which)\s*\b" is(name.builtin)
-  r"\#.*\n" is(comment)
-  r"\\[\w\W]" is(literal.string.escape)
-  r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
-  r"[\[\]{}()=]+" is(operator)
-  r"<<\s*(\'?)\\?(\w+)[\w\W]+?\2" is(literal.string)
+  lex(basic):
+    r"\b(if|endif|else|while|then|foreach|case|default|continue|goto|breaksw|end|switch|endsw)\s*\b" is(keyword)
+    r"\b(alias|alloc|bg|bindkey|break|builtins|bye|caller|cd|chdir|complete|dirs|echo|echotc|eval|exec|exit|fg|filetest|getxvers|glob|getspath|hashstat|history|hup|inlib|jobs|kill|limit|log|login|logout|ls-F|migrate|newgrp|nice|nohup|notify|onintr|popd|printenv|pushd|rehash|repeat|rootnode|popd|pushd|set|shift|sched|setenv|setpath|settc|setty|setxvers|shift|source|stop|suspend|source|suspend|telltc|time|umask|unalias|uncomplete|unhash|universe|unlimit|unset|unsetenv|ver|wait|warp|watchlog|where|which)\s*\b" is(name.builtin)
+    r"\#.*\n" is(comment)
+    r"\\[\w\W]" is(literal.string.escape)
+    r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
+    r"[\[\]{}()=]+" is(operator)
+    r"<<\s*(\'?)\\?(\w+)[\w\W]+?\2" is(literal.string)
 
-lex(paren):
-  r"\)" is(keyword) -> pop
-  any-of(root)
+  lex(paren):
+    r"\)" is(keyword) -> pop
+    any-of(root)
 
-lex(data):
-  r"(?m)\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
-  r"(?m)'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
-  r"\s+" is(text)
-  r"[^=\s\[\]{}()$\"\'`\\]+" is(text)
-  r"\d+(?= |\Z)" is(literal.number)
-  r"\$\#?(\w+|.)" is(name.variable)
+  lex(data):
+    r"(?m)\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
+    r"(?m)'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
+    r"\s+" is(text)
+    r"[^=\s\[\]{}()$\"\'`\\]+" is(text)
+    r"\d+(?= |\Z)" is(literal.number)
+    r"\$\#?(\w+|.)" is(name.variable)
 
 const-set(.Lexer, lexer)

@@ -2,41 +2,41 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Snobol"
-aliases: ["snobol"]
-extensions: [".snobol"]
-mimetypes: ["text/x-snobol"]
-start: .root
-flags: 0
+  name: "Snobol"
+  aliases: ["snobol"]
+  extensions: [".snobol"]
+  mimetypes: ["text/x-snobol"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\*.*\n" is(comment)
-  r"[\+\.] " is(punctuation) -> go-to(statement)
-  r"-.*\n" is(comment)
-  r"END\s*\n" is(name.label) -> go-to(heredoc)
-  r"[A-Za-z\$][\w$]*" is(name.label) -> go-to(statement)
-  r"\s+" is(text) -> go-to(statement)
+  lex(root):
+    r"\*.*\n" is(comment)
+    r"[\+\.] " is(punctuation) -> go-to(statement)
+    r"-.*\n" is(comment)
+    r"END\s*\n" is(name.label) -> go-to(heredoc)
+    r"[A-Za-z\$][\w$]*" is(name.label) -> go-to(statement)
+    r"\s+" is(text) -> go-to(statement)
 
-lex(goto):
-  r"\s*\n" is(text) -> pop(2)
-  r"\s+" is(text)
-  r"F|S" is(keyword)
-  r"(\()([A-Za-z][\w.]*)(\))" is(by-groups(punctuation, name.label, punctuation))
+  lex(goto):
+    r"\s*\n" is(text) -> pop(2)
+    r"\s+" is(text)
+    r"F|S" is(keyword)
+    r"(\()([A-Za-z][\w.]*)(\))" is(by-groups(punctuation, name.label, punctuation))
 
-lex(statement):
-  r"\s*\n" is(text) -> pop
-  r"\s+" is(text)
-  r"(?<=[^\w.])(LT|LE|EQ|NE|GE|GT|INTEGER|IDENT|DIFFER|LGT|SIZE|REPLACE|TRIM|DUPL|REMDR|DATE|TIME|EVAL|APPLY|OPSYN|LOAD|UNLOAD|LEN|SPAN|BREAK|ANY|NOTANY|TAB|RTAB|REM|POS|RPOS|FAIL|FENCE|ABORT|ARB|ARBNO|BAL|SUCCEED|INPUT|OUTPUT|TERMINAL)(?=[^\w.])" is(name.builtin)
-  r"[A-Za-z][\w\.]*" is(name)
-  r"\*\*|[\?\$\.!%\*/\#+\-@\|&\\=]" is(operator)
-  r"\"[^\"]*\"" is(literal.string)
-  r"'[^']*'" is(literal.string)
-  r"[0-9]+(?=[^\.EeDd])" is(literal.number.integer)
-  r"[0-9]+(\.[0-9]*)?([EDed][-+]?[0-9]+)?" is(literal.number.float)
-  r":" is(punctuation) -> go-to(goto)
-  r"[\(\)<>,;]" is(punctuation)
+  lex(statement):
+    r"\s*\n" is(text) -> pop
+    r"\s+" is(text)
+    r"(?<=[^\w.])(LT|LE|EQ|NE|GE|GT|INTEGER|IDENT|DIFFER|LGT|SIZE|REPLACE|TRIM|DUPL|REMDR|DATE|TIME|EVAL|APPLY|OPSYN|LOAD|UNLOAD|LEN|SPAN|BREAK|ANY|NOTANY|TAB|RTAB|REM|POS|RPOS|FAIL|FENCE|ABORT|ARB|ARBNO|BAL|SUCCEED|INPUT|OUTPUT|TERMINAL)(?=[^\w.])" is(name.builtin)
+    r"[A-Za-z][\w\.]*" is(name)
+    r"\*\*|[\?\$\.!%\*/\#+\-@\|&\\=]" is(operator)
+    r"\"[^\"]*\"" is(literal.string)
+    r"'[^']*'" is(literal.string)
+    r"[0-9]+(?=[^\.EeDd])" is(literal.number.integer)
+    r"[0-9]+(\.[0-9]*)?([EDed][-+]?[0-9]+)?" is(literal.number.float)
+    r":" is(punctuation) -> go-to(goto)
+    r"[\(\)<>,;]" is(punctuation)
 
-lex(heredoc):
-  r".*\n" is(literal.string.heredoc)
+  lex(heredoc):
+    r".*\n" is(literal.string.heredoc)
 
 const-set(.Lexer, lexer)

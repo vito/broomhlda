@@ -2,27 +2,27 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Brainfuck"
-aliases: ["brainfuck", "bf"]
-extensions: [".bf", ".b"]
-mimetypes: ["application/x-brainfuck"]
-start: .root
-flags: 0
+  name: "Brainfuck"
+  aliases: ["brainfuck", "bf"]
+  extensions: [".bf", ".b"]
+  mimetypes: ["application/x-brainfuck"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\[" is(keyword) -> go-to(loop)
-  r"\]" is(error)
-  any-of(common)
+  lex(root):
+    r"\[" is(keyword) -> go-to(loop)
+    r"\]" is(error)
+    any-of(common)
 
-lex(common):
-  r"[.,]+" is(name.tag)
-  r"[+-]+" is(name.builtin)
-  r"[<>]+" is(name.variable)
-  r"[^.,+\-<>\[\]]+" is(comment)
+  lex(common):
+    r"[.,]+" is(name.tag)
+    r"[+-]+" is(name.builtin)
+    r"[<>]+" is(name.variable)
+    r"[^.,+\-<>\[\]]+" is(comment)
 
-lex(loop):
-  r"\[" is(keyword) -> push
-  r"\]" is(keyword) -> pop
-  any-of(common)
+  lex(loop):
+    r"\[" is(keyword) -> push
+    r"\]" is(keyword) -> pop
+    any-of(common)
 
 const-set(.Lexer, lexer)

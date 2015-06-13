@@ -2,35 +2,35 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "LLVM"
-aliases: ["llvm"]
-extensions: [".ll"]
-mimetypes: ["text/x-llvm"]
-start: .root
-flags: 0
+  name: "LLVM"
+  aliases: ["llvm"]
+  extensions: [".ll"]
+  mimetypes: ["text/x-llvm"]
+  start: .root
+  flags: 0
 
-lex(root):
-  any-of(whitespace)
-  r"([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")\s*:" is(name.label)
-  any-of(keyword)
-  r"%([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable)
-  r"@([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable.global)
-  r"%\d+" is(name.variable.anonymous)
-  r"@\d+" is(name.variable.global)
-  r"!([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable)
-  r"!\d+" is(name.variable.anonymous)
-  r"c?\"[^\"]*?\"" is(literal.string)
-  r"0[xX][a-fA-F0-9]+" is(literal.number)
-  r"-?\d+(?:[.]\d+)?(?:[eE][-+]?\d+(?:[.]\d+)?)?" is(literal.number)
-  r"[=<>{}\[\]()*.,!]|x\b" is(punctuation)
+  lex(root):
+    any-of(whitespace)
+    r"([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")\s*:" is(name.label)
+    any-of(keyword)
+    r"%([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable)
+    r"@([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable.global)
+    r"%\d+" is(name.variable.anonymous)
+    r"@\d+" is(name.variable.global)
+    r"!([-a-zA-Z$._][-a-zA-Z$._0-9]*|\"[^\"]*?\")" is(name.variable)
+    r"!\d+" is(name.variable.anonymous)
+    r"c?\"[^\"]*?\"" is(literal.string)
+    r"0[xX][a-fA-F0-9]+" is(literal.number)
+    r"-?\d+(?:[.]\d+)?(?:[eE][-+]?\d+(?:[.]\d+)?)?" is(literal.number)
+    r"[=<>{}\[\]()*.,!]|x\b" is(punctuation)
 
-lex(whitespace):
-  r"(\n|\s)+" is(text)
-  r";.*?\n" is(comment)
+  lex(whitespace):
+    r"(\n|\s)+" is(text)
+    r";.*?\n" is(comment)
 
-lex(keyword):
-  r"(begin|end|true|false|declare|define|global|constant|private|linker_private|internal|available_externally|linkonce|linkonce_odr|weak|weak_odr|appending|dllimport|dllexport|common|default|hidden|protected|extern_weak|external|thread_local|zeroinitializer|undef|null|to|tail|target|triple|datalayout|volatile|nuw|nsw|nnan|ninf|nsz|arcp|fast|exact|inbounds|align|addrspace|section|alias|module|asm|sideeffect|gc|dbg|ccc|fastcc|coldcc|x86_stdcallcc|x86_fastcallcc|arm_apcscc|arm_aapcscc|arm_aapcs_vfpcc|cc|c|signext|zeroext|inreg|sret|nounwind|noreturn|noalias|nocapture|byval|nest|readnone|readonly|inlinehint|noinline|alwaysinline|optsize|ssp|sspreq|noredzone|noimplicitfloat|naked|type|opaque|eq|ne|slt|sgt|sle|sge|ult|ugt|ule|uge|oeq|one|olt|ogt|ole|oge|ord|uno|ueq|une|x|add|fadd|sub|fsub|mul|fmul|udiv|sdiv|fdiv|urem|srem|frem|shl|lshr|ashr|and|or|xor|icmp|fcmp|phi|call|trunc|zext|sext|fptrunc|fpext|uitofp|sitofp|fptouifptosi|inttoptr|ptrtoint|bitcast|select|va_arg|ret|br|switch|invoke|unwind|unreachable|malloc|alloca|free|load|store|getelementptr|extractelement|insertelement|shufflevector|getresult|extractvalue|insertvalue)\b" is(keyword)
-  r"void|float|double|x86_fp80|fp128|ppc_fp128|label|metadata" is(keyword.type)
-  r"i[1-9]\d*" is(keyword)
+  lex(keyword):
+    r"(begin|end|true|false|declare|define|global|constant|private|linker_private|internal|available_externally|linkonce|linkonce_odr|weak|weak_odr|appending|dllimport|dllexport|common|default|hidden|protected|extern_weak|external|thread_local|zeroinitializer|undef|null|to|tail|target|triple|datalayout|volatile|nuw|nsw|nnan|ninf|nsz|arcp|fast|exact|inbounds|align|addrspace|section|alias|module|asm|sideeffect|gc|dbg|ccc|fastcc|coldcc|x86_stdcallcc|x86_fastcallcc|arm_apcscc|arm_aapcscc|arm_aapcs_vfpcc|cc|c|signext|zeroext|inreg|sret|nounwind|noreturn|noalias|nocapture|byval|nest|readnone|readonly|inlinehint|noinline|alwaysinline|optsize|ssp|sspreq|noredzone|noimplicitfloat|naked|type|opaque|eq|ne|slt|sgt|sle|sge|ult|ugt|ule|uge|oeq|one|olt|ogt|ole|oge|ord|uno|ueq|une|x|add|fadd|sub|fsub|mul|fmul|udiv|sdiv|fdiv|urem|srem|frem|shl|lshr|ashr|and|or|xor|icmp|fcmp|phi|call|trunc|zext|sext|fptrunc|fpext|uitofp|sitofp|fptouifptosi|inttoptr|ptrtoint|bitcast|select|va_arg|ret|br|switch|invoke|unwind|unreachable|malloc|alloca|free|load|store|getelementptr|extractelement|insertelement|shufflevector|getresult|extractvalue|insertvalue)\b" is(keyword)
+    r"void|float|double|x86_fp80|fp128|ppc_fp128|label|metadata" is(keyword.type)
+    r"i[1-9]\d*" is(keyword)
 
 const-set(.Lexer, lexer)

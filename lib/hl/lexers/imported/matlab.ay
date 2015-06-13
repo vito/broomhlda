@@ -2,42 +2,42 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Matlab"
-aliases: ["matlab"]
-extensions: [".m"]
-mimetypes: ["text/matlab"]
-start: .root
-flags: 0
+  name: "Matlab"
+  aliases: ["matlab"]
+  extensions: [".m"]
+  mimetypes: ["text/matlab"]
+  start: .root
+  flags: 0
 
-lex(deffunc):
-  r"(\s*)(?:(.+)(\s*)(=)(\s*))?(.+)(\()(.*)(\))(\s*)" is(by-groups(text.whitespace, text, text.whitespace, punctuation, text.whitespace, name.function, punctuation, text, punctuation, text.whitespace)) -> pop
+  lex(deffunc):
+    r"(\s*)(?:(.+)(\s*)(=)(\s*))?(.+)(\()(.*)(\))(\s*)" is(by-groups(text.whitespace, text, text.whitespace, punctuation, text.whitespace, name.function, punctuation, text, punctuation, text.whitespace)) -> pop
 
-lex(blockcomment):
-  r"^\s*%\}" is(comment.multiline) -> pop
-  r"^.*\n" is(comment.multiline)
-  r"." is(comment.multiline)
+  lex(blockcomment):
+    r"^\s*%\}" is(comment.multiline) -> pop
+    r"^.*\n" is(comment.multiline)
+    r"." is(comment.multiline)
 
-lex(root):
-  r"^!.*" is(literal.string.other)
-  r"%\{\s*\n" is(comment.multiline) -> go-to(blockcomment)
-  r"%.*$" is(comment)
-  r"^\s*function" is(keyword) -> go-to(deffunc)
-  r"(break|case|catch|classdef|continue|else|elseif|end|enumerated|events|for|function|global|if|methods|otherwise|parfor|persistent|properties|return|spmd|switch|try|while)\b" is(keyword)
-  r"(sin|sind|sinh|asin|asind|asinh|cos|cosd|cosh|acos|acosd|acosh|tan|tand|tanh|atan|atand|atan2|atanh|sec|secd|sech|asec|asecd|asech|csc|cscd|csch|acsc|acscd|acsch|cot|cotd|coth|acot|acotd|acoth|hypot|exp|expm1|log|log1p|log10|log2|pow2|realpow|reallog|realsqrt|sqrt|nthroot|nextpow2|abs|angle|complex|conj|imag|real|unwrap|isreal|cplxpair|fix|floor|ceil|round|mod|rem|sign|airy|besselj|bessely|besselh|besseli|besselk|beta|betainc|betaln|ellipj|ellipke|erf|erfc|erfcx|erfinv|expint|gamma|gammainc|gammaln|psi|legendre|cross|dot|factor|isprime|primes|gcd|lcm|rat|rats|perms|nchoosek|factorial|cart2sph|cart2pol|pol2cart|sph2cart|hsv2rgb|rgb2hsv|zeros|ones|eye|repmat|rand|randn|linspace|logspace|freqspace|meshgrid|accumarray|size|length|ndims|numel|disp|isempty|isequal|isequalwithequalnans|cat|reshape|diag|blkdiag|tril|triu|fliplr|flipud|flipdim|rot90|find|end|sub2ind|ind2sub|bsxfun|ndgrid|permute|ipermute|shiftdim|circshift|squeeze|isscalar|isvector|ans|eps|realmax|realmin|pi|i|inf|nan|isnan|isinf|isfinite|j|why|compan|gallery|hadamard|hankel|hilb|invhilb|magic|pascal|rosser|toeplitz|vander|wilkinson)\b" is(name.builtin)
-  r"\.\.\..*$" is(comment)
-  r"-|==|\126=|<|>|<=|>=|&&|&|\126|\|\|?" is(operator)
-  r"\.\*|\*|\+|\.\^|\.\\|\.\/|\/|\\" is(operator)
-  r"\[|\]|\(|\)|\{|\}|:|@|\.|," is(punctuation)
-  r"=|:|;" is(punctuation)
-  r"(?<=[\w\)\]])\'" is(operator)
-  r"(\d+\.\d*|\d*\.\d+)([eEf][+-]?[0-9]+)?" is(literal.number.float)
-  r"\d+[eEf][+-]?[0-9]+" is(literal.number.float)
-  r"\d+" is(literal.number.integer)
-  r"(?<![\w\)\]])\'" is(literal.string) -> go-to(string)
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
-  r"." is(text)
+  lex(root):
+    r"^!.*" is(literal.string.other)
+    r"%\{\s*\n" is(comment.multiline) -> go-to(blockcomment)
+    r"%.*$" is(comment)
+    r"^\s*function" is(keyword) -> go-to(deffunc)
+    r"(break|case|catch|classdef|continue|else|elseif|end|enumerated|events|for|function|global|if|methods|otherwise|parfor|persistent|properties|return|spmd|switch|try|while)\b" is(keyword)
+    r"(sin|sind|sinh|asin|asind|asinh|cos|cosd|cosh|acos|acosd|acosh|tan|tand|tanh|atan|atand|atan2|atanh|sec|secd|sech|asec|asecd|asech|csc|cscd|csch|acsc|acscd|acsch|cot|cotd|coth|acot|acotd|acoth|hypot|exp|expm1|log|log1p|log10|log2|pow2|realpow|reallog|realsqrt|sqrt|nthroot|nextpow2|abs|angle|complex|conj|imag|real|unwrap|isreal|cplxpair|fix|floor|ceil|round|mod|rem|sign|airy|besselj|bessely|besselh|besseli|besselk|beta|betainc|betaln|ellipj|ellipke|erf|erfc|erfcx|erfinv|expint|gamma|gammainc|gammaln|psi|legendre|cross|dot|factor|isprime|primes|gcd|lcm|rat|rats|perms|nchoosek|factorial|cart2sph|cart2pol|pol2cart|sph2cart|hsv2rgb|rgb2hsv|zeros|ones|eye|repmat|rand|randn|linspace|logspace|freqspace|meshgrid|accumarray|size|length|ndims|numel|disp|isempty|isequal|isequalwithequalnans|cat|reshape|diag|blkdiag|tril|triu|fliplr|flipud|flipdim|rot90|find|end|sub2ind|ind2sub|bsxfun|ndgrid|permute|ipermute|shiftdim|circshift|squeeze|isscalar|isvector|ans|eps|realmax|realmin|pi|i|inf|nan|isnan|isinf|isfinite|j|why|compan|gallery|hadamard|hankel|hilb|invhilb|magic|pascal|rosser|toeplitz|vander|wilkinson)\b" is(name.builtin)
+    r"\.\.\..*$" is(comment)
+    r"-|==|\126=|<|>|<=|>=|&&|&|\126|\|\|?" is(operator)
+    r"\.\*|\*|\+|\.\^|\.\\|\.\/|\/|\\" is(operator)
+    r"\[|\]|\(|\)|\{|\}|:|@|\.|," is(punctuation)
+    r"=|:|;" is(punctuation)
+    r"(?<=[\w\)\]])\'" is(operator)
+    r"(\d+\.\d*|\d*\.\d+)([eEf][+-]?[0-9]+)?" is(literal.number.float)
+    r"\d+[eEf][+-]?[0-9]+" is(literal.number.float)
+    r"\d+" is(literal.number.integer)
+    r"(?<![\w\)\]])\'" is(literal.string) -> go-to(string)
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
+    r"." is(text)
 
-lex(string):
-  r"[^\']*\'" is(literal.string) -> pop
+  lex(string):
+    r"[^\']*\'" is(literal.string) -> pop
 
 const-set(.Lexer, lexer)

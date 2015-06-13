@@ -2,62 +2,62 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Bash"
-aliases: ["bash", "sh", "ksh"]
-extensions: [".sh", ".ksh", ".bash", ".ebuild", ".eclass", ".bashrc", "bashrc", ".bash_", "bash_"]
-mimetypes: ["application/x-sh", "application/x-shellscript"]
-start: .root
-flags: 0
+  name: "Bash"
+  aliases: ["bash", "sh", "ksh"]
+  extensions: [".sh", ".ksh", ".bash", ".ebuild", ".eclass", ".bashrc", "bashrc", ".bash_", "bash_"]
+  mimetypes: ["application/x-sh", "application/x-shellscript"]
+  start: .root
+  flags: 0
 
-lex(curly):
-  r"}" is(keyword) -> pop
-  r":-" is(keyword)
-  r"[a-zA-Z0-9_]+" is(name.variable)
-  r"[^}:\"\'`$]+" is(punctuation)
-  r":" is(punctuation)
-  any-of(root)
+  lex(curly):
+    r"}" is(keyword) -> pop
+    r":-" is(keyword)
+    r"[a-zA-Z0-9_]+" is(name.variable)
+    r"[^}:\"\'`$]+" is(punctuation)
+    r":" is(punctuation)
+    any-of(root)
 
-lex(backticks):
-  r"`" is(literal.string.backtick) -> pop
-  any-of(root)
+  lex(backticks):
+    r"`" is(literal.string.backtick) -> pop
+    any-of(root)
 
-lex(root):
-  any-of(basic)
-  r"\$\(\(" is(keyword) -> go-to(math)
-  r"\$\(" is(keyword) -> go-to(paren)
-  r"\${\#?" is(keyword) -> go-to(curly)
-  r"`" is(literal.string.backtick) -> go-to(backticks)
-  any-of(data)
+  lex(root):
+    any-of(basic)
+    r"\$\(\(" is(keyword) -> go-to(math)
+    r"\$\(" is(keyword) -> go-to(paren)
+    r"\${\#?" is(keyword) -> go-to(curly)
+    r"`" is(literal.string.backtick) -> go-to(backticks)
+    any-of(data)
 
-lex(basic):
-  r"\b(if|fi|else|while|do|done|for|then|return|function|case|select|continue|until|esac|elif)\s*\b" is(keyword)
-  r"\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|time|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)\s*\b(?!\.)" is(name.builtin)
-  r"\#.*\n" is(comment)
-  r"\\[\w\W]" is(literal.string.escape)
-  r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
-  r"[\[\]{}()=]" is(operator)
-  r"<<<" is(operator)
-  r"<<-?\s*(\'?)\\?(\w+)[\w\W]+?\2" is(literal.string)
-  r"&&|\|\|" is(operator)
+  lex(basic):
+    r"\b(if|fi|else|while|do|done|for|then|return|function|case|select|continue|until|esac|elif)\s*\b" is(keyword)
+    r"\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|time|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)\s*\b(?!\.)" is(name.builtin)
+    r"\#.*\n" is(comment)
+    r"\\[\w\W]" is(literal.string.escape)
+    r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
+    r"[\[\]{}()=]" is(operator)
+    r"<<<" is(operator)
+    r"<<-?\s*(\'?)\\?(\w+)[\w\W]+?\2" is(literal.string)
+    r"&&|\|\|" is(operator)
 
-lex(paren):
-  r"\)" is(keyword) -> pop
-  any-of(root)
+  lex(paren):
+    r"\)" is(keyword) -> pop
+    any-of(root)
 
-lex(data):
-  r"(?m)\$?\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
-  r"(?m)\$?'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
-  r";" is(text)
-  r"\s+" is(text)
-  r"[^=\s\[\]{}()$\"\'`\\<]+" is(text)
-  r"\d+(?= |\Z)" is(literal.number)
-  r"\$\#?(\w+|.)" is(name.variable)
-  r"<" is(text)
+  lex(data):
+    r"(?m)\$?\"(\\\\|\\[0-7]+|\\.|[^\"\\])*\"" is(literal.string.double)
+    r"(?m)\$?'(\\\\|\\[0-7]+|\\.|[^'\\])*'" is(literal.string.single)
+    r";" is(text)
+    r"\s+" is(text)
+    r"[^=\s\[\]{}()$\"\'`\\<]+" is(text)
+    r"\d+(?= |\Z)" is(literal.number)
+    r"\$\#?(\w+|.)" is(name.variable)
+    r"<" is(text)
 
-lex(math):
-  r"\)\)" is(keyword) -> pop
-  r"[-+*/%^|&]|\*\*|\|\|" is(operator)
-  r"\d+" is(literal.number)
-  any-of(root)
+  lex(math):
+    r"\)\)" is(keyword) -> pop
+    r"[-+*/%^|&]|\*\*|\|\|" is(operator)
+    r"\d+" is(literal.number)
+    any-of(root)
 
 const-set(.Lexer, lexer)

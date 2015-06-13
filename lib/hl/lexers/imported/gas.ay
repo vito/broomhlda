@@ -2,50 +2,50 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "GAS"
-aliases: ["gas"]
-extensions: [".s", ".S"]
-mimetypes: ["text/x-gas"]
-start: .root
-flags: 0
+  name: "GAS"
+  aliases: ["gas"]
+  extensions: [".s", ".S"]
+  mimetypes: ["text/x-gas"]
+  start: .root
+  flags: 0
 
-lex(directive-args):
-  r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.constant)
-  r"\"(\\\"|[^\"])*\"" is(literal.string)
-  r"@(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.attribute)
-  r"(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
-  r"[\r\n]+" is(text) -> pop
-  r"\#.*?$" is(comment) -> pop
-  any-of(punctuation)
-  any-of(whitespace)
+  lex(directive-args):
+    r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.constant)
+    r"\"(\\\"|[^\"])*\"" is(literal.string)
+    r"@(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.attribute)
+    r"(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
+    r"[\r\n]+" is(text) -> pop
+    r"\#.*?$" is(comment) -> pop
+    any-of(punctuation)
+    any-of(whitespace)
 
-lex(punctuation):
-  r"[-*,.():]+" is(punctuation)
+  lex(punctuation):
+    r"[-*,.():]+" is(punctuation)
 
-lex(root):
-  any-of(whitespace)
-  r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+):" is(name.label)
-  r"\.(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.attribute) -> go-to(directive-args)
-  r"lock|rep(n?z)?|data\d+" is(name.attribute)
-  r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.function) -> go-to(instruction-args)
-  r"[\r\n]+" is(text)
+  lex(root):
+    any-of(whitespace)
+    r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+):" is(name.label)
+    r"\.(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.attribute) -> go-to(directive-args)
+    r"lock|rep(n?z)?|data\d+" is(name.attribute)
+    r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.function) -> go-to(instruction-args)
+    r"[\r\n]+" is(text)
 
-lex(whitespace):
-  r"\n" is(text)
-  r"\s+" is(text)
-  r"\#.*?\n" is(comment)
+  lex(whitespace):
+    r"\n" is(text)
+    r"\s+" is(text)
+    r"\#.*?\n" is(comment)
 
-lex(instruction-args):
-  r"([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+))(>)" is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation))
-  r"([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+))([-+])((?:0[xX][a-zA-Z0-9]+|\d+))(>)" is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation, literal.number.integer, punctuation))
-  r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.constant)
-  r"(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
-  r"%(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.variable)
-  r"$(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
-  r"$'(.|\\')'" is(literal.string.char)
-  r"[\r\n]+" is(text) -> pop
-  r"\#.*?$" is(comment) -> pop
-  any-of(punctuation)
-  any-of(whitespace)
+  lex(instruction-args):
+    r"([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+))(>)" is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation))
+    r"([a-z0-9]+)( )(<)((?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+))([-+])((?:0[xX][a-zA-Z0-9]+|\d+))(>)" is(by-groups(literal.number.hex, text, punctuation, name.constant, punctuation, literal.number.integer, punctuation))
+    r"(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.constant)
+    r"(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
+    r"%(?:[a-zA-Z$_][a-zA-Z$._0-9@-]*|\.[a-zA-Z$._0-9@-]+)" is(name.variable)
+    r"$(?:0[xX][a-zA-Z0-9]+|\d+)" is(literal.number.integer)
+    r"$'(.|\\')'" is(literal.string.char)
+    r"[\r\n]+" is(text) -> pop
+    r"\#.*?$" is(comment) -> pop
+    any-of(punctuation)
+    any-of(whitespace)
 
 const-set(.Lexer, lexer)

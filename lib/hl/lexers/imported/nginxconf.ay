@@ -2,40 +2,40 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Nginx configuration file"
-aliases: ["nginx"]
-extensions: []
-mimetypes: ["text/x-nginx-conf"]
-start: .root
-flags: 0
+  name: "Nginx configuration file"
+  aliases: ["nginx"]
+  extensions: []
+  mimetypes: ["text/x-nginx-conf"]
+  start: .root
+  flags: 0
 
-lex(base):
-  r"\#.*\n" is(comment.single)
-  r"on|off" is(name.constant)
-  r"\$[^\s;\#()]+" is(name.variable)
-  r"([a-z0-9.-]+)(:)([0-9]+)" is(by-groups(name, punctuation, literal.number.integer))
-  r"[a-z-]+/[a-z-+]+" is(literal.string)
-  r"[0-9]+[km]?\b" is(literal.number.integer)
-  r"(\126)(\s*)([^\s{]+)" is(by-groups(punctuation, text, literal.string.regex))
-  r"[:=\126]" is(punctuation)
-  r"[^\s;\#{}$]+" is(literal.string)
-  r"/[^\s;\#]*" is(name)
-  r"\s+" is(text)
-  r"[$;]" is(text)
+  lex(base):
+    r"\#.*\n" is(comment.single)
+    r"on|off" is(name.constant)
+    r"\$[^\s;\#()]+" is(name.variable)
+    r"([a-z0-9.-]+)(:)([0-9]+)" is(by-groups(name, punctuation, literal.number.integer))
+    r"[a-z-]+/[a-z-+]+" is(literal.string)
+    r"[0-9]+[km]?\b" is(literal.number.integer)
+    r"(\126)(\s*)([^\s{]+)" is(by-groups(punctuation, text, literal.string.regex))
+    r"[:=\126]" is(punctuation)
+    r"[^\s;\#{}$]+" is(literal.string)
+    r"/[^\s;\#]*" is(name)
+    r"\s+" is(text)
+    r"[$;]" is(text)
 
-lex(root):
-  r"(include)(\s+)([^\s;]+)" is(by-groups(keyword, text, name))
-  r"[^\s;\#]+" is(keyword) -> go-to(stmt)
-  any-of(base)
+  lex(root):
+    r"(include)(\s+)([^\s;]+)" is(by-groups(keyword, text, name))
+    r"[^\s;\#]+" is(keyword) -> go-to(stmt)
+    any-of(base)
 
-lex(stmt):
-  r"{" is(punctuation) -> go-to(block)
-  r";" is(punctuation) -> pop
-  any-of(base)
+  lex(stmt):
+    r"{" is(punctuation) -> go-to(block)
+    r";" is(punctuation) -> pop
+    any-of(base)
 
-lex(block):
-  r"}" is(punctuation) -> pop(2)
-  r"[^\s;\#]+" is(keyword.namespace) -> go-to(stmt)
-  any-of(base)
+  lex(block):
+    r"}" is(punctuation) -> pop(2)
+    r"[^\s;\#]+" is(keyword.namespace) -> go-to(stmt)
+    any-of(base)
 
 const-set(.Lexer, lexer)

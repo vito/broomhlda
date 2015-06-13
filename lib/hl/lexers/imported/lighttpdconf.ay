@@ -2,23 +2,23 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Lighttpd configuration file"
-aliases: ["lighty", "lighttpd"]
-extensions: []
-mimetypes: ["text/x-lighttpd-conf"]
-start: .root
-flags: 0
+  name: "Lighttpd configuration file"
+  aliases: ["lighty", "lighttpd"]
+  extensions: []
+  mimetypes: ["text/x-lighttpd-conf"]
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\#.*\n" is(comment.single)
-  r"/\S*" is(name)
-  r"[a-zA-Z._-]+" is(keyword)
-  r"\d+\.\d+\.\d+\.\d+(?:/\d+)?" is(literal.number)
-  r"[0-9]+" is(literal.number)
-  r"=>|=\126|\+=|==|=|\+" is(operator)
-  r"\$[A-Z]+" is(name.builtin)
-  r"[(){}\[\],]" is(punctuation)
-  r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
-  r"\s+" is(text)
+  lex(root):
+    r"\#.*\n" is(comment.single)
+    r"/\S*" is(name)
+    r"[a-zA-Z._-]+" is(keyword)
+    r"\d+\.\d+\.\d+\.\d+(?:/\d+)?" is(literal.number)
+    r"[0-9]+" is(literal.number)
+    r"=>|=\126|\+=|==|=|\+" is(operator)
+    r"\$[A-Z]+" is(name.builtin)
+    r"[(){}\[\],]" is(punctuation)
+    r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
+    r"\s+" is(text)
 
 const-set(.Lexer, lexer)

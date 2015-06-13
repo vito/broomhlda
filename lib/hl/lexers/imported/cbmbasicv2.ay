@@ -2,24 +2,24 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "CBM BASIC V2"
-aliases: ["cbmbas"]
-extensions: [".bas"]
-mimetypes: []
-start: .root
-flags: Regexp IGNORECASE
+  name: "CBM BASIC V2"
+  aliases: ["cbmbas"]
+  extensions: [".bas"]
+  mimetypes: []
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"rem.*\n" is(comment.single)
-  r"\s+" is(text)
-  r"new|run|end|for|to|next|step|go(to|sub)?|on|return|stop|cont|if|then|input\#?|read|wait|load|save|verify|poke|sys|print\#?|list|clr|cmd|open|close|get\#?" is(keyword.reserved)
-  r"data|restore|dim|let|def|fn" is(keyword.declaration)
-  r"tab|spc|sgn|int|abs|usr|fre|pos|sqr|rnd|log|exp|cos|sin|tan|atn|peek|len|val|asc|(str|chr|left|right|mid)\$" is(name.builtin)
-  r"[-+*/^<>=]" is(operator)
-  r"not|and|or" is(operator.word)
-  r"\"[^\"\n]*." is(literal.string)
-  r"\d+|[-+]?\d*\.\d*(e[-+]?\d+)?" is(literal.number.float)
-  r"[\(\),:;]" is(punctuation)
-  r"\w+[$%]?" is(name)
+  lex(root):
+    r"rem.*\n" is(comment.single)
+    r"\s+" is(text)
+    r"new|run|end|for|to|next|step|go(to|sub)?|on|return|stop|cont|if|then|input\#?|read|wait|load|save|verify|poke|sys|print\#?|list|clr|cmd|open|close|get\#?" is(keyword.reserved)
+    r"data|restore|dim|let|def|fn" is(keyword.declaration)
+    r"tab|spc|sgn|int|abs|usr|fre|pos|sqr|rnd|log|exp|cos|sin|tan|atn|peek|len|val|asc|(str|chr|left|right|mid)\$" is(name.builtin)
+    r"[-+*/^<>=]" is(operator)
+    r"not|and|or" is(operator.word)
+    r"\"[^\"\n]*." is(literal.string)
+    r"\d+|[-+]?\d*\.\d*(e[-+]?\d+)?" is(literal.number.float)
+    r"[\(\),:;]" is(punctuation)
+    r"\w+[$%]?" is(name)
 
 const-set(.Lexer, lexer)

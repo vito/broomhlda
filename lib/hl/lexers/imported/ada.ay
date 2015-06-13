@@ -2,106 +2,106 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Ada"
-aliases: ["ada", "ada95ada2005"]
-extensions: [".adb", ".ads", ".ada"]
-mimetypes: ["text/x-ada"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "Ada"
+  aliases: ["ada", "ada95ada2005"]
+  extensions: [".adb", ".ads", ".ada"]
+  mimetypes: ["text/x-ada"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(package-instantiation):
-  r"(\"[^\"]+\"|[a-z0-9_]+)(\s+)(=>)" is(by-groups(name.variable, text, punctuation))
-  r"[a-z0-9._\'\"]" is(text)
-  r"\)" is(punctuation) -> pop
-  any-of(root)
+  lex(package-instantiation):
+    r"(\"[^\"]+\"|[a-z0-9_]+)(\s+)(=>)" is(by-groups(name.variable, text, punctuation))
+    r"[a-z0-9._\'\"]" is(text)
+    r"\)" is(punctuation) -> pop
+    any-of(root)
 
-lex(formal-part):
-  r"\)" is(punctuation) -> pop
-  r"[a-z0-9_]+" is(name.variable)
-  r",|:[^=]" is(punctuation)
-  r"(in|not|null|out|access)\b" is(keyword.reserved)
-  any-of(root)
+  lex(formal-part):
+    r"\)" is(punctuation) -> pop
+    r"[a-z0-9_]+" is(name.variable)
+    r",|:[^=]" is(punctuation)
+    r"(in|not|null|out|access)\b" is(keyword.reserved)
+    any-of(root)
 
-lex(attribute):
-  r"(')([a-zA-Z0-9_]+)" is(by-groups(punctuation, name.attribute))
+  lex(attribute):
+    r"(')([a-zA-Z0-9_]+)" is(by-groups(punctuation, name.attribute))
 
-lex(subprogram):
-  r"\(" is(punctuation) -> do-all(pop, go-to(formal-part))
-  r";" is(punctuation) -> pop
-  r"is\b" is(keyword.reserved) -> pop
-  r"\"[^\"]+\"|[a-z0-9_]+" is(name.function)
-  any-of(root)
+  lex(subprogram):
+    r"\(" is(punctuation) -> do-all(pop, go-to(formal-part))
+    r";" is(punctuation) -> pop
+    r"is\b" is(keyword.reserved) -> pop
+    r"\"[^\"]+\"|[a-z0-9_]+" is(name.function)
+    any-of(root)
 
-lex(numbers):
-  r"[0-9_]+\#[0-9a-f]+\#" is(literal.number.hex)
-  r"[0-9_]+\.[0-9_]*" is(literal.number.float)
-  r"[0-9_]+" is(literal.number.integer)
+  lex(numbers):
+    r"[0-9_]+\#[0-9a-f]+\#" is(literal.number.hex)
+    r"[0-9_]+\.[0-9_]*" is(literal.number.float)
+    r"[0-9_]+" is(literal.number.integer)
 
-lex(type-def):
-  r";" is(punctuation) -> pop
-  r"\(" is(punctuation) -> go-to(formal-part)
-  r"with|and|use" is(keyword.reserved)
-  r"array\b" is(keyword.reserved) -> do-all(pop, go-to(array-def))
-  r"record\b" is(keyword.reserved) -> go-to(record-def)
-  r"(null record)(;)" is(by-groups(keyword.reserved, punctuation)) -> pop
-  any-of(root)
+  lex(type-def):
+    r";" is(punctuation) -> pop
+    r"\(" is(punctuation) -> go-to(formal-part)
+    r"with|and|use" is(keyword.reserved)
+    r"array\b" is(keyword.reserved) -> do-all(pop, go-to(array-def))
+    r"record\b" is(keyword.reserved) -> go-to(record-def)
+    r"(null record)(;)" is(by-groups(keyword.reserved, punctuation)) -> pop
+    any-of(root)
 
-lex(record-def):
-  r"end record" is(keyword.reserved) -> pop
-  any-of(root)
+  lex(record-def):
+    r"end record" is(keyword.reserved) -> pop
+    any-of(root)
 
-lex(end):
-  r"(if|case|record|loop|select)" is(keyword.reserved)
-  r"\"[^\"]+\"|[a-zA-Z0-9_.]+" is(name.function)
-  r"\s+" is(text)
-  r";" is(punctuation) -> pop
+  lex(end):
+    r"(if|case|record|loop|select)" is(keyword.reserved)
+    r"\"[^\"]+\"|[a-zA-Z0-9_.]+" is(name.function)
+    r"\s+" is(text)
+    r";" is(punctuation) -> pop
 
-lex(array-def):
-  r";" is(punctuation) -> pop
-  r"([a-z0-9_]+)(\s+)(range)" is(by-groups(keyword.type, text, keyword.reserved))
-  any-of(root)
+  lex(array-def):
+    r";" is(punctuation) -> pop
+    r"([a-z0-9_]+)(\s+)(range)" is(by-groups(keyword.type, text, keyword.reserved))
+    any-of(root)
 
-lex(package):
-  r"body" is(keyword.declaration)
-  r"is\s+new|renames" is(keyword.reserved)
-  r"is" is(keyword.reserved) -> pop
-  r";" is(punctuation) -> pop
-  r"\(" is(punctuation) -> go-to(package-instantiation)
-  r"([a-zA-Z0-9_.]+)" is(name.class)
-  any-of(root)
+  lex(package):
+    r"body" is(keyword.declaration)
+    r"is\s+new|renames" is(keyword.reserved)
+    r"is" is(keyword.reserved) -> pop
+    r";" is(punctuation) -> pop
+    r"\(" is(punctuation) -> go-to(package-instantiation)
+    r"([a-zA-Z0-9_.]+)" is(name.class)
+    any-of(root)
 
-lex(import):
-  r"[a-z0-9_.]+" is(name.namespace) -> pop
-  r"" is(text) -> pop
+  lex(import):
+    r"[a-z0-9_.]+" is(name.namespace) -> pop
+    r"" is(text) -> pop
 
-lex(root):
-  r"[^\S\n]+" is(text)
-  r"--.*?\n" is(comment.single)
-  r"[^\S\n]+" is(text)
-  r"function|procedure|entry" is(keyword.declaration) -> go-to(subprogram)
-  r"(subtype|type)(\s+)([a-z0-9_]+)" is(by-groups(keyword.declaration, text, keyword.type)) -> go-to(type-def)
-  r"task|protected" is(keyword.declaration)
-  r"(subtype)(\s+)" is(by-groups(keyword.declaration, text))
-  r"(end)(\s+)" is(by-groups(keyword.reserved, text)) -> go-to(end)
-  r"(pragma)(\s+)([a-zA-Z0-9_]+)" is(by-groups(keyword.reserved, text, comment.preproc))
-  r"(true|false|null)\b" is(keyword.constant)
-  r"(Address|Byte|Boolean|Character|Controlled|Count|Cursor|Duration|File_Mode|File_Type|Float|Generator|Integer|Long_Float|Long_Integer|Long_Long_Float|Long_Long_Integer|Natural|Positive|Reference_Type|Short_Float|Short_Integer|Short_Short_Float|Short_Short_Integer|String|Wide_Character|Wide_String)\b" is(keyword.type)
-  r"(and(\s+then)?|in|mod|not|or(\s+else)|rem)\b" is(operator.word)
-  r"generic|private" is(keyword.declaration)
-  r"package" is(keyword.declaration) -> go-to(package)
-  r"array\b" is(keyword.reserved) -> go-to(array-def)
-  r"(with|use)(\s+)" is(by-groups(keyword.namespace, text)) -> go-to(import)
-  r"([a-z0-9_]+)(\s*)(:)(\s*)(constant)" is(by-groups(name.constant, text, punctuation, text, keyword.reserved))
-  r"<<[a-z0-9_]+>>" is(name.label)
-  r"([a-z0-9_]+)(\s*)(:)(\s*)(declare|begin|loop|for|while)" is(by-groups(name.label, text, punctuation, text, keyword.reserved))
-  r"\b(abort|abs|abstract|accept|access|aliased|all|array|at|begin|body|case|constant|declare|delay|delta|digits|do|else|elsif|end|entry|exception|exit|interface|for|goto|if|is|limited|loop|new|null|of|or|others|out|overriding|pragma|protected|raise|range|record|renames|requeue|return|reverse|select|separate|subtype|synchronized|task|tagged|terminate|then|type|until|when|while|xor)\b" is(keyword.reserved)
-  r"\"[^\"]*\"" is(literal.string)
-  any-of(attribute)
-  any-of(numbers)
-  r"'[^']'" is(literal.string.character)
-  r"([a-z0-9_]+)(\s*|[(,])" is(by-groups(name, using(self class)))
-  r"(<>|=>|:=|[()|:;,.'])" is(punctuation)
-  r"[*<>+=/&-]" is(operator)
-  r"\n+" is(text)
+  lex(root):
+    r"[^\S\n]+" is(text)
+    r"--.*?\n" is(comment.single)
+    r"[^\S\n]+" is(text)
+    r"function|procedure|entry" is(keyword.declaration) -> go-to(subprogram)
+    r"(subtype|type)(\s+)([a-z0-9_]+)" is(by-groups(keyword.declaration, text, keyword.type)) -> go-to(type-def)
+    r"task|protected" is(keyword.declaration)
+    r"(subtype)(\s+)" is(by-groups(keyword.declaration, text))
+    r"(end)(\s+)" is(by-groups(keyword.reserved, text)) -> go-to(end)
+    r"(pragma)(\s+)([a-zA-Z0-9_]+)" is(by-groups(keyword.reserved, text, comment.preproc))
+    r"(true|false|null)\b" is(keyword.constant)
+    r"(Address|Byte|Boolean|Character|Controlled|Count|Cursor|Duration|File_Mode|File_Type|Float|Generator|Integer|Long_Float|Long_Integer|Long_Long_Float|Long_Long_Integer|Natural|Positive|Reference_Type|Short_Float|Short_Integer|Short_Short_Float|Short_Short_Integer|String|Wide_Character|Wide_String)\b" is(keyword.type)
+    r"(and(\s+then)?|in|mod|not|or(\s+else)|rem)\b" is(operator.word)
+    r"generic|private" is(keyword.declaration)
+    r"package" is(keyword.declaration) -> go-to(package)
+    r"array\b" is(keyword.reserved) -> go-to(array-def)
+    r"(with|use)(\s+)" is(by-groups(keyword.namespace, text)) -> go-to(import)
+    r"([a-z0-9_]+)(\s*)(:)(\s*)(constant)" is(by-groups(name.constant, text, punctuation, text, keyword.reserved))
+    r"<<[a-z0-9_]+>>" is(name.label)
+    r"([a-z0-9_]+)(\s*)(:)(\s*)(declare|begin|loop|for|while)" is(by-groups(name.label, text, punctuation, text, keyword.reserved))
+    r"\b(abort|abs|abstract|accept|access|aliased|all|array|at|begin|body|case|constant|declare|delay|delta|digits|do|else|elsif|end|entry|exception|exit|interface|for|goto|if|is|limited|loop|new|null|of|or|others|out|overriding|pragma|protected|raise|range|record|renames|requeue|return|reverse|select|separate|subtype|synchronized|task|tagged|terminate|then|type|until|when|while|xor)\b" is(keyword.reserved)
+    r"\"[^\"]*\"" is(literal.string)
+    any-of(attribute)
+    any-of(numbers)
+    r"'[^']'" is(literal.string.character)
+    r"([a-z0-9_]+)(\s*|[(,])" is(by-groups(name, using(self class)))
+    r"(<>|=>|:=|[()|:;,.'])" is(punctuation)
+    r"[*<>+=/&-]" is(operator)
+    r"\n+" is(text)
 
 const-set(.Lexer, lexer)

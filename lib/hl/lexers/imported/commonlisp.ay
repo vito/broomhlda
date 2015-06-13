@@ -2,64 +2,64 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Common Lisp"
-aliases: ["common-lisp", "cl"]
-extensions: [".cl", ".lisp", ".el"]
-mimetypes: ["text/x-common-lisp"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "Common Lisp"
+  aliases: ["common-lisp", "cl"]
+  extensions: [".cl", ".lisp", ".el"]
+  mimetypes: ["text/x-common-lisp"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(multiline-comment):
-  r"\#\|" is(comment.multiline) -> push
-  r"\|\#" is(comment.multiline) -> pop
-  r"[^|\#]+" is(comment.multiline)
-  r"[|\#]" is(comment.multiline)
+  lex(multiline-comment):
+    r"\#\|" is(comment.multiline) -> push
+    r"\|\#" is(comment.multiline) -> pop
+    r"[^|\#]+" is(comment.multiline)
+    r"[|\#]" is(comment.multiline)
 
-lex(body):
-  r"\s+" is(text)
-  r";.*$" is(comment.single)
-  r"\#\|" is(comment.multiline) -> go-to(multiline-comment)
-  r"\#\d*Y.*$" is(comment.special)
-  r"\"(\\.|\\\n|[^\"\\])*\"" is(literal.string)
-  r":(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
-  r"'(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
-  r"'" is(operator)
-  r"`" is(operator)
-  r"[-+]?\d+\.?(?=[ \"()\'\n,;`])" is(literal.number.integer)
-  r"[-+]?\d+/\d+(?=[ \"()\'\n,;`])" is(literal.number)
-  r"[-+]?(\d*\.\d+([defls][-+]?\d+)?|\d+(\.\d*)?[defls][-+]?\d+)(?=[ \"()\'\n,;`])" is(literal.number.float)
-  r"\#\\.(?=[ \"()\'\n,;`])" is(literal.string.char)
-  r"\#\\(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.char)
-  r"\#\(" is(operator) -> go-to(body)
-  r"\#\d*\*[01]*" is(literal.other)
-  r"\#:(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
-  r"\#[.,]" is(operator)
-  r"\#\'" is(name.function)
-  r"\#[bB][+-]?[01]+(/[01]+)?" is(literal.number)
-  r"\#[oO][+-]?[0-7]+(/[0-7]+)?" is(literal.number.oct)
-  r"\#[xX][+-]?[0-9a-fA-F]+(/[0-9a-fA-F]+)?" is(literal.number.hex)
-  r"\#\d+[rR][+-]?[0-9a-zA-Z]+(/[0-9a-zA-Z]+)?" is(literal.number)
-  r"(\#[cC])(\()" is(by-groups(literal.number, punctuation)) -> go-to(body)
-  r"(\#\d+[aA])(\()" is(by-groups(literal.other, punctuation)) -> go-to(body)
-  r"(\#[sS])(\()" is(by-groups(literal.other, punctuation)) -> go-to(body)
-  r"\#[pP]?\"(\\.|[^\"])*\"" is(literal.other)
-  r"\#\d+=" is(operator)
-  r"\#\d+\#" is(operator)
-  r"\#+nil(?=[ \"()\'\n,;`])\s*\(" is(comment.preproc) -> go-to(commented-form)
-  r"\#[+-]" is(operator)
-  r"(,@|,|\.)" is(operator)
-  r"(t|nil)(?=[ \"()\'\n,;`])" is(name.constant)
-  r"\*(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)\*" is(name.variable.global)
-  r"(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(name.variable)
-  r"\(" is(punctuation) -> go-to(body)
-  r"\)" is(punctuation) -> pop
+  lex(body):
+    r"\s+" is(text)
+    r";.*$" is(comment.single)
+    r"\#\|" is(comment.multiline) -> go-to(multiline-comment)
+    r"\#\d*Y.*$" is(comment.special)
+    r"\"(\\.|\\\n|[^\"\\])*\"" is(literal.string)
+    r":(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
+    r"'(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
+    r"'" is(operator)
+    r"`" is(operator)
+    r"[-+]?\d+\.?(?=[ \"()\'\n,;`])" is(literal.number.integer)
+    r"[-+]?\d+/\d+(?=[ \"()\'\n,;`])" is(literal.number)
+    r"[-+]?(\d*\.\d+([defls][-+]?\d+)?|\d+(\.\d*)?[defls][-+]?\d+)(?=[ \"()\'\n,;`])" is(literal.number.float)
+    r"\#\\.(?=[ \"()\'\n,;`])" is(literal.string.char)
+    r"\#\\(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.char)
+    r"\#\(" is(operator) -> go-to(body)
+    r"\#\d*\*[01]*" is(literal.other)
+    r"\#:(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(literal.string.symbol)
+    r"\#[.,]" is(operator)
+    r"\#\'" is(name.function)
+    r"\#[bB][+-]?[01]+(/[01]+)?" is(literal.number)
+    r"\#[oO][+-]?[0-7]+(/[0-7]+)?" is(literal.number.oct)
+    r"\#[xX][+-]?[0-9a-fA-F]+(/[0-9a-fA-F]+)?" is(literal.number.hex)
+    r"\#\d+[rR][+-]?[0-9a-zA-Z]+(/[0-9a-zA-Z]+)?" is(literal.number)
+    r"(\#[cC])(\()" is(by-groups(literal.number, punctuation)) -> go-to(body)
+    r"(\#\d+[aA])(\()" is(by-groups(literal.other, punctuation)) -> go-to(body)
+    r"(\#[sS])(\()" is(by-groups(literal.other, punctuation)) -> go-to(body)
+    r"\#[pP]?\"(\\.|[^\"])*\"" is(literal.other)
+    r"\#\d+=" is(operator)
+    r"\#\d+\#" is(operator)
+    r"\#+nil(?=[ \"()\'\n,;`])\s*\(" is(comment.preproc) -> go-to(commented-form)
+    r"\#[+-]" is(operator)
+    r"(,@|,|\.)" is(operator)
+    r"(t|nil)(?=[ \"()\'\n,;`])" is(name.constant)
+    r"\*(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)\*" is(name.variable.global)
+    r"(\|[^|]+\||(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126])(?:\\.|[a-zA-Z0-9!$%&*+-/<=>?@\[\]^_{}\126]|[\#.:])*)" is(name.variable)
+    r"\(" is(punctuation) -> go-to(body)
+    r"\)" is(punctuation) -> pop
 
-lex(root):
-  r"" is(text) -> go-to(body)
+  lex(root):
+    r"" is(text) -> go-to(body)
 
-lex(commented-form):
-  r"\(" is(comment.preproc) -> push
-  r"\)" is(comment.preproc) -> pop
-  r"[^()]+" is(comment.preproc)
+  lex(commented-form):
+    r"\(" is(comment.preproc) -> push
+    r"\)" is(comment.preproc) -> pop
+    r"[^()]+" is(comment.preproc)
 
 const-set(.Lexer, lexer)

@@ -2,60 +2,60 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "dg"
-aliases: ["dg"]
-extensions: [".dg"]
-mimetypes: ["text/x-dg"]
-start: .root
-flags: 0
+  name: "dg"
+  aliases: ["dg"]
+  extensions: [".dg"]
+  mimetypes: ["text/x-dg"]
+  start: .root
+  flags: 0
 
-lex(tsqs):
-  r"'''" is(literal.string) -> pop
+  lex(tsqs):
+    r"'''" is(literal.string) -> pop
 
-lex(string):
-  r"%(\([a-zA-Z0-9_]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
-  r"[^\\\'\"%\n]+" is(literal.string)
-  r"[\'\"\\]" is(literal.string)
-  r"%" is(literal.string)
-  r"\n" is(literal.string)
+  lex(string):
+    r"%(\([a-zA-Z0-9_]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
+    r"[^\\\'\"%\n]+" is(literal.string)
+    r"[\'\"\\]" is(literal.string)
+    r"%" is(literal.string)
+    r"\n" is(literal.string)
 
-lex(dqs):
-  r"\"" is(literal.string) -> pop
+  lex(dqs):
+    r"\"" is(literal.string) -> pop
 
-lex(sqs):
-  r"'" is(literal.string) -> pop
+  lex(sqs):
+    r"'" is(literal.string) -> pop
 
-lex(root):
-  r"\s+" is(text)
-  r"\#.*?$" is(comment.single)
-  r"0[bB][01]+" is(literal.number.bin)
-  r"0[oO][0-7]+" is(literal.number.oct)
-  r"0[xX][\da-fA-F]+" is(literal.number.hex)
-  r"[+-]?\d+\.\d+([eE][+-]?\d+)?[jJ]?" is(literal.number.float)
-  r"[+-]?\d+[eE][+-]?\d+[jJ]?" is(literal.number.float)
-  r"[+-]?\d+[jJ]?" is(literal.number.integer)
-  r"[br]*'''" is(literal.string) -> combined(stringescape, tsqs, string)
-  r"[br]*\"\"\"" is(literal.string) -> combined(stringescape, tdqs, string)
-  r"[br]*'" is(literal.string) -> combined(stringescape, sqs, string)
-  r"[br]*\"" is(literal.string) -> combined(stringescape, dqs, string)
-  r"`\w+'*`" is(operator)
-  r"\b(or|and|if|else|where|is|in)\b" is(operator.word)
-  r"[!$%&*+\-./:<-@\\^|\126;,]+" is(operator)
-  r"(?<!\.)(bool|bytearray|bytes|classmethod|complex|dict'?|float|frozenset|int|list'?|memoryview|object|property|range|set'?|slice|staticmethod|str|super|tuple'?|type)(?!['\w])" is(name.builtin)
-  r"(?<!\.)(__import__|abs|all|any|bin|bind|chr|cmp|compile|complex|delattr|dir|divmod|drop|dropwhile|enumerate|eval|filter|flip|foldl1?|format|fst|getattr|globals|hasattr|hash|head|hex|id|init|input|isinstance|issubclass|iter|iterate|last|len|locals|map|max|min|next|oct|open|ord|pow|print|repr|reversed|round|setattr|scanl1?|snd|sorted|sum|tail|take|takewhile|vars|zip)(?!['\w])" is(name.builtin)
-  r"(?<!\.)(self|Ellipsis|NotImplemented|None|True|False)(?!['\w])" is(name.builtin.pseudo)
-  r"(?<!\.)[A-Z]\w*(Error|Exception|Warning)'*(?!['\w])" is(name.exception)
-  r"(?<!\.)(KeyboardInterrupt|SystemExit|StopIteration|GeneratorExit)(?!['\w])" is(name.exception)
-  r"(?<![\.\w])(import|inherit|for|while|switch|not|raise|unsafe|yield|with)(?!['\w])" is(keyword.reserved)
-  r"[A-Z_']+\b" is(name)
-  r"[A-Z][\w']*\b" is(keyword.type)
-  r"\w+'*" is(name)
-  r"[()]" is(punctuation)
+  lex(root):
+    r"\s+" is(text)
+    r"\#.*?$" is(comment.single)
+    r"0[bB][01]+" is(literal.number.bin)
+    r"0[oO][0-7]+" is(literal.number.oct)
+    r"0[xX][\da-fA-F]+" is(literal.number.hex)
+    r"[+-]?\d+\.\d+([eE][+-]?\d+)?[jJ]?" is(literal.number.float)
+    r"[+-]?\d+[eE][+-]?\d+[jJ]?" is(literal.number.float)
+    r"[+-]?\d+[jJ]?" is(literal.number.integer)
+    r"[br]*'''" is(literal.string) -> combined(stringescape, tsqs, string)
+    r"[br]*\"\"\"" is(literal.string) -> combined(stringescape, tdqs, string)
+    r"[br]*'" is(literal.string) -> combined(stringescape, sqs, string)
+    r"[br]*\"" is(literal.string) -> combined(stringescape, dqs, string)
+    r"`\w+'*`" is(operator)
+    r"\b(or|and|if|else|where|is|in)\b" is(operator.word)
+    r"[!$%&*+\-./:<-@\\^|\126;,]+" is(operator)
+    r"(?<!\.)(bool|bytearray|bytes|classmethod|complex|dict'?|float|frozenset|int|list'?|memoryview|object|property|range|set'?|slice|staticmethod|str|super|tuple'?|type)(?!['\w])" is(name.builtin)
+    r"(?<!\.)(__import__|abs|all|any|bin|bind|chr|cmp|compile|complex|delattr|dir|divmod|drop|dropwhile|enumerate|eval|filter|flip|foldl1?|format|fst|getattr|globals|hasattr|hash|head|hex|id|init|input|isinstance|issubclass|iter|iterate|last|len|locals|map|max|min|next|oct|open|ord|pow|print|repr|reversed|round|setattr|scanl1?|snd|sorted|sum|tail|take|takewhile|vars|zip)(?!['\w])" is(name.builtin)
+    r"(?<!\.)(self|Ellipsis|NotImplemented|None|True|False)(?!['\w])" is(name.builtin.pseudo)
+    r"(?<!\.)[A-Z]\w*(Error|Exception|Warning)'*(?!['\w])" is(name.exception)
+    r"(?<!\.)(KeyboardInterrupt|SystemExit|StopIteration|GeneratorExit)(?!['\w])" is(name.exception)
+    r"(?<![\.\w])(import|inherit|for|while|switch|not|raise|unsafe|yield|with)(?!['\w])" is(keyword.reserved)
+    r"[A-Z_']+\b" is(name)
+    r"[A-Z][\w']*\b" is(keyword.type)
+    r"\w+'*" is(name)
+    r"[()]" is(punctuation)
 
-lex(stringescape):
-  r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
+  lex(stringescape):
+    r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
 
-lex(tdqs):
-  r"\"\"\"" is(literal.string) -> pop
+  lex(tdqs):
+    r"\"\"\"" is(literal.string) -> pop
 
 const-set(.Lexer, lexer)

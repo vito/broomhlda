@@ -2,22 +2,22 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Redcode"
-aliases: ["redcode"]
-extensions: [".cw"]
-mimetypes: []
-start: .root
-flags: 0
+  name: "Redcode"
+  aliases: ["redcode"]
+  extensions: [".cw"]
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(root):
-  r"\s+" is(text)
-  r";.*$" is(comment.single)
-  r"\b(DAT|MOV|ADD|SUB|MUL|DIV|MOD|JMP|JMZ|JMN|DJN|CMP|SLT|SPL|ORG|EQU|END)\b" is(name.function)
-  r"\b(A|B|AB|BA|F|X|I)\b" is(name.decorator)
-  r"[A-Za-z_][A-Za-z_0-9]+" is(name)
-  r"[-+*/%]" is(operator)
-  r"[\#$@<>]" is(operator)
-  r"[.,]" is(punctuation)
-  r"[-+]?\d+" is(literal.number.integer)
+  lex(root):
+    r"\s+" is(text)
+    r";.*$" is(comment.single)
+    r"\b(DAT|MOV|ADD|SUB|MUL|DIV|MOD|JMP|JMZ|JMN|DJN|CMP|SLT|SPL|ORG|EQU|END)\b" is(name.function)
+    r"\b(A|B|AB|BA|F|X|I)\b" is(name.decorator)
+    r"[A-Za-z_][A-Za-z_0-9]+" is(name)
+    r"[-+*/%]" is(operator)
+    r"[\#$@<>]" is(operator)
+    r"[.,]" is(punctuation)
+    r"[-+]?\d+" is(literal.number.integer)
 
 const-set(.Lexer, lexer)

@@ -2,83 +2,83 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Dart"
-aliases: ["dart"]
-extensions: [".dart"]
-mimetypes: ["text/x-dart"]
-start: .root
-flags: Regexp MULTILINE
+  name: "Dart"
+  aliases: ["dart"]
+  extensions: [".dart"]
+  mimetypes: ["text/x-dart"]
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(string-single-multiline):
-  r"'''" is(literal.string.single) -> pop
-  r"[^\'$\\]+" is(literal.string.single)
-  any-of(string-common)
-  r"(\$|\')+" is(literal.string.single)
+  lex(string-single-multiline):
+    r"'''" is(literal.string.single) -> pop
+    r"[^\'$\\]+" is(literal.string.single)
+    any-of(string-common)
+    r"(\$|\')+" is(literal.string.single)
 
-lex(string-single):
-  r"'" is(literal.string.single) -> pop
-  r"[^\'$\\\n]+" is(literal.string.single)
-  any-of(string-common)
-  r"\$+" is(literal.string.single)
+  lex(string-single):
+    r"'" is(literal.string.single) -> pop
+    r"[^\'$\\\n]+" is(literal.string.single)
+    any-of(string-common)
+    r"\$+" is(literal.string.single)
 
-lex(string-common):
-  r"\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\{[0-9A-Fa-f]*\}|[a-z\'\\"$\\])" is(literal.string.escape)
-  r"(\$)([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(literal.string.interpol, name))
-  r"(\$\{)(.*?)(\})" is(by-groups(literal.string.interpol, using(self class), literal.string.interpol))
+  lex(string-common):
+    r"\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\{[0-9A-Fa-f]*\}|[a-z\'\\"$\\])" is(literal.string.escape)
+    r"(\$)([a-zA-Z_][a-zA-Z0-9_]*)" is(by-groups(literal.string.interpol, name))
+    r"(\$\{)(.*?)(\})" is(by-groups(literal.string.interpol, using(self class), literal.string.interpol))
 
-lex(string-literal):
-  r"r\"\"\"([\s|\S]*?)\"\"\"" is(literal.string.double)
-  r"r'''([\s|\S]*?)'''" is(literal.string.single)
-  r"r\"(.*?)\"" is(literal.string.double)
-  r"r'(.*?)'" is(literal.string.single)
-  r"\"\"\"" is(literal.string.double) -> go-to(string-double-multiline)
-  r"'''" is(literal.string.single) -> go-to(string-single-multiline)
-  r"\"" is(literal.string.double) -> go-to(string-double)
-  r"'" is(literal.string.single) -> go-to(string-single)
+  lex(string-literal):
+    r"r\"\"\"([\s|\S]*?)\"\"\"" is(literal.string.double)
+    r"r'''([\s|\S]*?)'''" is(literal.string.single)
+    r"r\"(.*?)\"" is(literal.string.double)
+    r"r'(.*?)'" is(literal.string.single)
+    r"\"\"\"" is(literal.string.double) -> go-to(string-double-multiline)
+    r"'''" is(literal.string.single) -> go-to(string-single-multiline)
+    r"\"" is(literal.string.double) -> go-to(string-double)
+    r"'" is(literal.string.single) -> go-to(string-single)
 
-lex(string-double):
-  r"\"" is(literal.string.double) -> pop
-  r"[^\\"$\\\n]+" is(literal.string.double)
-  any-of(string-common)
-  r"\$+" is(literal.string.double)
+  lex(string-double):
+    r"\"" is(literal.string.double) -> pop
+    r"[^\\"$\\\n]+" is(literal.string.double)
+    any-of(string-common)
+    r"\$+" is(literal.string.double)
 
-lex(import-decl):
-  any-of(string-literal)
-  r"\s+" is(text)
-  r"\b(as|show|hide)\b" is(keyword)
-  r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name)
-  r"\," is(punctuation)
-  r"\;" is(punctuation) -> pop
+  lex(import-decl):
+    any-of(string-literal)
+    r"\s+" is(text)
+    r"\b(as|show|hide)\b" is(keyword)
+    r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name)
+    r"\," is(punctuation)
+    r"\;" is(punctuation) -> pop
 
-lex(string-double-multiline):
-  r"\"\"\"" is(literal.string.double) -> pop
-  r"[^\\"$\\]+" is(literal.string.double)
-  any-of(string-common)
-  r"(\$|\\")+" is(literal.string.double)
+  lex(string-double-multiline):
+    r"\"\"\"" is(literal.string.double) -> pop
+    r"[^\\"$\\]+" is(literal.string.double)
+    any-of(string-common)
+    r"(\$|\\")+" is(literal.string.double)
 
-lex(root):
-  any-of(string-literal)
-  r"\#!(.*?)$" is(comment.preproc)
-  r"\b(import|export)\b" is(keyword) -> go-to(import-decl)
-  r"\b(library|source|part of|part)\b" is(keyword)
-  r"[^\S\n]+" is(text)
-  r"//.*?\n" is(comment.single)
-  r"/\*.*?\*/" is(comment.multiline)
-  r"\b(class)\b(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(class)
-  r"\b(assert|break|case|catch|continue|default|do|else|finally|for|if|in|is|new|return|super|switch|this|throw|try|while)\b" is(keyword)
-  r"\b(abstract|const|extends|factory|final|get|implements|native|operator|set|static|typedef|var)\b" is(keyword.declaration)
-  r"\b(bool|double|Dynamic|int|num|Object|String|void)\b" is(keyword.type)
-  r"\b(false|null|true)\b" is(keyword.constant)
-  r"[\126!%^&*+=|?:<>/-]|as" is(operator)
-  r"[a-zA-Z_$][a-zA-Z0-9_]*:" is(name.label)
-  r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name)
-  r"[(){}\[\],.;]" is(punctuation)
-  r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
-  r"\d+(\.\d*)?([eE][+-]?\d+)?" is(literal.number)
-  r"\.\d+([eE][+-]?\d+)?" is(literal.number)
-  r"\n" is(text)
+  lex(root):
+    any-of(string-literal)
+    r"\#!(.*?)$" is(comment.preproc)
+    r"\b(import|export)\b" is(keyword) -> go-to(import-decl)
+    r"\b(library|source|part of|part)\b" is(keyword)
+    r"[^\S\n]+" is(text)
+    r"//.*?\n" is(comment.single)
+    r"/\*.*?\*/" is(comment.multiline)
+    r"\b(class)\b(\s+)" is(by-groups(keyword.declaration, text)) -> go-to(class)
+    r"\b(assert|break|case|catch|continue|default|do|else|finally|for|if|in|is|new|return|super|switch|this|throw|try|while)\b" is(keyword)
+    r"\b(abstract|const|extends|factory|final|get|implements|native|operator|set|static|typedef|var)\b" is(keyword.declaration)
+    r"\b(bool|double|Dynamic|int|num|Object|String|void)\b" is(keyword.type)
+    r"\b(false|null|true)\b" is(keyword.constant)
+    r"[\126!%^&*+=|?:<>/-]|as" is(operator)
+    r"[a-zA-Z_$][a-zA-Z0-9_]*:" is(name.label)
+    r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name)
+    r"[(){}\[\],.;]" is(punctuation)
+    r"0[xX][0-9a-fA-F]+" is(literal.number.hex)
+    r"\d+(\.\d*)?([eE][+-]?\d+)?" is(literal.number)
+    r"\.\d+([eE][+-]?\d+)?" is(literal.number)
+    r"\n" is(text)
 
-lex(class):
-  r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name.class) -> pop
+  lex(class):
+    r"[a-zA-Z_$][a-zA-Z0-9_]*" is(name.class) -> pop
 
 const-set(.Lexer, lexer)

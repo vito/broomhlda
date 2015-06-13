@@ -2,115 +2,115 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Python"
-aliases: ["python", "py", "sage"]
-extensions: [".py", ".pyw", ".sc", "SConstruct", "SConscript", ".tac", ".sage"]
-mimetypes: ["text/x-python", "application/x-python"]
-start: .root
-flags: 0
+  name: "Python"
+  aliases: ["python", "py", "sage"]
+  extensions: [".py", ".pyw", ".sc", "SConstruct", "SConscript", ".tac", ".sage"]
+  mimetypes: ["text/x-python", "application/x-python"]
+  start: .root
+  flags: 0
 
-lex(tsqs):
-  r"'''" is(literal.string) -> pop
-  any-of(strings)
-  any-of(nl)
+  lex(tsqs):
+    r"'''" is(literal.string) -> pop
+    any-of(strings)
+    any-of(nl)
 
-lex(builtins):
-  r"(?<!\.)(__import__|abs|all|any|apply|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|exit|file|filter|float|frozenset|getattr|globals|hasattr|hash|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b" is(name.builtin)
-  r"(?<!\.)(self|None|Ellipsis|NotImplemented|False|True)\b" is(name.builtin.pseudo)
-  r"(?<!\.)(ArithmeticError|AssertionError|AttributeError|BaseException|DeprecationWarning|EOFError|EnvironmentError|Exception|FloatingPointError|FutureWarning|GeneratorExit|IOError|ImportError|ImportWarning|IndentationError|IndexError|KeyError|KeyboardInterrupt|LookupError|MemoryError|NameError|NotImplemented|NotImplementedError|OSError|OverflowError|OverflowWarning|PendingDeprecationWarning|ReferenceError|RuntimeError|RuntimeWarning|StandardError|StopIteration|SyntaxError|SyntaxWarning|SystemError|SystemExit|TabError|TypeError|UnboundLocalError|UnicodeDecodeError|UnicodeEncodeError|UnicodeError|UnicodeTranslateError|UnicodeWarning|UserWarning|ValueError|VMSError|Warning|WindowsError|ZeroDivisionError)\b" is(name.exception)
+  lex(builtins):
+    r"(?<!\.)(__import__|abs|all|any|apply|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|exit|file|filter|float|frozenset|getattr|globals|hasattr|hash|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b" is(name.builtin)
+    r"(?<!\.)(self|None|Ellipsis|NotImplemented|False|True)\b" is(name.builtin.pseudo)
+    r"(?<!\.)(ArithmeticError|AssertionError|AttributeError|BaseException|DeprecationWarning|EOFError|EnvironmentError|Exception|FloatingPointError|FutureWarning|GeneratorExit|IOError|ImportError|ImportWarning|IndentationError|IndexError|KeyError|KeyboardInterrupt|LookupError|MemoryError|NameError|NotImplemented|NotImplementedError|OSError|OverflowError|OverflowWarning|PendingDeprecationWarning|ReferenceError|RuntimeError|RuntimeWarning|StandardError|StopIteration|SyntaxError|SyntaxWarning|SystemError|SystemExit|TabError|TypeError|UnboundLocalError|UnicodeDecodeError|UnicodeEncodeError|UnicodeError|UnicodeTranslateError|UnicodeWarning|UserWarning|ValueError|VMSError|Warning|WindowsError|ZeroDivisionError)\b" is(name.exception)
 
-lex(name):
-  r"@[a-zA-Z0-9_.]+" is(name.decorator)
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
+  lex(name):
+    r"@[a-zA-Z0-9_.]+" is(name.decorator)
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name)
 
-lex(dqs):
-  r"\"" is(literal.string) -> pop
-  r"\\\\|\\\"|\\\n" is(literal.string.escape)
-  any-of(strings)
+  lex(dqs):
+    r"\"" is(literal.string) -> pop
+    r"\\\\|\\\"|\\\n" is(literal.string.escape)
+    any-of(strings)
 
-lex(sqs):
-  r"'" is(literal.string) -> pop
-  r"\\\\|\\'|\\\n" is(literal.string.escape)
-  any-of(strings)
+  lex(sqs):
+    r"'" is(literal.string) -> pop
+    r"\\\\|\\'|\\\n" is(literal.string.escape)
+    any-of(strings)
 
-lex(tdqs):
-  r"\"\"\"" is(literal.string) -> pop
-  any-of(strings)
-  any-of(nl)
+  lex(tdqs):
+    r"\"\"\"" is(literal.string) -> pop
+    any-of(strings)
+    any-of(nl)
 
-lex(backtick):
-  r"`.*?`" is(literal.string.backtick)
+  lex(backtick):
+    r"`.*?`" is(literal.string.backtick)
 
-lex(funcname):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.function) -> pop
+  lex(funcname):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.function) -> pop
 
-lex(classname):
-  r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
+  lex(classname):
+    r"[a-zA-Z_][a-zA-Z0-9_]*" is(name.class) -> pop
 
-lex(stringescape):
-  r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
+  lex(stringescape):
+    r"\\([\\abfnrtv\"\']|\n|N{.*?}|u[a-fA-F0-9]{4}|U[a-fA-F0-9]{8}|x[a-fA-F0-9]{2}|[0-7]{1,3})" is(literal.string.escape)
 
-lex(numbers):
-  r"(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?j?" is(literal.number.float)
-  r"\d+[eE][+-]?[0-9]+j?" is(literal.number.float)
-  r"0[0-7]+j?" is(literal.number.oct)
-  r"0[xX][a-fA-F0-9]+" is(literal.number.hex)
-  r"\d+L" is(literal.number.integer.long)
-  r"\d+j?" is(literal.number.integer)
+  lex(numbers):
+    r"(\d+\.\d*|\d*\.\d+)([eE][+-]?[0-9]+)?j?" is(literal.number.float)
+    r"\d+[eE][+-]?[0-9]+j?" is(literal.number.float)
+    r"0[0-7]+j?" is(literal.number.oct)
+    r"0[xX][a-fA-F0-9]+" is(literal.number.hex)
+    r"\d+L" is(literal.number.integer.long)
+    r"\d+j?" is(literal.number.integer)
 
-lex(keywords):
-  r"(assert|break|continue|del|elif|else|except|exec|finally|for|global|if|lambda|pass|print|raise|return|try|while|yield(\s+from)?|as|with)\b" is(keyword)
+  lex(keywords):
+    r"(assert|break|continue|del|elif|else|except|exec|finally|for|global|if|lambda|pass|print|raise|return|try|while|yield(\s+from)?|as|with)\b" is(keyword)
 
-lex(import):
-  r"(?:[ \t]|\\\n)+" is(text)
-  r"as\b" is(keyword.namespace)
-  r"," is(operator)
-  r"[a-zA-Z_][a-zA-Z0-9_.]*" is(name.namespace)
-  r"" is(text) -> pop
+  lex(import):
+    r"(?:[ \t]|\\\n)+" is(text)
+    r"as\b" is(keyword.namespace)
+    r"," is(operator)
+    r"[a-zA-Z_][a-zA-Z0-9_.]*" is(name.namespace)
+    r"" is(text) -> pop
 
-lex(nl):
-  r"\n" is(literal.string)
+  lex(nl):
+    r"\n" is(literal.string)
 
-lex(root):
-  r"\n" is(text)
-  r"^(\s*)([rRuU]{,2}\"\"\"(?:.|\n)*?\"\"\")" is(by-groups(text, literal.string.doc))
-  r"^(\s*)([rRuU]{,2}'''(?:.|\n)*?''')" is(by-groups(text, literal.string.doc))
-  r"[^\S\n]+" is(text)
-  r"\#.*$" is(comment)
-  r"[\]{}:(),;\[]" is(punctuation)
-  r"\\\n" is(text)
-  r"\\" is(text)
-  r"(in|is|and|or|not)\b" is(operator.word)
-  r"!=|==|<<|>>|[-\126+/*%=<>&^|.]" is(operator)
-  any-of(keywords)
-  r"(def)((?:\s|\\\s)+)" is(by-groups(keyword, text)) -> go-to(funcname)
-  r"(class)((?:\s|\\\s)+)" is(by-groups(keyword, text)) -> go-to(classname)
-  r"(from)((?:\s|\\\s)+)" is(by-groups(keyword.namespace, text)) -> go-to(fromimport)
-  r"(import)((?:\s|\\\s)+)" is(by-groups(keyword.namespace, text)) -> go-to(import)
-  any-of(builtins)
-  any-of(backtick)
-  r"(?:[rR]|[uU][rR]|[rR][uU])\"\"\"" is(literal.string) -> go-to(tdqs)
-  r"(?:[rR]|[uU][rR]|[rR][uU])'''" is(literal.string) -> go-to(tsqs)
-  r"(?:[rR]|[uU][rR]|[rR][uU])\"" is(literal.string) -> go-to(dqs)
-  r"(?:[rR]|[uU][rR]|[rR][uU])'" is(literal.string) -> go-to(sqs)
-  r"[uU]?\"\"\"" is(literal.string) -> combined(stringescape, tdqs)
-  r"[uU]?'''" is(literal.string) -> combined(stringescape, tsqs)
-  r"[uU]?\"" is(literal.string) -> combined(stringescape, dqs)
-  r"[uU]?'" is(literal.string) -> combined(stringescape, sqs)
-  any-of(name)
-  any-of(numbers)
+  lex(root):
+    r"\n" is(text)
+    r"^(\s*)([rRuU]{,2}\"\"\"(?:.|\n)*?\"\"\")" is(by-groups(text, literal.string.doc))
+    r"^(\s*)([rRuU]{,2}'''(?:.|\n)*?''')" is(by-groups(text, literal.string.doc))
+    r"[^\S\n]+" is(text)
+    r"\#.*$" is(comment)
+    r"[\]{}:(),;\[]" is(punctuation)
+    r"\\\n" is(text)
+    r"\\" is(text)
+    r"(in|is|and|or|not)\b" is(operator.word)
+    r"!=|==|<<|>>|[-\126+/*%=<>&^|.]" is(operator)
+    any-of(keywords)
+    r"(def)((?:\s|\\\s)+)" is(by-groups(keyword, text)) -> go-to(funcname)
+    r"(class)((?:\s|\\\s)+)" is(by-groups(keyword, text)) -> go-to(classname)
+    r"(from)((?:\s|\\\s)+)" is(by-groups(keyword.namespace, text)) -> go-to(fromimport)
+    r"(import)((?:\s|\\\s)+)" is(by-groups(keyword.namespace, text)) -> go-to(import)
+    any-of(builtins)
+    any-of(backtick)
+    r"(?:[rR]|[uU][rR]|[rR][uU])\"\"\"" is(literal.string) -> go-to(tdqs)
+    r"(?:[rR]|[uU][rR]|[rR][uU])'''" is(literal.string) -> go-to(tsqs)
+    r"(?:[rR]|[uU][rR]|[rR][uU])\"" is(literal.string) -> go-to(dqs)
+    r"(?:[rR]|[uU][rR]|[rR][uU])'" is(literal.string) -> go-to(sqs)
+    r"[uU]?\"\"\"" is(literal.string) -> combined(stringescape, tdqs)
+    r"[uU]?'''" is(literal.string) -> combined(stringescape, tsqs)
+    r"[uU]?\"" is(literal.string) -> combined(stringescape, dqs)
+    r"[uU]?'" is(literal.string) -> combined(stringescape, sqs)
+    any-of(name)
+    any-of(numbers)
 
-lex(strings):
-  r"%(\([a-zA-Z0-9_]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
-  r"[^\\\'\"%\n]+" is(literal.string)
-  r"[\'\"\\]" is(literal.string)
-  r"%" is(literal.string)
+  lex(strings):
+    r"%(\([a-zA-Z0-9_]+\))?[-\#0 +]*([0-9]+|[*])?(\.([0-9]+|[*]))?[hlL]?[diouxXeEfFgGcrs%]" is(literal.string.interpol)
+    r"[^\\\'\"%\n]+" is(literal.string)
+    r"[\'\"\\]" is(literal.string)
+    r"%" is(literal.string)
 
-lex(fromimport):
-  r"(?:[ \t]|\\\n)+" is(text)
-  r"import\b" is(keyword.namespace) -> pop
-  r"None\b" is(name.builtin.pseudo) -> pop
-  r"[a-zA-Z_.][a-zA-Z0-9_.]*" is(name.namespace)
-  r"" is(text) -> pop
+  lex(fromimport):
+    r"(?:[ \t]|\\\n)+" is(text)
+    r"import\b" is(keyword.namespace) -> pop
+    r"None\b" is(name.builtin.pseudo) -> pop
+    r"[a-zA-Z_.][a-zA-Z0-9_.]*" is(name.namespace)
+    r"" is(text) -> pop
 
 const-set(.Lexer, lexer)

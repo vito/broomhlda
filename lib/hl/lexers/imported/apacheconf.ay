@@ -2,28 +2,28 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "ApacheConf"
-aliases: ["apacheconf", "aconf", "apache"]
-extensions: [".htaccess", "apache.conf", "apache2.conf"]
-mimetypes: ["text/x-apacheconf"]
-start: .root
-flags: Regexp IGNORECASE
+  name: "ApacheConf"
+  aliases: ["apacheconf", "aconf", "apache"]
+  extensions: [".htaccess", "apache.conf", "apache2.conf"]
+  mimetypes: ["text/x-apacheconf"]
+  start: .root
+  flags: Regexp IGNORECASE
 
-lex(root):
-  r"\s+" is(text)
-  r"(\#.*?)$" is(comment)
-  r"(<[^\s>]+)(?:(\s+)(.*?))?(>)" is(by-groups(name.tag, text, literal.string, name.tag))
-  r"([a-zA-Z][a-zA-Z0-9_]*)(\s+)" is(by-groups(name.builtin, text)) -> go-to(value)
-  r"\.+" is(text)
+  lex(root):
+    r"\s+" is(text)
+    r"(\#.*?)$" is(comment)
+    r"(<[^\s>]+)(?:(\s+)(.*?))?(>)" is(by-groups(name.tag, text, literal.string, name.tag))
+    r"([a-zA-Z][a-zA-Z0-9_]*)(\s+)" is(by-groups(name.builtin, text)) -> go-to(value)
+    r"\.+" is(text)
 
-lex(value):
-  r"$" is(text) -> pop
-  r"[^\S\n]+" is(text)
-  r"\d+\.\d+\.\d+\.\d+(?:/\d+)?" is(literal.number)
-  r"\d+" is(literal.number)
-  r"/([a-zA-Z0-9][a-zA-Z0-9_./-]+)" is(literal.string.other)
-  r"(on|off|none|any|all|double|email|dns|min|minimal|os|productonly|full|emerg|alert|crit|error|warn|notice|info|debug|registry|script|inetd|standalone|user|group)\b" is(keyword)
-  r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
-  r"[^\s\"]+" is(text)
+  lex(value):
+    r"$" is(text) -> pop
+    r"[^\S\n]+" is(text)
+    r"\d+\.\d+\.\d+\.\d+(?:/\d+)?" is(literal.number)
+    r"\d+" is(literal.number)
+    r"/([a-zA-Z0-9][a-zA-Z0-9_./-]+)" is(literal.string.other)
+    r"(on|off|none|any|all|double|email|dns|min|minimal|os|productonly|full|emerg|alert|crit|error|warn|notice|info|debug|registry|script|inetd|standalone|user|group)\b" is(keyword)
+    r"\"([^\"\\]*(?:\\.[^\"\\]*)*)\"" is(literal.string.double)
+    r"[^\s\"]+" is(text)
 
 const-set(.Lexer, lexer)

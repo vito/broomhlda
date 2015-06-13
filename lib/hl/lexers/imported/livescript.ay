@@ -2,81 +2,81 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "LiveScript"
-aliases: ["live-script", "livescript"]
-extensions: [".ls"]
-mimetypes: ["text/livescript"]
-start: .root
-flags: Regexp MULTILINE
+  name: "LiveScript"
+  aliases: ["live-script", "livescript"]
+  extensions: [".ls"]
+  mimetypes: ["text/livescript"]
+  start: .root
+  flags: Regexp MULTILINE
 
-lex(commentsandwhitespace):
-  r"\s+" is(text)
-  r"/\*.*?\*/" is(comment.multiline)
-  r"\#.*?\n" is(comment.single)
+  lex(commentsandwhitespace):
+    r"\s+" is(text)
+    r"/\*.*?\*/" is(comment.multiline)
+    r"\#.*?\n" is(comment.single)
 
-lex(tdqs):
-  r"\"\"\"" is(literal.string) -> pop
-  r"\\.|\'|\"" is(literal.string)
-  r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
-  r"\#" is(literal.string)
-  any-of(strings)
+  lex(tdqs):
+    r"\"\"\"" is(literal.string) -> pop
+    r"\\.|\'|\"" is(literal.string)
+    r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
+    r"\#" is(literal.string)
+    any-of(strings)
 
-lex(interpoling-string):
-  r"}" is(literal.string.interpol) -> pop
-  any-of(root)
+  lex(interpoling-string):
+    r"}" is(literal.string.interpol) -> pop
+    any-of(root)
 
-lex(dqs):
-  r"\"" is(literal.string) -> pop
-  r"\\.|\'" is(literal.string)
-  r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
-  r"\#" is(literal.string)
-  any-of(strings)
+  lex(dqs):
+    r"\"" is(literal.string) -> pop
+    r"\\.|\'" is(literal.string)
+    r"\#{" is(literal.string.interpol) -> go-to(interpoling-string)
+    r"\#" is(literal.string)
+    any-of(strings)
 
-lex(sqs):
-  r"'" is(literal.string) -> pop
-  r"\#|\\.|\"" is(literal.string)
-  any-of(strings)
+  lex(sqs):
+    r"'" is(literal.string) -> pop
+    r"\#|\\.|\"" is(literal.string)
+    any-of(strings)
 
-lex(root):
-  any-of(commentsandwhitespace)
-  r"(?:\([^()]+\))?[ ]*[\126-]{1,2}>|(?:\(?[^()\n]+\)?)?[ ]*<[\126-]{1,2}" is(name.function)
-  r"\+\+|&&|(?<![\.\$])\b(?:and|x?or|is|isnt|not)\b|\?|:|=|\|\||\\(?=\n)|(<<|>>>?|==?|!=?|\126(?!\\126?>)|-(?!\-?>)|<(?!\[)|(?<!\])>|[+*`%&\|\^/])=?" is(operator) -> go-to(slashstartsregex)
-  r"[{(\[;,]" is(punctuation) -> go-to(slashstartsregex)
-  r"[})\].]" is(punctuation)
-  r"(?<![\.\$])(for|own|in|of|while|until|loop|break|return|continue|switch|when|then|if|unless|else|throw|try|catch|finally|new|delete|typeof|instanceof|super|extends|this|class|by|const|var|to|til)\b" is(keyword) -> go-to(slashstartsregex)
-  r"(?<![\.\$])(true|false|yes|no|on|off|null|NaN|Infinity|undefined|void)\b" is(keyword.constant)
-  r"(Array|Boolean|Date|Error|Function|Math|netscape|Number|Object|Packages|RegExp|String|sun|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt|document|window)\b" is(name.builtin)
-  r"[$a-zA-Z_][a-zA-Z0-9_\.\-:\$]*\s*[:=]\s" is(name.variable) -> go-to(slashstartsregex)
-  r"@[$a-zA-Z_][a-zA-Z0-9_\.\-:\$]*\s*[:=]\s" is(name.variable.instance) -> go-to(slashstartsregex)
-  r"@" is(name.other) -> go-to(slashstartsregex)
-  r"@?[$a-zA-Z_][a-zA-Z0-9_\-]*" is(name.other) -> go-to(slashstartsregex)
-  r"[0-9]+\.[0-9]+([eE][0-9]+)?[fd]?(?:[a-zA-Z_]+)?" is(literal.number.float)
-  r"[0-9]+(\126[0-9a-z]+)?(?:[a-zA-Z_]+)?" is(literal.number.integer)
-  r"\"\"\"" is(literal.string) -> go-to(tdqs)
-  r"'''" is(literal.string) -> go-to(tsqs)
-  r"\"" is(literal.string) -> go-to(dqs)
-  r"'" is(literal.string) -> go-to(sqs)
-  r"\\[\w$-]+" is(literal.string)
-  r"<\[.*\]>" is(literal.string)
+  lex(root):
+    any-of(commentsandwhitespace)
+    r"(?:\([^()]+\))?[ ]*[\126-]{1,2}>|(?:\(?[^()\n]+\)?)?[ ]*<[\126-]{1,2}" is(name.function)
+    r"\+\+|&&|(?<![\.\$])\b(?:and|x?or|is|isnt|not)\b|\?|:|=|\|\||\\(?=\n)|(<<|>>>?|==?|!=?|\126(?!\\126?>)|-(?!\-?>)|<(?!\[)|(?<!\])>|[+*`%&\|\^/])=?" is(operator) -> go-to(slashstartsregex)
+    r"[{(\[;,]" is(punctuation) -> go-to(slashstartsregex)
+    r"[})\].]" is(punctuation)
+    r"(?<![\.\$])(for|own|in|of|while|until|loop|break|return|continue|switch|when|then|if|unless|else|throw|try|catch|finally|new|delete|typeof|instanceof|super|extends|this|class|by|const|var|to|til)\b" is(keyword) -> go-to(slashstartsregex)
+    r"(?<![\.\$])(true|false|yes|no|on|off|null|NaN|Infinity|undefined|void)\b" is(keyword.constant)
+    r"(Array|Boolean|Date|Error|Function|Math|netscape|Number|Object|Packages|RegExp|String|sun|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|eval|isFinite|isNaN|parseFloat|parseInt|document|window)\b" is(name.builtin)
+    r"[$a-zA-Z_][a-zA-Z0-9_\.\-:\$]*\s*[:=]\s" is(name.variable) -> go-to(slashstartsregex)
+    r"@[$a-zA-Z_][a-zA-Z0-9_\.\-:\$]*\s*[:=]\s" is(name.variable.instance) -> go-to(slashstartsregex)
+    r"@" is(name.other) -> go-to(slashstartsregex)
+    r"@?[$a-zA-Z_][a-zA-Z0-9_\-]*" is(name.other) -> go-to(slashstartsregex)
+    r"[0-9]+\.[0-9]+([eE][0-9]+)?[fd]?(?:[a-zA-Z_]+)?" is(literal.number.float)
+    r"[0-9]+(\126[0-9a-z]+)?(?:[a-zA-Z_]+)?" is(literal.number.integer)
+    r"\"\"\"" is(literal.string) -> go-to(tdqs)
+    r"'''" is(literal.string) -> go-to(tsqs)
+    r"\"" is(literal.string) -> go-to(dqs)
+    r"'" is(literal.string) -> go-to(sqs)
+    r"\\[\w$-]+" is(literal.string)
+    r"<\[.*\]>" is(literal.string)
 
-lex(multilineregex):
-  any-of(commentsandwhitespace)
-  r"//([gim]+\b|\B)" is(literal.string.regex) -> pop
-  r"/" is(literal.string.regex)
-  r"[^/\#]+" is(literal.string.regex)
+  lex(multilineregex):
+    any-of(commentsandwhitespace)
+    r"//([gim]+\b|\B)" is(literal.string.regex) -> pop
+    r"/" is(literal.string.regex)
+    r"[^/\#]+" is(literal.string.regex)
 
-lex(slashstartsregex):
-  any-of(commentsandwhitespace)
-  r"//" is(literal.string.regex) -> do-all(pop, go-to(multilineregex))
-  r"/(?! )(\\.|[^\[/\\\n]|\[(\\.|[^\]\\\n])*])+/([gim]+\b|\B)" is(literal.string.regex) -> pop
-  r"" is(text) -> pop
+  lex(slashstartsregex):
+    any-of(commentsandwhitespace)
+    r"//" is(literal.string.regex) -> do-all(pop, go-to(multilineregex))
+    r"/(?! )(\\.|[^\[/\\\n]|\[(\\.|[^\]\\\n])*])+/([gim]+\b|\B)" is(literal.string.regex) -> pop
+    r"" is(text) -> pop
 
-lex(tsqs):
-  r"'''" is(literal.string) -> pop
-  r"\#|\\.|\'|\"" is(literal.string)
-  any-of(strings)
+  lex(tsqs):
+    r"'''" is(literal.string) -> pop
+    r"\#|\\.|\'|\"" is(literal.string)
+    any-of(strings)
 
-lex(strings):
-  r"[^\#\\\'\"]+" is(literal.string)
+  lex(strings):
+    r"[^\#\\\'\"]+" is(literal.string)
 
 const-set(.Lexer, lexer)

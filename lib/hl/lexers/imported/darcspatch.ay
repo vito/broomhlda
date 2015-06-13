@@ -2,44 +2,44 @@ use(require("atomy"))
 use(require("hl/define"))
 
 lexer = lexer:
-name: "Darcs Patch"
-aliases: ["dpatch"]
-extensions: [".dpatch", ".darcspatch"]
-mimetypes: []
-start: .root
-flags: 0
+  name: "Darcs Patch"
+  aliases: ["dpatch"]
+  extensions: [".dpatch", ".darcspatch"]
+  mimetypes: []
+  start: .root
+  flags: 0
 
-lex(comment):
-  r"[^\]].*\n" is(comment)
-  r"\]" is(operator) -> pop
+  lex(comment):
+    r"[^\]].*\n" is(comment)
+    r"\]" is(operator) -> pop
 
-lex(insert):
-  any-of(specialText)
-  r"\[" is(generic.inserted)
-  r"[^\n\[]+" is(generic.inserted)
+  lex(insert):
+    any-of(specialText)
+    r"\[" is(generic.inserted)
+    r"[^\n\[]+" is(generic.inserted)
 
-lex(delete):
-  any-of(specialText)
-  r"\[" is(generic.deleted)
-  r"[^\n\[]+" is(generic.deleted)
+  lex(delete):
+    any-of(specialText)
+    r"\[" is(generic.deleted)
+    r"[^\n\[]+" is(generic.deleted)
 
-lex(root):
-  r"<" is(operator)
-  r">" is(operator)
-  r"{" is(operator)
-  r"}" is(operator)
-  r"(\[)((?:TAG )?)(.*)(\n)(.*)(\*\*)(\d+)(\s?)(\])" is(by-groups(operator, keyword, name, text, name, operator, literal.date, text, operator))
-  r"(\[)((?:TAG )?)(.*)(\n)(.*)(\*\*)(\d+)(\s?)" is(by-groups(operator, keyword, name, text, name, operator, literal.date, text)) -> go-to(comment)
-  r"New patches:" is(generic.heading)
-  r"Context:" is(generic.heading)
-  r"Patch bundle hash:" is(generic.heading)
-  r"(\s*)(hunk|addfile|adddir|rmfile|rmdir|move|replace)(.*\n)" is(by-groups(text, keyword, text))
-  r"\+" is(generic.inserted) -> go-to(insert)
-  r"-" is(generic.deleted) -> go-to(delete)
-  r".*\n" is(text)
+  lex(root):
+    r"<" is(operator)
+    r">" is(operator)
+    r"{" is(operator)
+    r"}" is(operator)
+    r"(\[)((?:TAG )?)(.*)(\n)(.*)(\*\*)(\d+)(\s?)(\])" is(by-groups(operator, keyword, name, text, name, operator, literal.date, text, operator))
+    r"(\[)((?:TAG )?)(.*)(\n)(.*)(\*\*)(\d+)(\s?)" is(by-groups(operator, keyword, name, text, name, operator, literal.date, text)) -> go-to(comment)
+    r"New patches:" is(generic.heading)
+    r"Context:" is(generic.heading)
+    r"Patch bundle hash:" is(generic.heading)
+    r"(\s*)(hunk|addfile|adddir|rmfile|rmdir|move|replace)(.*\n)" is(by-groups(text, keyword, text))
+    r"\+" is(generic.inserted) -> go-to(insert)
+    r"-" is(generic.deleted) -> go-to(delete)
+    r".*\n" is(text)
 
-lex(specialText):
-  r"\n" is(text) -> pop
-  r"\[_[^_]*_]" is(operator)
+  lex(specialText):
+    r"\n" is(text) -> pop
+    r"\[_[^_]*_]" is(operator)
 
 const-set(.Lexer, lexer)
