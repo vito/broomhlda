@@ -1,13 +1,14 @@
 -- TODO: use my li'l html lib from anatomy (extract to gem)
-use("atomy")
+use(require("atomy"))
 
 require("rubygems")
 require("nokogiri")
 
-Formatter = class:
-  initialize(@tokens, @line-numbers = false) := .ok
+formatter = class:
+  def(initialize(@tokens, @line-numbers = false)):
+    .ok
 
-  format(builder = Nokogiri XML Builder new) := do:
+  def(format(builder = Nokogiri XML Builder new)):
     builder
       div(#{ .class: "highlight" }) [d]:
         d pre [p]:
@@ -15,9 +16,11 @@ Formatter = class:
       
     builder doc children first serialize(#{ .save-with: 0 })
 
-  format-tokens(to) := do:
+  def(format-tokens(to)):
     @tokens each [t]:
       to span(#{ .class: t type tag }) [s]:
         s text(t contents)
 
     to
+
+const-set(.Formatter, formatter)

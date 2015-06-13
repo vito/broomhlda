@@ -1,86 +1,87 @@
-use("atomy")
+use(require("atomy"))
 
-lexer = require(File expand-path("../lexer", _FILE))
+lexer = require(File expand-path("../lexer", __FILE__))
 
-Lexer = lexer Lexer
-Matcher = lexer Matcher
-State = require(File expand-path("../state", _FILE))
-Token = require(File expand-path("../token", _FILE))
+const-set(.Lexer, lexer Lexer)
+Lexer const-set(.Matcher, lexer Matcher)
+Lexer const-set(.State, require(File expand-path("../state", __FILE__)))
+Lexer const-set(.Token, require(File expand-path("../token", __FILE__)))
 
-macro(lexer { ~*body }):
+macro(lexer: ~*body):
   `(Lexer class:
       @matchers = Hash new
       @info = Hash new
 
       ~*body)
 
-short-name(["name", "constant"]) := "no"
-short-name(["name", "entity"]) := "ni"
-short-name(["name", "property"]) := "py"
-short-name(["literal", b]) := short-name([b])
-short-name([a, "other"]) := short-name([a]) + "x"
-short-name([a, "error"]) := short-name([a]) + "r"
-short-name([a, "single"]) := short-name([a]) + "1"
-short-name([a, "double"]) := short-name([a]) + "2"
-short-name([a, b]) := short-name([a]) + short-name([b])
-short-name(["error"]) := "err"
-short-name(["number"]) := "m"
-short-name([x]) := x slice(0, 1)
-short-name(_ . xs) := short-name(xs)
+def(short-name(["name", "constant"])): "no"
+def(short-name(["name", "entity"])): "ni"
+def(short-name(["name", "property"])): "py"
+def(short-name(["literal", b])): short-name([b])
+def(short-name([a, "other"])): short-name([a]) + "x"
+def(short-name([a, "error"])): short-name([a]) + "r"
+def(short-name([a, "single"])): short-name([a]) + "1"
+def(short-name([a, "double"])): short-name([a]) + "2"
+def(short-name([a, b])): short-name([a]) + short-name([b])
+def(short-name(["error"])): "err"
+def(short-name(["number"])): "m"
+def(short-name([x])): x slice(0, 1)
+def(short-name(_ . xs)): short-name(xs)
 
-type-from(x: Atomy AST Word) :=
-  `(Token Tagged new(~short-name([x text to-s])))
+fn(str(x)): Atomy Grammar AST StringLiteral new(x)
 
-type-from(`((~a). ~(b))) := do:
+def(type-from(x & Atomy Grammar AST Word)):
+  `(Token Tagged new(~str(short-name([x text to-s]))))
+
+def(type-from(`((~a). ~(b)))):
   tag = short-name([
     a text to-s
     b text to-s])
-  `(Token Tagged new(~tag))
+  `(Token Tagged new(~str(tag)))
 
-type-from(`(~_ (~a). ~(b))) := do:
+def(type-from(`(~_ (~a). ~(b)))):
   tag = short-name([
     a text to-s
     b text to-s])
-  `(Token Tagged new(~tag))
+  `(Token Tagged new(~str(tag)))
 
-type-from(`(by-groups(~*args))) :=
+def(type-from(`(by-groups(~*args)))):
   `(Token ByGroups new([~*(args collect [a]: type-from(a))]))
 
-type-from(`(using(~who))) :=
+def(type-from(`(using(~who)))):
   `(Token Using new(~who))
 
-type-from(x) := raise("unknown match type: " + x inspect)
+def(type-from(x)): raise("unknown match type: " + x inspect)
 
-regexp-from(x, regexps) := do:
-  names [regexp]:
-    regexps <<
-      `(~regexp = [x]: Regexp new(
-          x source
-          x options | @info fetch(.flags)
-        ); call(~x))
+def(regexp-from(x, regexps)):
+  regexps <<
+    `([x]: Regexp new(
+        x source
+        x options | @info fetch(.flags)
+      ); call(~x))
 
-    regexp
+  `(regexps[~(Atomy Grammar AST Number new(regexps size - 1))])
 
-state-from('pop) := '(State Pop new)
-state-from(`(pop(~n))) := `(State PopNum new(~n))
-state-from('push) := '(State Push new)
-state-from(`(do-all(~*args))) :=
+def(state-from('pop)): '(State Pop new)
+def(state-from(`(pop(~n)))): `(State PopNum new(~n))
+def(state-from('push)): '(State Push new)
+def(state-from(`(do-all(~*args)))):
   `(State DoAll new(~(args collect [a]: state-from(a))))
-state-from(`(combined(~*args))) := do:
+def(state-from(`(combined(~*args)))):
   all = args reverse collect [a]:
     `(@matchers fetch(.~a))
 
   `(State Combined new(~all))
-state-from(`(go-to(~n))) :=
+def(state-from(`(go-to(~n)))):
   `(State GoTo new(@matchers, .~n))
-state-from(x) :=
+def(state-from(x)):
   raise("unknown state: " + x inspect)
 
 
-macro(lex(~name) { ~*tokens }):
-  `(lex(~name) [] { ~*tokens })
+macro(lex(~name): ~*tokens):
+  `(lex(~name) []: ~*tokens)
 
-macro(lex(~name) [~*args] { ~*tokens }):
+macro(lex(~name) [~*args]: ~*tokens):
   branches = []
 
   body = []
@@ -90,7 +91,7 @@ macro(lex(~name) [~*args] { ~*tokens }):
   tokens each [c]:
     c match:
       -- implicit continue state
-      `(~x is(~y)) ->
+      `(~x is(~y)):
         branches <<
           `(Matcher new(
               ~(regexp-from(x, regexps))
@@ -99,7 +100,7 @@ macro(lex(~name) [~*args] { ~*tokens }):
             ))
 
       -- specifying a state
-      `(~x is(~y) -> ~z) -> do:
+      `(~x is(~y) -> ~z):
         branches <<
           `(Matcher new(
               ~(regexp-from(x, regexps))
@@ -108,7 +109,7 @@ macro(lex(~name) [~*args] { ~*tokens }):
             ))
 
       -- goto shortcut
-      `(~x is(~y) => ~z) ->
+      `(~x is(~y) => ~z):
         branches <<
           `(Matcher new(
               ~(regexp-from(x, regexps))
@@ -116,14 +117,15 @@ macro(lex(~name) [~*args] { ~*tokens }):
               State GoTo new(@matchers, .~z)
             ))
 
-      `(any-of(~any)) ->
+      `(any-of(~any)):
         branches <<
           `(@matchers fetch(.~any) call) -- TODO: parameterization?
 
-      _ -> body << c
+      _:
+        body << c
 
   body << `([~*branches] flatten)
 
-  `(do:
-      ~*regexps
-      @matchers[.~name] = proc [~*args]: ~*body)
+  `([regexps] {
+      @matchers[.~name] = proc [~*args]: ~*body
+    } call([~*regexps]))

@@ -1,17 +1,17 @@
-use("atomy")
+use(require("atomy"))
 
-here = File expand-path("../", _FILE)
+here = File expand-path("../", __FILE__)
 
-$path unshift(here)
+$LOAD_PATH unshift(here)
 
-load(lexer) :=
-  {
+def(load(lexer)):
+  do {
     require(
       File expand-path(
         "../hl/lexers/" + lexer downcase
-        _FILE)) Lexer
+        __FILE__)) Lexer
   } rescue:
     LoadError: require(
       File expand-path(
         "../hl/lexers/imported/" + lexer downcase
-        _FILE)) Lexer
+        __FILE__)) Lexer

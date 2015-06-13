@@ -204,10 +204,10 @@ def convert_next(n):
         return "go-to(" + convert_name(n) + ")"
 
 def convert_lexer(mod, name, aliases, filenames, mimetypes, flags):
-  return """use("atomy")
-use("hl/define")
+  return """use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
 name: %s
 aliases: %s
 extensions: %s
@@ -273,6 +273,8 @@ def try_converting(k, l, to = "lib/hl/lexers/imported"):
 
     for name, state in cls.tokens.items():
         mod.write(convert_state(cls.tokens, name, state) + "\n")
+
+    mod.write("const-set(.Lexer, lexer)\n")
 
     return True
 

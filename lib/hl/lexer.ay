@@ -1,40 +1,38 @@
-use("atomy")
+use(require("atomy"))
 
-token = require(File expand-path("../token", _FILE))
+token = require(File expand-path("../token", __FILE__))
 
 
-NoMatchFor = Error class:
-  initialize(@input) := .ok
+Error data(NoMatchFor(@input))
 
-  message :=
-    "no matchers succeeded for: " +
-      @input slice(0, 50) inspect + " [...]"
+def(NoMatchFor(input) message):
+  "no matchers succeeded for: " +
+    (input slice(0, 50) inspect + " [...]")
 
 
 data(Matcher(@regexp, @type, @next))
 
 -- TODO: Using
-tokens(data, gs: token ByGroups) =
+fn(tokens(data, gs & token ByGroups)):
   gs types zip(data to-a drop(1)) [[t, d]]:
     when(t nil? || d nil?):
       return(nil)
 
     @lexed << token Token new(t, d)
 
-tokens(data, t: token Tagged) =
+fn(tokens(data, t & token Tagged)):
   @lexed << token Token new(t, data to-s)
 
 -- go through matchers until one matches the immediate
 -- next input. if none match, try again, but allowing
 -- matches past the start.
-try-all(matchers) = do:
+fn(try-all(matchers)):
   closest = nil
   worked = nil
 
   matchers each [m]:
     d = m regexp match(@input)
-    when(d and (not closest or
-                  d pre-match size < closest pre-match size)):
+    when(d && (!closest || (d pre-match size < closest pre-match size))):
       closest =! d
       worked =! m
 
@@ -57,8 +55,8 @@ try-all(matchers) = do:
 
   tokens(closest, worked type)
 
-Lexer = class:
-  initialize(input) := do:
+lexer = class:
+  def(initialize(input)):
     @input = input dup
 
     @state = [
@@ -69,7 +67,7 @@ Lexer = class:
 
   -- run the lexer until the input is empty, yielding
   -- the lexed tokens
-  run := do:
+  def(run):
     until(@input empty?):
       try-all(@state last)
 
@@ -78,22 +76,24 @@ Lexer = class:
   singleton:
     attr-accessor(.matchers, .info)
 
-    lex(x) := new(x) run
+    def(lex(x)): new(x) run
 
-    name &x :=
+    def(name &x):
       @info[.name] = x call
 
-    aliases &x :=
+    def(aliases &x):
       @info[.aliases] = x call
 
-    extensions &x :=
+    def(extensions &x):
       @info[.extensions] = x call
 
-    mimetypes &x :=
+    def(mimetypes &x):
       @info[.mimetypes] = x call
 
-    start &x :=
+    def(start &x):
       @info[.start] = x call
 
-    flags &x :=
+    def(flags &x):
       @info[.flags] = x call
+
+const-set(.Lexer, lexer)

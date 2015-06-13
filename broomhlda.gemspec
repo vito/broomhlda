@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = false
 
-  s.add_runtime_dependency "atomy", "~> 0.4"
+  s.add_runtime_dependency "atomy", "~> 0.6"
 
   s.add_development_dependency "rake"
 end

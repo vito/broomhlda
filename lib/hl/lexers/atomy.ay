@@ -1,7 +1,7 @@
-use("atomy")
-use("hl/define")
+use(require("atomy"))
+use(require("hl/define"))
 
-Lexer = lexer:
+lexer = lexer:
   name: "Atomy"
   aliases: "atomy"
   extensions: [".ay"]
@@ -23,7 +23,7 @@ Lexer = lexer:
   ]
 
 
-  word(reg) =
+  fn(word(reg)):
     r"(?<!#{@@op-char}|#{@@ident-char})#{reg}(?!#{@@op-char}|#{@@ident-char})"
 
 
@@ -118,3 +118,5 @@ Lexer = lexer:
     r"x[\da-fA-F]+" is(string.escape) -> pop
     r"\d+" is(string.escape) -> pop
     r"\s+\\" is(string.escape) -> pop
+
+const-set(.Lexer, lexer)
