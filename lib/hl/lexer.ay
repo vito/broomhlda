@@ -33,8 +33,8 @@ fn(try-all(matchers)):
   matchers each [m]:
     d = m regexp match(@input)
     when(d && (!closest || (d pre-match size < closest pre-match size))):
-      closest =! d
-      worked =! m
+      &closest = d
+      &worked = m
 
       when(closest pre-match empty?):
         break
