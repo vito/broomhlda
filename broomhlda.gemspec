@@ -1,10 +1,15 @@
 Gem::Specification.new do |s|
   s.name     = "broomhlda"
-  s.version  = "0.0.1"
+  s.version  = "0.1.0"
   s.authors  = ["Alex Suraci"]
   s.email    = ["suraci.alex@gmail.com"]
   s.homepage = "http://atomy-lang.org"
   s.summary  = "broomhlda syntax highlighter and tokenizer"
+
+  s.description = %q{
+    A DSL for authoring lexers, largely based on Pygments (with many of its
+    lexers auto-converted).
+  }
 
   s.files         = %w{LICENSE.md} + Dir["lib/**/*"]
   s.require_paths = ["lib"]
@@ -13,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = false
 
-  s.add_runtime_dependency "atomy", "~> 0.6"
+  s.add_runtime_dependency "atomy", "~> 0.6.2"
 
-  s.add_development_dependency "rake"
+  s.add_development_dependency "rake", "~> 10.4"
 end
