@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version  = "0.1.0"
   s.authors  = ["Alex Suraci"]
   s.email    = ["suraci.alex@gmail.com"]
-  s.homepage = "http://atomy-lang.org"
+  s.homepage = "https://vito.github.io/atomy"
   s.summary  = "broomhlda syntax highlighter and tokenizer"
 
   s.description = %q{
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = false
 
-  s.add_runtime_dependency "atomy", "~> 0.6.2"
+  s.add_runtime_dependency "atomy", "~> 0.6.3"
 
   s.add_development_dependency "rake", "~> 10.4"
 end
