@@ -1,0 +1,348 @@
+use(require("atomy"))
+use(require("hl/define"))
+
+lexer = lexer:
+  name: "YAML"
+  aliases: "yaml"
+  extensions: [".yaml", ".yml"]
+  mimetypes: "text/x-yaml"
+  start: .root
+  flags: Regexp MULTILINE
+
+  -- starting point for lexing
+  lex(root):
+    @indent-stack = []
+    @indent = -1
+    @next-indent = 0
+
+    -- ignored whitespace
+    r"[ ]+(?=#|$)" is(text)
+
+    -- line breaks
+    r"\n+" is(text)
+
+    -- comments
+    r"#[^\n]*" is(comment.single)
+
+    -- '%YAML' directive
+    r"^%YAML(?=[ ]|$)" is(name.tag) -> do-all(
+      go-to(reset-indent)
+      go-to(yaml-directive)
+    )
+
+    -- '%TAG' directive
+    r"^%TAG(?=[ ]|$)" is(name.tag) -> do-all(
+      go-to(reset-indent)
+      go-to(tag-directive)
+    )
+
+    -- document start/end indicators
+    r"^(?:---|\.\.\.)(?=[ ]|$)" is(name.namespace) -> do-all(
+      go-to(reset-indent)
+      go-to(block-line)
+    )
+
+    -- indentation
+    r"[ ]*(?!\s|$)" is(text) -> do-all(
+      go-to(save-start-indent)
+      go-to(block-line)
+      go-to(indentation)
+    )
+
+
+  lex(reset-indent):
+    @indent-stack = []
+    @indent = -1
+    @next-indent = 0
+
+    r"" is(text) -> pop
+
+  lex(save-start-indent) [d]:
+    @next-indent = d[0] size
+
+    when(@next-indent < @indent):
+      while(@next-indent < @indent):
+        @indent = @indent-stack pop
+
+    r"" is(text) -> pop
+
+  lex(save-indent) [d]:
+    @next-indent += d[0] size
+
+    r"" is(text) -> pop
+
+  lex(set-indent) [d]:
+    when(@indent < @next-indent):
+      @indent-stack << @indent
+      @indent = @next-indent
+
+    @next-indent += d[0] size
+
+    r"" is(text) -> pop
+
+  lex(set-implicit-indent) [d]:
+    when(@indent < @next-indent):
+      @indent-stack << @indent
+      @indent = @next-indent
+
+    r"" is(text) -> pop
+
+
+  lex(ignored-line):
+    -- ignored whitespace
+    r"[ ]+(?=#|$)" is(text)
+
+    -- a comment
+    r"#[^\n]*" is(comment.single)
+
+    -- line break
+    r"\n" is(text) -> pop(2)
+
+
+  lex(yaml-directive):
+    -- the version number
+    r"([ ]+)([0-9]+\.[0-9]+)" is(by-groups(text, number)) => ignored-line
+
+
+  lex(tag-directive):
+    -- a tag handle and the corresponding prefix
+    r"([ ]+)(!|![\w-]*!)([ ]+)(!|!?[\w;/?:@&=+$,.!~*'()\[\]%-]+)" is(
+        by-groups(text, keyword.type, text, keyword.type)) => ignored-line
+
+
+  lex(indentation):
+    -- trailing whitespaces are ignored
+    r"[ ]*$" is(text) -> pop(2)
+
+    -- whitespaces preceding block collection indicators
+    r"[ ]+(?=[?:-](?:[ ]|$))" is(text) => save-indent
+
+    -- block collection indicators
+    r"[?:-](?=[ ]|$)" is(punctuation.indicator) => set-indent
+
+    -- the beginning a block line
+    r"[ ]*" is(text) -> do-all(pop, go-to(save-indent))
+
+
+  lex(block-line):
+    -- the line end
+    r"[ ]*(?=#|$)" is(text) -> pop -- something(Text)
+
+    -- whitespaces separating tokens
+    r"[ ]+" is(text)
+
+    -- tags, anchors and aliases,
+    any-of(descriptors)
+
+    -- block collections and scalars
+    any-of(block-nodes)
+
+    -- flow collections and quoted scalars
+    any-of(flow-nodes)
+
+    -- a plain scalar
+    r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`-]|[?:-]\S)" is(name.variable) => plain-scalar-in-block-context -- something(Name.Variable)
+
+
+  lex(descriptors):
+    -- a full-form tag
+    r"!<[\w;/?:@&=+$,.!~*'()\[\]%-]+>" is(keyword.type)
+
+    -- a tag in the form '!', '!suffix' or '!handle!suffix'
+    r"!(?:[\w-]+)?(?:![\w;/?:@&=+$,.!~*'()\[\]%-]+)?" is(keyword.type)
+
+    -- an anchor
+    r"&[\w-]+" is(name.label)
+
+    -- an alias
+    r"\*[\w-]+" is(name.variable)
+
+
+  lex(block-nodes):
+    -- implicit key
+    r":(?=[ ]|$)" is(punctuation.indicator) => set-implicit-indent
+
+    -- literal and folded scalars
+    r"[|>][+-]?\n(?=([ ]*))" is(punctuation.indicator) => block-scalar-content
+
+    -- literal and folded scalars with explicit indent levels
+    r"[|>][+-]?([0-9]+)\n" is(punctuation.indicator) => block-scalar-content-with-indent
+    r"[|>]([0-9]+)[+-]?\n" is(punctuation.indicator) => block-scalar-content-with-indent
+
+
+  lex(block-scalar-content) [d]:
+    -- line break
+    r"\n" is(text)
+
+    -- indented line
+    r"^([ ]{#{d[1] size}})([^\n]*)" is(by-groups(text, name.constant))
+
+    -- unindented; leave state
+    r"^([ ]{0,#{d[1] size - 1}})(?=[^ ])" is(text) -> pop(2)
+
+
+  lex(block-scalar-content-with-indent) [d]:
+    -- line break
+    r"\n" is(text)
+
+    -- indented line
+    r"^([ ]{#{d[1] to-i}})([^\n]*)" is(by-groups(text, name.constant))
+
+    -- unindented; leave state
+    r"^([ ]{0,#{d[1] to-i - 1}})(?=[^ ])" is(text) -> pop(2)
+
+
+  lex(flow-nodes):
+    -- a flow sequence
+    r"\[" is(punctuation.indicator) => flow-sequence
+
+    -- a flow mapping
+    r"\{" is(punctuation.indicator) => flow-mapping
+
+    -- a single-quoted scalar
+    r"'" is(string) => single-quoted-scalar
+
+    -- a double-quoted scalar
+    r"\"" is(string) => double-quoted-scalar
+
+
+  lex(flow-collection):
+    -- whitespaces
+    r"[ ]+" is(text)
+
+    -- line breaks
+    r"\n+" is(text)
+
+    -- a comment
+    r"#[^\n]*" is(comment.single)
+
+    -- simple indicators
+    r"[?:,]" is(punctuation.indicator)
+
+    -- tags, anchors and aliases
+    any-of(descriptors)
+
+    -- nested collections and quoted scalars
+    any-of(flow-nodes)
+
+    -- a plain scalar
+    r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`])" is(name.variable) => plain-scalar-in-flow-context
+
+
+  lex(flow-sequence):
+    -- include flow collection rules
+    any-of(flow-collection)
+
+    -- the closing indicator
+    r"\]" is(punctuation.indicator) -> pop
+
+
+  lex(flow-mapping):
+    -- include flow collection rules
+    any-of(flow-collection)
+
+    -- the closing indicator
+    r"\}" is(punctuation.indicator) -> pop
+
+
+  lex(quoted-scalar-whitespaces):
+    -- leading and trailing whitespaces are ignored
+    r"^[ ]+" is(text)
+    r"[ ]+$" is(text)
+
+    -- line breaks are ignored
+    r"\n+" is(text)
+
+    -- other whitespaces are a part of the value
+    r"[ ]+" is(name.variable)
+
+
+  lex(single-quoted-scalar):
+    -- include whitespace and line break rules
+    any-of(quoted-scalar-whitespaces)
+
+    -- escaping of the quote character
+    r"\'\'" is(string.escape)
+
+    -- regular non-whitespace characters
+    r"[^\s\']+" is(string)
+
+    -- the closing quote
+    r"\'" is(string) -> pop
+
+
+  lex(double-quoted-scalar):
+    -- include whitespace and line break rules
+    any-of(quoted-scalar-whitespaces)
+
+    -- escaping of special characters
+    r"\\[0abt\tn\nvfre \"\\N_LP]" is(string)
+
+    -- escape codes
+    r"\\(?:x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})" is(string.escape)
+
+    -- regular non-whitespace characters
+    r"[^\s\"\\]+" is(string)
+
+    -- the closing quote
+    r"\"" is(string) -> pop
+
+
+  lex(plain-scalar-in-block-context-new-line):
+    -- empty lines
+    r"^[ ]+$" is(text)
+
+    -- line breaks
+    r"\n+" is(text)
+
+    -- document start and document end indicators
+    r"^(?=---|\.\.\.)" is(name.namespace) -> pop(3)
+
+    -- continuing indentation spaces
+    r"^[ ]{#{@indent}}" is(text) -> pop
+
+    -- unindented; pop out of scalar
+    r"^[ ]{0,#{@indent - 1}}(?=[^ ])" is(text) -> pop(3)
+
+
+  lex(plain-scalar-in-block-context):
+    -- the scalar ends with the ':' indicator
+    r"[ ]*(?=:[ ]|:$)" is(text) -> pop -- something(Text)
+
+    -- the scalar ends with whitespaces followed by a comment
+    r"[ ]+(?=#)" is(text) -> pop
+
+    -- trailing whitespaces are ignored
+    r"[ ]+$" is(text)
+
+    -- line breaks are ignored
+    r"\n+" is(text) => plain-scalar-in-block-context-new-line
+
+    -- other whitespaces are a part of the value
+    r"[ ]+" is(literal.scalar.plain)
+
+    -- regular non-whitespace characters
+    r"(?::(?!\s)|[^\s:])+" is(name.property) --literal.scalar.plain)
+
+
+  lex(plain-scalar-in-flow-context):
+    -- the scalar ends with an indicator character
+    r"[ ]*(?=[,:?\[\]{}])" is(text) -> pop -- something(Text)
+
+    -- the scalar ends with a comment
+    r"[ ]+(?=#)" is(text) -> pop
+
+    -- leading and trailing whitespaces are ignored
+    r"^[ ]+" is(text)
+    r"[ ]+$" is(text)
+
+    -- line breaks are ignored
+    r"\n+" is(text)
+
+    -- other whitespaces are a part of the value
+    r"[ ]+" is(name.variable)
+
+    -- regular non-whitespace characters
+    r"[^\s,:?\[\]{}]+" is(name.variable)
+
+const-set(.Lexer, lexer)
