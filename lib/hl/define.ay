@@ -53,14 +53,11 @@ def(type-from(`(using(~who)))):
 
 def(type-from(x)): raise("unknown match type: " + x inspect)
 
-def(regexp-from(x, regexps)):
-  regexps <<
-    `([x]: Regexp new(
-        x source
-        x options | @info fetch(.flags)
-      ); call(~x))
-
-  `(regexps[~(Atomy Grammar AST Number new(regexps size - 1))])
+def(regexp-from(x)):
+  `([x]: Regexp new(
+      x source
+      x options | @info fetch(.flags)
+    ); call(~x))
 
 def(state-from('pop)): '(State Pop new)
 def(state-from(`(pop(~n)))): `(State PopNum new(~n))
@@ -86,15 +83,13 @@ macro(lex(~name) [~*args]: ~*tokens):
 
   body = []
 
-  regexps = []
-
   tokens each [c]:
     c match:
       -- implicit continue state
       `(~x is(~y)):
         branches <<
           `(Matcher new(
-              ~(regexp-from(x, regexps))
+              ~(regexp-from(x))
               ~(type-from(y))
               State Continue new
             ))
@@ -103,7 +98,7 @@ macro(lex(~name) [~*args]: ~*tokens):
       `(~x is(~y) -> ~z):
         branches <<
           `(Matcher new(
-              ~(regexp-from(x, regexps))
+              ~(regexp-from(x))
               ~(type-from(y))
               ~(state-from(z))
             ))
@@ -112,7 +107,7 @@ macro(lex(~name) [~*args]: ~*tokens):
       `(~x is(~y) => ~z):
         branches <<
           `(Matcher new(
-              ~(regexp-from(x, regexps))
+              ~(regexp-from(x))
               ~(type-from(y))
               State GoTo new(@matchers, .~z)
             ))
@@ -126,6 +121,5 @@ macro(lex(~name) [~*args]: ~*tokens):
 
   body << `([~*branches] flatten)
 
-  `([regexps] {
-      @matchers[.~name] = proc [~*args]: ~*body
-    } call([~*regexps]))
+  `(@matchers[.~name] = proc [~*args]:
+      ~*body)

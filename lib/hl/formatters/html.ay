@@ -13,7 +13,7 @@ formatter = class:
       div(#{ .class: "highlight" }) [d]:
         d pre [p]:
           format-tokens(p)
-      
+
     builder doc children first serialize(#{ .save-with: 0 })
 
   def(format-tokens(to)):
