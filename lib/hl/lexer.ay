@@ -40,7 +40,7 @@ fn(try-all(matchers)):
         break
 
   unless(closest):
-    /error(NoMatchFor new(@input))
+    Self error(NoMatchFor new(@input))
 
   skipped = closest pre-match
   @input = closest post-match
