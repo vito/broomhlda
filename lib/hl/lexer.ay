@@ -55,7 +55,7 @@ fn(try-all(matchers)):
 
   tokens(closest, worked type)
 
-lexer = class:
+class(Lexer):
   def(initialize(input)):
     @input = input dup
 
@@ -95,5 +95,3 @@ lexer = class:
 
     def(flags &x):
       @info[.flags] = x call
-
-const-set(.Lexer, lexer)
