@@ -126,7 +126,7 @@ lexer = lexer:
 
   lex(block-line):
     -- the line end
-    r"[ ]*(?=#|$)" is(text) -> pop -- something(Text)
+    r"[ ]*(?=#|$)" is(text) -> pop
 
     -- whitespaces separating tokens
     r"[ ]+" is(text)
@@ -141,7 +141,7 @@ lexer = lexer:
     any-of(flow-nodes)
 
     -- a plain scalar
-    r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`-]|[?:-]\S)" is(name.variable) => plain-scalar-in-block-context -- something(Name.Variable)
+    r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`-]|[?:-]\S)" is(name.variable) => plain-scalar-in-block-context
 
 
   lex(descriptors):
@@ -307,7 +307,7 @@ lexer = lexer:
 
   lex(plain-scalar-in-block-context):
     -- the scalar ends with the ':' indicator
-    r"[ ]*(?=:[ ]|:$)" is(text) -> pop -- something(Text)
+    r"[ ]*(?=:[ ]|:$)" is(text) -> pop
 
     -- the scalar ends with whitespaces followed by a comment
     r"[ ]+(?=#)" is(text) -> pop
@@ -327,7 +327,7 @@ lexer = lexer:
 
   lex(plain-scalar-in-flow-context):
     -- the scalar ends with an indicator character
-    r"[ ]*(?=[,:?\[\]{}])" is(text) -> pop -- something(Text)
+    r"[ ]*(?=[,:?\[\]{}])" is(text) -> pop
 
     -- the scalar ends with a comment
     r"[ ]+(?=#)" is(text) -> pop
