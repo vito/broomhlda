@@ -131,7 +131,7 @@ lexer = lexer:
     -- whitespaces separating tokens
     r"[ ]+" is(text)
 
-    -- tags, anchors and aliases,
+    -- tags, anchors and aliases
     any-of(descriptors)
 
     -- block collections and scalars
@@ -139,6 +139,9 @@ lexer = lexer:
 
     -- flow collections and quoted scalars
     any-of(flow-nodes)
+
+    -- constant literals (null, bool, numeric)
+    any-of(constants)
 
     -- a plain scalar
     r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`-]|[?:-]\S)" is(name.variable) => plain-scalar-in-block-context
@@ -224,6 +227,9 @@ lexer = lexer:
 
     -- nested collections and quoted scalars
     any-of(flow-nodes)
+
+    -- constant literals (null, bool, numeric)
+    any-of(constants)
 
     -- a plain scalar
     r"(?=[^\s?:,\[\]{}#&*!|>'\"%@`])" is(name.variable) => plain-scalar-in-flow-context
@@ -321,8 +327,6 @@ lexer = lexer:
     -- other whitespaces are a part of the value
     r"[ ]+" is(literal.scalar.plain)
 
-    any-of(constants)
-
     -- regular non-whitespace characters acting as a key
     r"(?::(?!\s)|[^\s:])+(?=:( |$))" is(name.property)
 
@@ -347,8 +351,6 @@ lexer = lexer:
     -- other whitespaces are a part of the value
     r"[ ]+" is(name.variable)
 
-    any-of(constants)
-
     -- regular non-whitespace characters acting as a key
     r"[^\s,:?\[\]{}]+(?=:( |$))" is(name.property)
 
@@ -357,8 +359,38 @@ lexer = lexer:
 
 
   lex(constants):
+    -- null
     r"\b(~|null|Null|NULL)\b" is(keyword.constant)
-    r"\b(y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)\b" is(keyword.constant)
+
+    -- true/false
+    r"\b(yes|Yes|YES|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)\b" is(keyword.constant)
+
+    -- base 60 floats (yes really)
+    r"[\-+]?[0-9][0-9_]*(:[0-5]?[0-9])+\.[0-9_]*" is(literal.number.float)
+
+    -- base 10 floats
+    r"[\-+]?([0-9][0-9_]*)?\.[0-9]+([eE][-+][0-9]+)?" is(literal.number.float)
+
+    -- infinity
+    r"[\-+]?\.(inf|Inf|INF)\b" is(literal.number.float)
+
+    -- not a number
+    r"\.(nan|NaN|NAN)\b" is(literal.number.float)
+
+    -- base 2 integers
+    r"[\-+]?0b[0-1_]+" is(literal.number.integer)
+
+    -- base 60 integers (yes really)
+    r"[\-+]?[1-9][0-9_]*(:[0-5]?[0-9])+" is(literal.number.integer)
+
+    -- base 16 integers
+    r"[\-+]?0x[0-9a-fA-F_]+" is(literal.number.hex)
+
+    -- base 8 integers
+    r"[\-+]?0[0-7_]+" is(literal.number.oct)
+
+    -- base 10 integers
+    r"[\-+]?(0|[1-9][0-9_]*)" is(literal.number.integer)
 
 
 const-set(.Lexer, lexer)
