@@ -366,10 +366,10 @@ lexer = lexer:
     r"\b(yes|Yes|YES|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)\b" is(keyword.constant)
 
     -- base 60 floats (yes really)
-    r"[\-+]?[0-9][0-9_]*(:[0-5]?[0-9])+\.[0-9_]*" is(literal.number.float)
+    r"[\-+]?[0-9][0-9_]*(:[0-5]?[0-9])+\.[0-9_]*(?![.0-9_])" is(literal.number.float)
 
     -- base 10 floats
-    r"[\-+]?([0-9][0-9_]*)?\.[0-9]+([eE][-+][0-9]+)?" is(literal.number.float)
+    r"[\-+]?([0-9][0-9_]*)?\.[0-9]+([eE][-+][0-9]+)?(?![.0-9_])" is(literal.number.float)
 
     -- infinity
     r"[\-+]?\.(inf|Inf|INF)\b" is(literal.number.float)
@@ -378,19 +378,19 @@ lexer = lexer:
     r"\.(nan|NaN|NAN)\b" is(literal.number.float)
 
     -- base 2 integers
-    r"[\-+]?0b[0-1_]+" is(literal.number.integer)
+    r"[\-+]?0b[0-1_]+(?![.0-9_])" is(literal.number.integer)
 
     -- base 60 integers (yes really)
-    r"[\-+]?[1-9][0-9_]*(:[0-5]?[0-9])+" is(literal.number.integer)
+    r"[\-+]?[1-9][0-9_]*(:[0-5]?[0-9])+(?![.0-9_])" is(literal.number.integer)
 
     -- base 16 integers
-    r"[\-+]?0x[0-9a-fA-F_]+" is(literal.number.hex)
+    r"[\-+]?0x[0-9a-fA-F_]+(?![.0-9_])" is(literal.number.hex)
 
     -- base 8 integers
-    r"[\-+]?0[0-7_]+" is(literal.number.oct)
+    r"[\-+]?0[0-7_]+(?![.0-9_])" is(literal.number.oct)
 
     -- base 10 integers
-    r"[\-+]?(0|[1-9][0-9_]*)" is(literal.number.integer)
+    r"[\-+]?(0|[1-9][0-9_]*)(?![.0-9_])" is(literal.number.integer)
 
 
 const-set(.Lexer, lexer)
