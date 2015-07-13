@@ -321,8 +321,13 @@ lexer = lexer:
     -- other whitespaces are a part of the value
     r"[ ]+" is(literal.scalar.plain)
 
+    any-of(constants)
+
+    -- regular non-whitespace characters acting as a key
+    r"(?::(?!\s)|[^\s:])+(?=:( |$))" is(name.property)
+
     -- regular non-whitespace characters
-    r"(?::(?!\s)|[^\s:])+" is(name.property) --literal.scalar.plain)
+    r"(?::(?!\s)|[^\s:])+" is(name.variable)
 
 
   lex(plain-scalar-in-flow-context):
@@ -342,7 +347,18 @@ lexer = lexer:
     -- other whitespaces are a part of the value
     r"[ ]+" is(name.variable)
 
+    any-of(constants)
+
+    -- regular non-whitespace characters acting as a key
+    r"[^\s,:?\[\]{}]+(?=:( |$))" is(name.property)
+
     -- regular non-whitespace characters
     r"[^\s,:?\[\]{}]+" is(name.variable)
+
+
+  lex(constants):
+    r"\b(~|null|Null|NULL)\b" is(keyword.constant)
+    r"\b(y|Y|yes|Yes|YES|n|N|no|No|NO|true|True|TRUE|false|False|FALSE|on|On|ON|off|Off|OFF)\b" is(keyword.constant)
+
 
 const-set(.Lexer, lexer)
