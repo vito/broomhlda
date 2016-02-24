@@ -1,6 +1,8 @@
 use(require("atomy"))
 use(require("hl/define"))
 
+boundary = raw"[\.\-]"
+
 lexer = lexer:
   name: "Bash"
   aliases: ["bash", "sh", "ksh"]
@@ -30,8 +32,8 @@ lexer = lexer:
     any-of(data)
 
   lex(basic):
-    r"\b(if|fi|else|while|do|done|for|then|return|function|case|select|continue|until|esac|elif)\s*\b" is(keyword)
-    r"\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|time|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)\s*\b(?!\.)" is(name.builtin)
+    r"\b(?<!#{boundary})(if|fi|else|while|do|done|for|then|return|function|case|select|continue|until|esac|elif)\s*(?!#{boundary})\b" is(keyword)
+    r"\b(?<!#{boundary})(alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|shopt|source|suspend|test|time|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)\s*(?!#{boundary})\b" is(name.builtin)
     r"\#.*$" is(comment)
     r"\\[\w\W]" is(literal.string.escape)
     r"(\b\w+)(\s*)(=)" is(by-groups(name.variable, text, operator))
