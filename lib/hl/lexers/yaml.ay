@@ -304,11 +304,11 @@ lexer = lexer:
     -- document start and document end indicators
     r"^(?=---|\.\.\.)" is(name.namespace) -> pop(3)
 
-    -- continuing indentation spaces
-    r"^[ ]{#{@indent}}" is(text) -> pop
-
     -- unindented; pop out of scalar
-    r"^[ ]{0,#{@indent - 1}}(?=[^ ])" is(text) -> pop(3)
+    r"^[ ]{0,#{@indent}}(?! )" is(text) -> pop(3)
+
+    -- indentation increased
+    r"^[ ]{#{@indent + 1},}+" is(text) -> pop
 
 
   lex(plain-scalar-in-block-context):
