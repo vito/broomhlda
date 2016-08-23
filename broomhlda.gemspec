@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name     = "broomhlda"
-  s.version  = "0.2.4"
+  s.version  = "0.3.0"
   s.authors  = ["Alex Suraci"]
   s.email    = ["suraci.alex@gmail.com"]
   s.homepage = "https://vito.github.io/atomy"
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = false
 
-  s.add_runtime_dependency "atomy", "~> 0.6.3"
+  s.add_runtime_dependency "atomy", "~> 0.7.0"
 
   s.add_development_dependency "rake", "~> 10.4"
 end
